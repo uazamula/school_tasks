@@ -11,4 +11,7 @@ abstract base class BaseCommand implements Command {
 
   @override
   String get example => 'dart run tool/project_tools.dart $name';
+
+  @override
+  List<String> get options => const [];
 }

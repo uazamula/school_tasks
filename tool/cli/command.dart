@@ -16,6 +16,9 @@ abstract interface class Command {
   /// Приклад запуску.
   String get example;
 
+  /// Опції команди.
+  List<String> get options;
+
   /// Виконання команди.
   Future<void> run(List<String> args);
 }

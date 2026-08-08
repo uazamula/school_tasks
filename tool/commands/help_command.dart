@@ -29,7 +29,7 @@ final class HelpCommand extends BaseCommand {
 
     print('Usage');
     print('');
-    print('  dart run tool/project_tools.dart <command>');
+    print('  dart run tool/project_tools.dart <command> [options]');
     print('');
 
     print('Available commands');
@@ -37,6 +37,16 @@ final class HelpCommand extends BaseCommand {
 
     for (final command in registry.commands) {
       _printCommand(command);
+
+      if (command.options.isNotEmpty) {
+        print('');
+
+        for (final option in command.options) {
+          print('      $option');
+        }
+
+        print('');
+      }
     }
 
     print('');

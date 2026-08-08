@@ -23,6 +23,13 @@ final class TreeCommand extends BaseCommand {
   String get example => 'dart run tool/project_tools.dart tree lib --depth 2';
 
   @override
+  List<String> get options => const [
+    '--dirs        Show directories only',
+    '--files       Show files only',
+    '--depth N     Limit recursion depth',
+  ];
+
+  @override
   Future<void> run(List<String> args) async {
     var path = 'lib';
 
