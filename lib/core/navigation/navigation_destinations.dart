@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:school_tasks/core/extensions/build_context_extension.dart';
+import 'package:school_tasks/core/extensions/context_extension.dart';
 import 'package:school_tasks/core/navigation/navigation_destination_data.dart';
 
 // тут додаються кнопки на панель навігації

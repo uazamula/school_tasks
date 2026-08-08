@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/core/responsive/responsive_extension.dart';
 
-import '../extensions/build_context_extension.dart';
+import '../extensions/context_extension.dart';
 import 'app_navigation.dart';
 import 'app_navigation_controller.dart';
 
@@ -32,7 +33,7 @@ class MainShell extends StatelessWidget {
     );
 
     return Scaffold(
-      body: context.isMobile
+      body: context.useBottomNavigation
           ? navigationShell
           : Row(
         children: [
@@ -43,7 +44,7 @@ class MainShell extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: context.isMobile ? navigation : null,
+      bottomNavigationBar: context.useBottomNavigation ? navigation : null,
     );
   }
 }

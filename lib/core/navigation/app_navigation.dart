@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/core/responsive/responsive_extension.dart';
 
-import '../extensions/build_context_extension.dart';
+import '../extensions/context_extension.dart';
 import 'app_navigation_bar.dart';
 import 'app_navigation_controller.dart';
 import 'app_navigation_rail.dart';
@@ -15,7 +16,7 @@ class AppNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.isMobile) {
+    if (context.useBottomNavigation) {
       return AppNavigationBar(
         controller: controller,
       );

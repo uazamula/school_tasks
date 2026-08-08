@@ -10,6 +10,10 @@
 /// dart run tool/project_tools.dart tree
 /// dart run tool/project_tools.dart tree .
 /// dart run tool/project_tools.dart tree tool
+/// dart run tool/project_tools.dart stats lib
+/// dart run tool/project_tools.dart tree --dirs --depth 2
+/// dart run tool/project_tools.dart tree --files --depth 1
+/// dart run tool/project_tools.dart tree . --files --depth 1
 
 import 'cli/cli.dart';
 import 'cli/command_registry.dart';
