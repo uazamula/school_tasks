@@ -1,5 +1,1 @@
-enum DeviceType {
-  phone,
-  tablet,
-  desktop,
-}
+enum DeviceType { phone, tablet, desktop }

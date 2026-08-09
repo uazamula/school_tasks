@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_navigation_controller.dart';
 
 class AppNavigationBar extends StatelessWidget {
-  const AppNavigationBar({
-    super.key,
-    required this.controller,
-  });
+  const AppNavigationBar({super.key, required this.controller});
 
   final AppNavigationController controller;
 
@@ -18,11 +15,11 @@ class AppNavigationBar extends StatelessWidget {
       destinations: controller.destinations
           .map(
             (destination) => NavigationDestination(
-          icon: Icon(destination.icon),
-          selectedIcon: Icon(destination.selectedIcon),
-          label: destination.labelBuilder(context),
-        ),
-      )
+              icon: Icon(destination.icon),
+              selectedIcon: Icon(destination.selectedIcon),
+              label: destination.labelBuilder(context),
+            ),
+          )
           .toList(),
     );
   }

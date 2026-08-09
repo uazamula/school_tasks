@@ -3,13 +3,7 @@ import 'dart:io';
 import 'project_stats.dart';
 
 final class StatsService {
-  static const _ignored = {
-    '.dart_tool',
-    '.git',
-    '.idea',
-    '.DS_Store',
-    'build',
-  };
+  static const _ignored = {'.dart_tool', '.git', '.idea', '.DS_Store', 'build'};
 
   ProjectStats collect(Directory root) {
     var directories = 0;
@@ -66,8 +60,6 @@ final class StatsService {
   }
 
   String _name(FileSystemEntity entity) {
-    return entity.uri.pathSegments
-        .where((e) => e.isNotEmpty)
-        .last;
+    return entity.uri.pathSegments.where((e) => e.isNotEmpty).last;
   }
 }

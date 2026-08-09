@@ -3,13 +3,7 @@ import 'dart:io';
 import 'tree_options.dart';
 
 final class TreePrinter {
-  static const _ignored = {
-    '.dart_tool',
-    '.git',
-    '.idea',
-    '.DS_Store',
-    'build',
-  };
+  static const _ignored = {'.dart_tool', '.git', '.idea', '.DS_Store', 'build'};
 
   void print(TreeOptions options) {
     stdout.writeln('${_name(options.root)}/');
@@ -22,11 +16,7 @@ final class TreePrinter {
         depth: 0,
       );
     } else {
-      _printFilesOnly(
-        directory: options.root,
-        options: options,
-        depth: 0,
-      );
+      _printFilesOnly(directory: options.root, options: options, depth: 0);
     }
   }
 
@@ -104,18 +94,11 @@ final class TreePrinter {
       }
 
       if (entity is File) {
-        stdout.writeln(_relativePath(
-          options.root.path,
-          entity.path,
-        ));
+        stdout.writeln(_relativePath(options.root.path, entity.path));
       }
 
       if (entity is Directory) {
-        _printFilesOnly(
-          directory: entity,
-          options: options,
-          depth: depth + 1,
-        );
+        _printFilesOnly(directory: entity, options: options, depth: depth + 1);
       }
     }
   }
@@ -131,15 +114,10 @@ final class TreePrinter {
   }
 
   String _name(FileSystemEntity entity) {
-    return entity.uri.pathSegments
-        .where((e) => e.isNotEmpty)
-        .last;
+    return entity.uri.pathSegments.where((e) => e.isNotEmpty).last;
   }
 
-  String _relativePath(
-      String root,
-      String path,
-      ) {
+  String _relativePath(String root, String path) {
     final normalizedRoot = root.endsWith(Platform.pathSeparator)
         ? root
         : '$root${Platform.pathSeparator}';

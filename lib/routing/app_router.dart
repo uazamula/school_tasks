@@ -17,9 +17,7 @@ final GoRouter appRouter = GoRouter(
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return MainShell(
-          navigationShell: navigationShell,
-        );
+        return MainShell(navigationShell: navigationShell);
       },
       branches: [
         StatefulShellBranch(

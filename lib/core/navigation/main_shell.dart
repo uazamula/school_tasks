@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/responsive/responsive_extension.dart';
 
-import '../extensions/context_extension.dart';
 import 'app_navigation.dart';
 import 'app_navigation_controller.dart';
 
 class MainShell extends StatelessWidget {
-  const MainShell({
-    super.key,
-    required this.navigationShell,
-  });
+  const MainShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
@@ -28,22 +24,18 @@ class MainShell extends StatelessWidget {
       onDestinationSelected: _onDestinationSelected,
     );
 
-    final navigation = AppNavigation(
-      controller: controller,
-    );
+    final navigation = AppNavigation(controller: controller);
 
     return Scaffold(
       body: context.useBottomNavigation
           ? navigationShell
           : Row(
-        children: [
-          navigation,
-          const VerticalDivider(width: 1),
-          Expanded(
-            child: navigationShell,
-          ),
-        ],
-      ),
+              children: [
+                navigation,
+                const VerticalDivider(width: 1),
+                Expanded(child: navigationShell),
+              ],
+            ),
       bottomNavigationBar: context.useBottomNavigation ? navigation : null,
     );
   }

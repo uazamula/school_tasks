@@ -65,7 +65,7 @@ final class HelpCommand extends BaseCommand {
 
     print(
       '  ${command.name.padRight(10)} '
-          '${command.description}$aliases',
+      '${command.description}$aliases',
     );
   }
 }

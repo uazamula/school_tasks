@@ -27,13 +27,9 @@ class CommandRegistry {
   Iterable<Command> get commands {
     final uniqueFactories = _factories.values.toSet();
 
-    final commands = uniqueFactories
-        .map((factory) => factory())
-        .toList();
+    final commands = uniqueFactories.map((factory) => factory()).toList();
 
-    commands.sort(
-          (a, b) => a.name.compareTo(b.name),
-    );
+    commands.sort((a, b) => a.name.compareTo(b.name));
 
     return commands;
   }

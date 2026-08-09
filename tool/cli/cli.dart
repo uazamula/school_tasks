@@ -26,8 +26,6 @@ class Cli {
       return;
     }
 
-    await command.run(
-      args.skip(1).toList(),
-    );
+    await command.run(args.skip(1).toList());
   }
 }

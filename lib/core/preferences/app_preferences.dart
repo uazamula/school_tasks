@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'preference_keys.dart';
+
+class AppPreferences {
+  AppPreferences(this._prefs);
+
+  final SharedPreferences _prefs;
+
+  ThemeMode getThemeMode() {
+    final value = _prefs.getString(PreferenceKeys.themeMode);
+
+    switch (value) {
+      case 'light':
+        return ThemeMode.light;
+
+      case 'dark':
+        return ThemeMode.dark;
+
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  Future<bool> setThemeMode(ThemeMode mode) {
+    return _prefs.setString(PreferenceKeys.themeMode, switch (mode) {
+      ThemeMode.light => 'light',
+      ThemeMode.dark => 'dark',
+      ThemeMode.system => 'system',
+    });
+  }
+
+  Locale getLocale() {
+    final languageCode = _prefs.getString(PreferenceKeys.languageCode);
+
+    if (languageCode == null) {
+      return const Locale('uk');
+    }
+
+    return Locale(languageCode);
+  }
+
+  Future<bool> setLocale(Locale locale) {
+    return _prefs.setString(PreferenceKeys.languageCode, locale.languageCode);
+  }
+}
