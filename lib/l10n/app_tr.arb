@@ -1,5 +1,14 @@
 {
   "appName": "Okul Görevleri",
   "home": "Ana Sayfa",
-  "settings": "Ayarlar"
+  "settings": "Ayarlar",
+  "appearance": "Görünüm",
+  "theme": "Tema",
+  "language": "Dil",
+  "system": "Sistem",
+  "light": "Açık",
+  "dark": "Koyu",
+  "ukrainian": "Українська",
+  "english": "English",
+  "turkish": "Türkçe"
 }

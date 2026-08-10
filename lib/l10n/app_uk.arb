@@ -1,6 +1,14 @@
 {
   "appName": "Шкільні завдання",
   "home": "Головна",
-  "settings": "Налаштування"
-
+  "settings": "Налаштування",
+  "appearance": "Вигляд",
+  "theme": "Тема",
+  "language": "Мова",
+  "system": "Системна",
+  "light": "Світла",
+  "dark": "Темна",
+  "ukrainian": "Українська",
+  "english": "English",
+  "turkish": "Türkçe"
 }

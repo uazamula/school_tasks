@@ -1,6 +1,14 @@
 {
   "appName": "School Tasks",
   "home": "Home",
-  "settings": "Settings"
-
+  "settings": "Settings",
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "language": "Language",
+  "system": "System",
+  "light": "Light",
+  "dark": "Dark",
+  "ukrainian": "Українська",
+  "english": "English",
+  "turkish": "Türkçe"
 }

@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_preferences.dart';
-// dart run build_runner build - у терміналі
+// dart run build_runner build - у терміналі і комітимо (лежить в unversioned)
 part 'preferences_provider.g.dart';
 
 @Riverpod(keepAlive: true)
