@@ -12,5 +12,8 @@
   "english": "English",
   "turkish": "Türkçe",
   "profile": "Profile",
-  "defaultUserName": "User"
+  "defaultUserName": "User",
+  "editName": "Edit name",
+  "cancel": "Cancel",
+  "save": "Save"
 }

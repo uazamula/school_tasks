@@ -49,4 +49,13 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get defaultUserName => 'Користувач';
+
+  @override
+  String get editName => 'Змінити ім’я';
+
+  @override
+  String get cancel => 'Скасувати';
+
+  @override
+  String get save => 'Зберегти';
 }

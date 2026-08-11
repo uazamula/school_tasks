@@ -21,4 +21,12 @@ class ProfileController extends _$ProfileController {
 
     state = AsyncData(profile);
   }
+
+  Future<void> setName(String name) async {
+    final profile = state.value;
+
+    if (profile == null) return;
+
+    await saveProfile(profile.copyWith(name: name.trim()));
+  }
 }

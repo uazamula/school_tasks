@@ -12,5 +12,8 @@
   "english": "English",
   "turkish": "Türkçe",
   "profile": "Профіль",
-  "defaultUserName": "Користувач"
+  "defaultUserName": "Користувач",
+  "editName": "Змінити ім’я",
+  "cancel": "Скасувати",
+  "save": "Зберегти"
 }

@@ -49,4 +49,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get defaultUserName => 'Kullanıcı';
+
+  @override
+  String get editName => 'Adı değiştir';
+
+  @override
+  String get cancel => 'İptal';
+
+  @override
+  String get save => 'Kaydet';
 }

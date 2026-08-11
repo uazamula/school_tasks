@@ -12,5 +12,8 @@
   "english": "English",
   "turkish": "Türkçe",
   "profile": "Profil",
-  "defaultUserName": "Kullanıcı"
+  "defaultUserName": "Kullanıcı",
+  "editName": "Adı değiştir",
+  "cancel": "İptal",
+  "save": "Kaydet"
 }

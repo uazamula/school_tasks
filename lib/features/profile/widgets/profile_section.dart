@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/extensions/context_extension.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/profile/providers/profile_controller.dart';
+import 'package:school_tasks/features/profile/widgets/edit_name_button.dart';
 import 'package:school_tasks/features/profile/widgets/profile_avatar.dart';
 
 class ProfileSection extends ConsumerWidget {
@@ -17,21 +18,30 @@ class ProfileSection extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) => ListTile(title: Text(error.toString())),
       data: (profile) {
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProfileAvatar(avatar: profile.avatar),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ProfileAvatar(avatar: profile.avatar),
 
-            const SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.md),
 
-            Expanded(
-              child: Text(
-                profile.name.isEmpty
-                    ? context.l10n.defaultUserName
-                    : profile.name,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
+                Expanded(
+                  child: Text(
+                    profile.name.isEmpty
+                        ? context.l10n.defaultUserName
+                        : profile.name,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+              ],
             ),
+
+            const SizedBox(height: AppSpacing.md),
+
+            const EditNameButton(),
           ],
         );
       },
