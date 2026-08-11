@@ -201,6 +201,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
+
+  /// No description provided for @editAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Change avatar'**
+  String get editAvatar;
 }
 
 class _AppLocalizationsDelegate

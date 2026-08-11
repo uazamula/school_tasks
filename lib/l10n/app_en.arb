@@ -15,5 +15,6 @@
   "defaultUserName": "User",
   "editName": "Edit name",
   "cancel": "Cancel",
-  "save": "Save"
+  "save": "Save",
+  "editAvatar": "Change avatar"
 }

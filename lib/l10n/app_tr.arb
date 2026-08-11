@@ -15,5 +15,6 @@
   "defaultUserName": "Kullanıcı",
   "editName": "Adı değiştir",
   "cancel": "İptal",
-  "save": "Kaydet"
+  "save": "Kaydet",
+  "editAvatar": "Avatarı değiştir"
 }

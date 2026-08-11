@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'avatar_picker_dialog.dart';
+
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({super.key, required this.avatar});
 
@@ -7,9 +9,21 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 36,
-      child: Text(avatar, style: const TextStyle(fontSize: 36)),
+    return Tooltip(
+      message: 'Виберіть аватар',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(36),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (_) => const AvatarPickerDialog(),
+          );
+        },
+        child: CircleAvatar(
+          radius: 36,
+          child: Text(avatar, style: const TextStyle(fontSize: 36)),
+        ),
+      ),
     );
   }
 }

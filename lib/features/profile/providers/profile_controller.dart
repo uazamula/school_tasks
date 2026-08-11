@@ -29,4 +29,12 @@ class ProfileController extends _$ProfileController {
 
     await saveProfile(profile.copyWith(name: name.trim()));
   }
+
+  Future<void> setAvatar(String avatar) async {
+    final profile = state.value;
+
+    if (profile == null) return;
+
+    await saveProfile(profile.copyWith(avatar: avatar));
+  }
 }

@@ -58,4 +58,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get save => 'Зберегти';
+
+  @override
+  String get editAvatar => 'Змінити аватар';
 }

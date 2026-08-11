@@ -58,4 +58,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get save => 'Kaydet';
+
+  @override
+  String get editAvatar => 'Avatarı değiştir';
 }
