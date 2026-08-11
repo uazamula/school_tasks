@@ -12,6 +12,11 @@ abstract final class AppNavigationDestinations {
       labelBuilder: (context) => context.l10n.home,
     ),
     NavigationDestinationData(
+      icon: Icons.account_circle_outlined,
+      selectedIcon: Icons.account_circle,
+      labelBuilder: (context) => context.l10n.profile,
+    ),
+    NavigationDestinationData(
       icon: Icons.settings_outlined,
       selectedIcon: Icons.settings,
       labelBuilder: (context) => context.l10n.settings,

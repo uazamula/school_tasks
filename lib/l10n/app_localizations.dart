@@ -171,6 +171,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Türkçe'**
   String get turkish;
+
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @defaultUserName.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get defaultUserName;
 }
 
 class _AppLocalizationsDelegate

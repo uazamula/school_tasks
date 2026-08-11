@@ -10,5 +10,7 @@
   "dark": "Koyu",
   "ukrainian": "Українська",
   "english": "English",
-  "turkish": "Türkçe"
+  "turkish": "Türkçe",
+  "profile": "Profil",
+  "defaultUserName": "Kullanıcı"
 }

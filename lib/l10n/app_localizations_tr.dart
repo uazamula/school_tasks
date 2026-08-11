@@ -43,4 +43,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get turkish => 'Türkçe';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get defaultUserName => 'Kullanıcı';
 }

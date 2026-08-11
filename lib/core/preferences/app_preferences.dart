@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
+import 'package:school_tasks/features/profile/model/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'preference_keys.dart';
@@ -44,5 +45,26 @@ class AppPreferences {
 
   Future<bool> setLocale(Locale locale) {
     return _prefs.setString(PreferenceKeys.languageCode, locale.languageCode);
+  }
+
+  UserProfile getUserProfile() {
+    return UserProfile(
+      name: _prefs.getString(PreferenceKeys.profileName) ?? 'Користувач',
+      avatar: _prefs.getString(PreferenceKeys.profileAvatar) ?? '🙂',
+    );
+  }
+
+  Future<bool> setUserProfile(UserProfile profile) async {
+    final nameSaved = await _prefs.setString(
+      PreferenceKeys.profileName,
+      profile.name,
+    );
+
+    final avatarSaved = await _prefs.setString(
+      PreferenceKeys.profileAvatar,
+      profile.avatar,
+    );
+
+    return nameSaved && avatarSaved;
   }
 }
