@@ -16,5 +16,12 @@
   "editName": "Adı değiştir",
   "cancel": "İptal",
   "save": "Kaydet",
-  "editAvatar": "Avatarı değiştir"
+  "editAvatar": "Avatarı değiştir",
+  "statistics": "İstatistikler",
+  "usageTime": "Kullanım süresi",
+  "notAvailable": "—",
+  "hoursShort": "sa",
+  "minutesShort": "dk",
+  "todayUsageTime": "Bugün",
+  "totalUsageTime": "Toplam"
 }

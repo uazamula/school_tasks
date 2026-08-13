@@ -61,4 +61,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editAvatar => 'Change avatar';
+
+  @override
+  String get statistics => 'Statistics';
+
+  @override
+  String get usageTime => 'Usage time';
+
+  @override
+  String get notAvailable => '—';
+
+  @override
+  String get hoursShort => 'h';
+
+  @override
+  String get minutesShort => 'm';
+
+  @override
+  String get todayUsageTime => 'Today';
+
+  @override
+  String get totalUsageTime => 'Total';
 }

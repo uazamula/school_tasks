@@ -16,5 +16,12 @@
   "editName": "Edit name",
   "cancel": "Cancel",
   "save": "Save",
-  "editAvatar": "Change avatar"
+  "editAvatar": "Change avatar",
+  "statistics": "Statistics",
+  "usageTime": "Usage time",
+  "notAvailable": "—",
+  "hoursShort": "h",
+  "minutesShort": "m",
+  "todayUsageTime": "Today",
+  "totalUsageTime": "Total"
 }

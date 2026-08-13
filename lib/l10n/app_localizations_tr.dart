@@ -61,4 +61,25 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get editAvatar => 'Avatarı değiştir';
+
+  @override
+  String get statistics => 'İstatistikler';
+
+  @override
+  String get usageTime => 'Kullanım süresi';
+
+  @override
+  String get notAvailable => '—';
+
+  @override
+  String get hoursShort => 'sa';
+
+  @override
+  String get minutesShort => 'dk';
+
+  @override
+  String get todayUsageTime => 'Bugün';
+
+  @override
+  String get totalUsageTime => 'Toplam';
 }

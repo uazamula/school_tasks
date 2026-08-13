@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/l10n/app_localizations.dart';
 
 import 'core/localization/locale_controller.dart';
+import 'core/statistics/usage_statistics_service_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'routing/app_router.dart';
@@ -12,6 +13,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(usageStatisticsServiceProvider);
     final themeMode = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
 

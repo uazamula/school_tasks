@@ -4,6 +4,7 @@ import 'package:school_tasks/core/extensions/context_extension.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/profile/widgets/profile_section.dart';
+import 'package:school_tasks/features/profile/widgets/statistics_section.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -20,6 +21,10 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
 
           const ProfileSection(),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          const StatisticsSection(),
         ],
       ),
     );

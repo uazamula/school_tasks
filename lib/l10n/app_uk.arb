@@ -16,5 +16,12 @@
   "editName": "Змінити ім’я",
   "cancel": "Скасувати",
   "save": "Зберегти",
-  "editAvatar": "Змінити аватар"
+  "editAvatar": "Змінити аватар",
+  "statistics": "Статистика",
+  "usageTime": "Час використання",
+  "notAvailable": "—",
+  "hoursShort": "год",
+  "minutesShort": "хв",
+  "todayUsageTime": "Час сьогодні",
+  "totalUsageTime": "Загальний час"
 }

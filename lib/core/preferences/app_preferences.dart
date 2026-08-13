@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/core/model/usage_statistics.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
 import 'package:school_tasks/features/profile/model/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,5 +67,69 @@ class AppPreferences {
     );
 
     return nameSaved && avatarSaved;
+  }
+
+  /// Повертає накопичену статистику використання.
+  ///
+  /// Містить:
+  /// - загальний час використання застосунку;
+  /// - час використання за поточний день.
+  UsageStatistics getUsageStatistics() {
+    return UsageStatistics(
+      totalUsage: Duration(
+        seconds: _prefs.getInt(PreferenceKeys.usageTotalSeconds) ?? 0,
+      ),
+      todayUsage: Duration(
+        seconds: _prefs.getInt(PreferenceKeys.usageTodaySeconds) ?? 0,
+      ),
+    );
+  }
+
+  Future<void> setUsageStatistics(
+    UsageStatistics statistics,
+    DateTime todayDate,
+  ) async {
+    await _prefs.setInt(
+      PreferenceKeys.usageTotalSeconds,
+      statistics.totalUsage.inSeconds,
+    );
+
+    await _prefs.setInt(
+      PreferenceKeys.usageTodaySeconds,
+      statistics.todayUsage.inSeconds,
+    );
+
+    await _prefs.setString(
+      PreferenceKeys.usageDate,
+      todayDate.toIso8601String(),
+    );
+  }
+
+  /// Повертає дату, до якої належить збережена денна статистика використання.
+  ///
+  /// Якщо дата ще не була збережена або її не вдалося розпізнати,
+  /// повертає `null`.
+  DateTime? getUsageDate() {
+    final value = _prefs.getString(PreferenceKeys.usageDate);
+
+    if (value == null) {
+      return null;
+    }
+
+    return DateTime.tryParse(value);
+  }
+
+  /// Повертає дату, до якої належить значення `todayUsage`.
+  ///
+  /// Використовується для визначення, чи потрібно
+  /// скидати денну статистику.
+  DateTime? getUsageTodayDate() {
+    final value = _prefs.getString(PreferenceKeys.usageDate);
+
+    if (value == null) {
+      return null;
+    }
+
+    return DateTime.tryParse(value);
   }
 }

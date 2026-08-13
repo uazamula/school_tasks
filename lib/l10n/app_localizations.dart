@@ -207,6 +207,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change avatar'**
   String get editAvatar;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// No description provided for @usageTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage time'**
+  String get usageTime;
+
+  /// No description provided for @notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get notAvailable;
+
+  /// No description provided for @hoursShort.
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get hoursShort;
+
+  /// No description provided for @minutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'m'**
+  String get minutesShort;
+
+  /// No description provided for @todayUsageTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get todayUsageTime;
+
+  /// No description provided for @totalUsageTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get totalUsageTime;
 }
 
 class _AppLocalizationsDelegate

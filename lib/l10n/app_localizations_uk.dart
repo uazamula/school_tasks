@@ -61,4 +61,25 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get editAvatar => 'Змінити аватар';
+
+  @override
+  String get statistics => 'Статистика';
+
+  @override
+  String get usageTime => 'Час використання';
+
+  @override
+  String get notAvailable => '—';
+
+  @override
+  String get hoursShort => 'год';
+
+  @override
+  String get minutesShort => 'хв';
+
+  @override
+  String get todayUsageTime => 'Час сьогодні';
+
+  @override
+  String get totalUsageTime => 'Загальний час';
 }
