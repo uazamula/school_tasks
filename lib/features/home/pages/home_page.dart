@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
+import 'package:school_tasks/features/learning/presentation/dialogs/topic_dialog.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_node_widget.dart';
 
 import '../../../core/widgets/app_scaffold.dart';
@@ -15,9 +16,12 @@ class HomePage extends StatelessWidget {
           return LearningNodeWidget(
             node: node,
             onTopicPressed: (topic) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(topic.titleKey)));
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return TopicDialog(topic: topic);
+                },
+              );
             },
           );
         }).toList(),

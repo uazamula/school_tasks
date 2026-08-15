@@ -4,6 +4,7 @@ import 'package:school_tasks/features/profile/pages/profile_page.dart';
 
 import '../core/navigation/main_shell.dart';
 import '../features/home/pages/home_page.dart';
+import '../features/learning/presentation/pages/learning_page.dart';
 import '../features/settings/pages/settings_page.dart';
 import 'app_routes.dart';
 
@@ -50,6 +51,15 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+
+    GoRoute(
+      path: AppRoutes.learning,
+      builder: (context, state) {
+        final topicId = state.pathParameters['topicId']!;
+
+        return LearningPage(topicId: topicId);
+      },
     ),
   ],
 );
