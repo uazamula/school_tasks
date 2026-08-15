@@ -1,3 +1,6 @@
+import 'task_answer_state.dart';
+import 'task_result.dart';
+
 class LearningTask {
   const LearningTask({
     required this.firstNumber,
@@ -11,5 +14,13 @@ class LearningTask {
   final int correctAnswer;
   final List<int> answers;
 
-  bool isCorrect(int answer) => answer == correctAnswer;
+  TaskResult<int> checkAnswer(int answer) {
+    return TaskResult<int>(
+      state: answer == correctAnswer
+          ? TaskAnswerState.correct
+          : TaskAnswerState.incorrect,
+      selectedAnswer: answer,
+      correctAnswer: correctAnswer,
+    );
+  }
 }

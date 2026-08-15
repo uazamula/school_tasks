@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:school_tasks/core/theme/app_spacing.dart';
-import 'package:school_tasks/features/learning/domain/learning_task.dart';
-import 'package:school_tasks/features/learning/domain/learning_task_generator.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/choice_task_widget.dart';
+import 'package:school_tasks/core/widgets/app_scaffold.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/widgets/app_scaffold.dart';
+import '../../domain/learning_task.dart';
+import '../../domain/learning_task_generator.dart';
+import '../../domain/task_result.dart';
+import '../widgets/choice_task_widget.dart';
 
 class LearningPage extends StatefulWidget {
   const LearningPage({super.key, required this.topicId});
@@ -20,7 +21,7 @@ class _LearningPageState extends State<LearningPage> {
   late final LearningTask _task;
   final LearningTaskGenerator _generator = LearningTaskGenerator();
 
-  int? _selectedAnswer;
+  TaskResult<int>? _result;
 
   @override
   void initState() {
@@ -31,23 +32,35 @@ class _LearningPageState extends State<LearningPage> {
 
   @override
   Widget build(BuildContext context) {
+    final result = _result;
+    final isAnswered = result?.isAnswered ?? false;
+
     return AppScaffold(
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ChoiceTaskWidget(task: _task, onAnswerSelected: _onAnswerSelected),
+            ChoiceTaskWidget(
+              task: _task,
+              result: result,
+              onAnswerSelected: _onAnswerSelected,
+            ),
 
-            if (_selectedAnswer != null)
-              Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.lg),
-                child: Text(
-                  _task.isCorrect(_selectedAnswer!)
-                      ? 'Правильно!'
-                      : 'Неправильно!',
-                  style: AppTextStyles.title,
-                ),
+            if (isAnswered) ...[
+              const SizedBox(height: AppSpacing.lg),
+
+              Text(
+                result!.isCorrect ? 'Правильно!' : 'Неправильно!',
+                style: AppTextStyles.title,
               ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              FilledButton(
+                onPressed: _finishTask,
+                child: const Text('Завершити'),
+              ),
+            ],
           ],
         ),
       ),
@@ -56,7 +69,11 @@ class _LearningPageState extends State<LearningPage> {
 
   void _onAnswerSelected(int answer) {
     setState(() {
-      _selectedAnswer = answer;
+      _result = _task.checkAnswer(answer);
     });
+  }
+
+  void _finishTask() {
+    Navigator.of(context).pop();
   }
 }

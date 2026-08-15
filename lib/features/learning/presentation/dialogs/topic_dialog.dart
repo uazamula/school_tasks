@@ -21,7 +21,8 @@ class TopicDialog extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
 
-            context.go(AppRoutes.learningFor(topic.id));
+            //context.go(AppRoutes.learningFor(topic.id));
+            context.push(AppRoutes.learningFor(topic.id));
           },
           child: const Text('Почати'),
         ),
