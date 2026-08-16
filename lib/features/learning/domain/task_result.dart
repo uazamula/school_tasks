@@ -11,7 +11,7 @@ class TaskResult<TAnswer> {
   final TAnswer? selectedAnswer;
   final TAnswer? correctAnswer;
 
-  bool get isAnswered => state != TaskAnswerState.unanswered;
+  bool get isAnswered => state != TaskAnswerState.neutral;
 
   bool get isCorrect => state == TaskAnswerState.correct;
 

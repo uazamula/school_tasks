@@ -1,1 +1,1 @@
-enum TaskAnswerState { unanswered, correct, incorrect }
+enum TaskAnswerState { neutral, correct, incorrect }

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/learning_task.dart';
+import '../../domain/task_answer_state.dart';
 import '../../domain/task_result.dart';
+import 'choice_answer_button.dart';
 
 class ChoiceTaskWidget extends StatelessWidget {
   const ChoiceTaskWidget({
@@ -28,22 +30,34 @@ class ChoiceTaskWidget extends StatelessWidget {
           '${task.firstNumber} + ${task.secondNumber} = ?',
           style: AppTextStyles.headline,
         ),
-
         const SizedBox(height: AppSpacing.xl),
-
         ...task.answers.map(
           (answer) => Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: SizedBox(
-              width: 200,
-              child: FilledButton(
-                onPressed: isAnswered ? null : () => onAnswerSelected(answer),
-                child: Text('$answer', style: AppTextStyles.title),
-              ),
+            child: ChoiceAnswerButton(
+              answer: answer,
+              state: _getAnswerState(answer),
+              onPressed: isAnswered ? null : () => onAnswerSelected(answer),
             ),
           ),
         ),
       ],
     );
+  }
+
+  TaskAnswerState _getAnswerState(int answer) {
+    if (result == null) {
+      return TaskAnswerState.neutral;
+    }
+
+    if (answer == result!.correctAnswer) {
+      return TaskAnswerState.correct;
+    }
+
+    if (answer == result!.selectedAnswer) {
+      return TaskAnswerState.incorrect;
+    }
+
+    return TaskAnswerState.neutral;
   }
 }
