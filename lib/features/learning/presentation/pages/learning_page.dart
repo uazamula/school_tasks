@@ -3,13 +3,16 @@ import 'package:school_tasks/core/widgets/app_scaffold.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../domain/learning_task.dart';
+import '../../domain/attempt_task.dart';
 import '../../domain/learning_task_generator.dart';
-import '../../domain/task_result.dart';
+import '../../domain/topic_attempt.dart';
 import '../widgets/choice_task_widget.dart';
 
 class LearningPage extends StatefulWidget {
-  const LearningPage({super.key, required this.topicId});
+  const LearningPage({
+    super.key,
+    required this.topicId,
+  });
 
   final String topicId;
 
@@ -18,47 +21,56 @@ class LearningPage extends StatefulWidget {
 }
 
 class _LearningPageState extends State<LearningPage> {
-  late final LearningTask _task;
-  final LearningTaskGenerator _generator = LearningTaskGenerator();
+  late final TopicAttempt _attempt;
 
-  TaskResult<int>? _result;
+  final LearningTaskGenerator _generator = LearningTaskGenerator();
 
   @override
   void initState() {
     super.initState();
 
-    _task = _generator.generateAdditionWithin10();
+    _attempt = _createAttempt();
   }
 
   @override
   Widget build(BuildContext context) {
-    final result = _result;
-    final isAnswered = result?.isAnswered ?? false;
+    final currentTask = _attempt.currentTask;
+    final result = currentTask.result;
 
     return AppScaffold(
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Text(
+              'Завдання ${_attempt.currentTaskIndex + 1} '
+                  'з ${_attempt.tasks.length}',
+              style: AppTextStyles.body,
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
             ChoiceTaskWidget(
-              task: _task,
+              task: currentTask.task,
               result: result,
               onAnswerSelected: _onAnswerSelected,
             ),
 
-            if (isAnswered) ...[
+            if (result != null) ...[
               const SizedBox(height: AppSpacing.lg),
 
               Text(
-                result!.isCorrect ? 'Правильно!' : 'Неправильно!',
+                result.isCorrect ? 'Правильно!' : 'Неправильно!',
                 style: AppTextStyles.title,
               ),
 
               const SizedBox(height: AppSpacing.lg),
 
               FilledButton(
-                onPressed: _finishTask,
-                child: const Text('Завершити'),
+                onPressed: _finishCurrentTask,
+                child: Text(
+                  _attempt.isFinished ? 'Завершити тему' : 'Наступне',
+                ),
               ),
             ],
           ],
@@ -67,13 +79,52 @@ class _LearningPageState extends State<LearningPage> {
     );
   }
 
+  TopicAttempt _createAttempt() {
+    return TopicAttempt(
+      tasks: [
+        AttemptTask(
+          task: _generator.generateAdditionWithin10(),
+        ),
+        AttemptTask(
+          task: _generator.generateAdditionWithin10(),
+        ),
+        AttemptTask(
+          task: _generator.generateAdditionWithin10(),
+        ),
+      ],
+    );
+  }
+
   void _onAnswerSelected(int answer) {
+    final currentTask = _attempt.currentTask;
+
+    if (currentTask.isAnswered) {
+      return;
+    }
+
     setState(() {
-      _result = _task.checkAnswer(answer);
+      _attempt.recordResult(
+        currentTask.task.checkAnswer(answer),
+      );
     });
   }
 
-  void _finishTask() {
+  void _finishCurrentTask() {
+    if (!_attempt.isFinished) {
+      setState(() {
+        _attempt.moveToNextTask();
+      });
+
+      return;
+    }
+
+    final result = _attempt.getResult();
+
+    debugPrint(
+      'Topic result: '
+          '${result.correctTasks}/${result.totalTasks}',
+    );
+
     Navigator.of(context).pop();
   }
 }
