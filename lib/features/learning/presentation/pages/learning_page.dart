@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 
 import '../../../../core/theme/app_spacing.dart';
@@ -9,10 +10,7 @@ import '../../domain/topic_attempt.dart';
 import '../widgets/choice_task_widget.dart';
 
 class LearningPage extends StatefulWidget {
-  const LearningPage({
-    super.key,
-    required this.topicId,
-  });
+  const LearningPage({super.key, required this.topicId});
 
   final String topicId;
 
@@ -44,7 +42,7 @@ class _LearningPageState extends State<LearningPage> {
           children: [
             Text(
               'Завдання ${_attempt.currentTaskIndex + 1} '
-                  'з ${_attempt.tasks.length}',
+              'з ${_attempt.tasks.length}',
               style: AppTextStyles.body,
             ),
 
@@ -82,15 +80,9 @@ class _LearningPageState extends State<LearningPage> {
   TopicAttempt _createAttempt() {
     return TopicAttempt(
       tasks: [
-        AttemptTask(
-          task: _generator.generateAdditionWithin10(),
-        ),
-        AttemptTask(
-          task: _generator.generateAdditionWithin10(),
-        ),
-        AttemptTask(
-          task: _generator.generateAdditionWithin10(),
-        ),
+        AttemptTask(task: _generator.generateAdditionWithin10()),
+        AttemptTask(task: _generator.generateAdditionWithin10()),
+        AttemptTask(task: _generator.generateAdditionWithin10()),
       ],
     );
   }
@@ -103,9 +95,7 @@ class _LearningPageState extends State<LearningPage> {
     }
 
     setState(() {
-      _attempt.recordResult(
-        currentTask.task.checkAnswer(answer),
-      );
+      _attempt.recordResult(currentTask.task.checkAnswer(answer));
     });
   }
 
@@ -120,11 +110,6 @@ class _LearningPageState extends State<LearningPage> {
 
     final result = _attempt.getResult();
 
-    debugPrint(
-      'Topic result: '
-          '${result.correctTasks}/${result.totalTasks}',
-    );
-
-    Navigator.of(context).pop();
+    context.pop(result);
   }
 }

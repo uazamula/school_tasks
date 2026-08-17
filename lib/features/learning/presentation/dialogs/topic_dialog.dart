@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../routing/app_routes.dart';
@@ -18,11 +19,14 @@ class TopicDialog extends StatelessWidget {
       actionsAlignment: MainAxisAlignment.center,
       actions: [
         FilledButton(
-          onPressed: () {
-            Navigator.pop(context);
+          onPressed: () async {
+            final result = await context.push<TopicAttemptResult>(
+              AppRoutes.learningFor(topic.id),
+            );
 
-            //context.go(AppRoutes.learningFor(topic.id));
-            context.push(AppRoutes.learningFor(topic.id));
+            if (context.mounted) {
+              Navigator.pop(context, result);
+            }
           },
           child: const Text('Почати'),
         ),
