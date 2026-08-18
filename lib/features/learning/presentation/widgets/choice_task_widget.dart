@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/choice_task.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../domain/learning_task.dart';
 import '../../domain/task_answer_state.dart';
 import '../../domain/task_result.dart';
 import 'choice_answer_button.dart';
@@ -15,7 +15,7 @@ class ChoiceTaskWidget extends StatelessWidget {
     this.result,
   });
 
-  final LearningTask task;
+  final ChoiceTask task;
   final ValueChanged<int> onAnswerSelected;
   final TaskResult<int>? result;
 
@@ -26,10 +26,7 @@ class ChoiceTaskWidget extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          '${task.firstNumber} + ${task.secondNumber} = ?',
-          style: AppTextStyles.headline,
-        ),
+        Text(task.condition, style: AppTextStyles.headline),
         const SizedBox(height: AppSpacing.xl),
         ...task.answers.map(
           (answer) => Padding(

@@ -1,13 +1,12 @@
 import 'dart:math';
-
-import 'learning_task.dart';
+import 'package:school_tasks/features/learning/domain/choice_task.dart';
 
 class LearningTaskGenerator {
   LearningTaskGenerator({Random? random}) : _random = random ?? Random();
 
   final Random _random;
 
-  LearningTask generateAdditionWithin10() {
+  ChoiceTask generateAdditionWithin10() {
     int firstNumber;
     int secondNumber;
 
@@ -26,9 +25,8 @@ class LearningTaskGenerator {
 
     final shuffledAnswers = answers.toList()..shuffle(_random);
 
-    return LearningTask(
-      firstNumber: firstNumber,
-      secondNumber: secondNumber,
+    return ChoiceTask(
+      condition: '$firstNumber + $secondNumber = ?',
       correctAnswer: correctAnswer,
       answers: shuffledAnswers,
     );

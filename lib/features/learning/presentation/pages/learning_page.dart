@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
+import 'package:school_tasks/features/learning/domain/choice_task.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -11,9 +12,7 @@ import '../widgets/choice_task_widget.dart';
 
 class LearningPage extends StatefulWidget {
   const LearningPage({super.key, required this.topicId});
-
   final String topicId;
-
   @override
   State<LearningPage> createState() => _LearningPageState();
 }
@@ -34,6 +33,7 @@ class _LearningPageState extends State<LearningPage> {
   Widget build(BuildContext context) {
     final currentTask = _attempt.currentTask;
     final result = currentTask.result;
+    final task = currentTask.task as ChoiceTask; //temporary
 
     return AppScaffold(
       child: Center(
@@ -49,7 +49,7 @@ class _LearningPageState extends State<LearningPage> {
             const SizedBox(height: AppSpacing.lg),
 
             ChoiceTaskWidget(
-              task: currentTask.task,
+              task: task,
               result: result,
               onAnswerSelected: _onAnswerSelected,
             ),
@@ -94,8 +94,10 @@ class _LearningPageState extends State<LearningPage> {
       return;
     }
 
+    final task = currentTask.task as ChoiceTask;
+
     setState(() {
-      _attempt.recordResult(currentTask.task.checkAnswer(answer));
+      _attempt.recordResult(task.checkAnswer(answer));
     });
   }
 
