@@ -8,6 +8,7 @@ class NumericInputTask extends LearningTask {
     required super.correctAnswer,
   });
 
+  @override
   TaskResult<int> checkAnswer(int answer) {
     return TaskResult<int>(
       state: answer == correctAnswer

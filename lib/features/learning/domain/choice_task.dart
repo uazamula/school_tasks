@@ -11,6 +11,7 @@ class ChoiceTask extends LearningTask {
 
   final List<int> answers;
 
+  @override
   TaskResult<int> checkAnswer(int answer) {
     return TaskResult<int>(
       state: answer == correctAnswer

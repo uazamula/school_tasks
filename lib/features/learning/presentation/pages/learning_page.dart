@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
-import 'package:school_tasks/features/learning/domain/choice_task.dart';
 import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 
@@ -81,6 +80,8 @@ class _LearningPageState extends State<LearningPage> {
   TopicAttempt _createAttempt() {
     return TopicAttempt(
       tasks: [
+        AttemptTask(task: _generator.generateAdditionWithin10()),
+        AttemptTask(task: _generator.generateAdditionWithin10()),
         AttemptTask(
           task: NumericInputTask(condition: '3 + 5 = ?', correctAnswer: 8),
         ),
@@ -96,10 +97,8 @@ class _LearningPageState extends State<LearningPage> {
       return;
     }
 
-    final task = currentTask.task as ChoiceTask;
-
     setState(() {
-      _attempt.recordResult(task.checkAnswer(answer));
+      _attempt.recordResult(currentTask.task.checkAnswer(answer));
     });
   }
 
