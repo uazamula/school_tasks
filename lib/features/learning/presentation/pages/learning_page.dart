@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/domain/choice_task.dart';
+import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/attempt_task.dart';
 import '../../domain/learning_task_generator.dart';
 import '../../domain/topic_attempt.dart';
-import '../widgets/choice_task_widget.dart';
 
 class LearningPage extends StatefulWidget {
   const LearningPage({super.key, required this.topicId});
@@ -33,7 +34,6 @@ class _LearningPageState extends State<LearningPage> {
   Widget build(BuildContext context) {
     final currentTask = _attempt.currentTask;
     final result = currentTask.result;
-    final task = currentTask.task as ChoiceTask; //temporary
 
     return AppScaffold(
       child: Center(
@@ -48,8 +48,8 @@ class _LearningPageState extends State<LearningPage> {
 
             const SizedBox(height: AppSpacing.lg),
 
-            ChoiceTaskWidget(
-              task: task,
+            TaskWidget(
+              task: currentTask.task,
               result: result,
               onAnswerSelected: _onAnswerSelected,
             ),
@@ -77,15 +77,17 @@ class _LearningPageState extends State<LearningPage> {
     );
   }
 
+  //-------------temporary-------------
   TopicAttempt _createAttempt() {
     return TopicAttempt(
       tasks: [
-        AttemptTask(task: _generator.generateAdditionWithin10()),
-        AttemptTask(task: _generator.generateAdditionWithin10()),
-        AttemptTask(task: _generator.generateAdditionWithin10()),
+        AttemptTask(
+          task: NumericInputTask(condition: '3 + 5 = ?', correctAnswer: 8),
+        ),
       ],
     );
   }
+  //-------------temporary-------------
 
   void _onAnswerSelected(int answer) {
     final currentTask = _attempt.currentTask;
