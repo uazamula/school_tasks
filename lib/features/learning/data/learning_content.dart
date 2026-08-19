@@ -1,5 +1,7 @@
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
+import 'package:school_tasks/features/learning/domain/learning_type_task.dart';
+import 'package:school_tasks/features/learning/domain/topic.dart';
 
 abstract final class LearningContent {
   static const List<LearningNode> items = [
@@ -21,6 +23,14 @@ abstract final class LearningContent {
           ],
         ),
       ],
+    ),
+  ];
+
+  static const List<Topic> topics = [
+    Topic(
+      id: 'addition_within_10',
+      totalTasks: 4,
+      taskTypes: [LearningTaskType.choice, LearningTaskType.numericInput],
     ),
   ];
 }
