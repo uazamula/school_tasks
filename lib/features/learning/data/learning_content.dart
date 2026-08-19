@@ -29,8 +29,10 @@ abstract final class LearningContent {
   static const List<Topic> topics = [
     Topic(
       id: 'addition_within_10',
-      totalTasks: 4,
-      taskTypes: [LearningTaskType.choice, LearningTaskType.numericInput],
+      taskTypeCounts: {
+        LearningTaskType.choice: 2,
+        LearningTaskType.numericInput: 2,
+      },
     ),
   ];
 }

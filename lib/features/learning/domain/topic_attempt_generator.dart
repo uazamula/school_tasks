@@ -15,20 +15,17 @@ class TopicAttemptGenerator {
   final Random _random;
 
   TopicAttempt generate(Topic topic) {
-    final taskTypes = List<LearningTaskType>.generate(
-      topic.totalTasks,
-      (_) => _randomTaskType(topic.taskTypes),
-    );
+    final taskTypes = <LearningTaskType>[];
+
+    for (final entry in topic.taskTypeCounts.entries) {
+      taskTypes.addAll(List.filled(entry.value, entry.key));
+    }
 
     taskTypes.shuffle(_random);
 
     final tasks = taskTypes.map(_generateTask).toList();
 
     return TopicAttempt(tasks: tasks);
-  }
-
-  LearningTaskType _randomTaskType(List<LearningTaskType> taskTypes) {
-    return taskTypes[_random.nextInt(taskTypes.length)];
   }
 
   AttemptTask _generateTask(LearningTaskType type) {
