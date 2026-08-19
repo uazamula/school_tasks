@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
-import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
+import 'package:school_tasks/features/learning/data/learning_content.dart';
+import 'package:school_tasks/features/learning/domain/topic_attempt_generator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
-
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../domain/attempt_task.dart';
-import '../../domain/learning_task_generator.dart';
 import '../../domain/topic_attempt.dart';
 
 class LearningPage extends StatefulWidget {
@@ -20,8 +18,7 @@ class LearningPage extends StatefulWidget {
 class _LearningPageState extends State<LearningPage> {
   late final TopicAttempt _attempt;
 
-  final LearningTaskGenerator _generator = LearningTaskGenerator();
-
+  final TopicAttemptGenerator _attemptGenerator = TopicAttemptGenerator();
   @override
   void initState() {
     super.initState();
@@ -76,19 +73,13 @@ class _LearningPageState extends State<LearningPage> {
     );
   }
 
-  //-------------temporary-------------
   TopicAttempt _createAttempt() {
-    return TopicAttempt(
-      tasks: [
-        AttemptTask(task: _generator.generateAdditionWithin10()),
-        AttemptTask(task: _generator.generateAdditionWithin10()),
-        AttemptTask(
-          task: NumericInputTask(condition: '3 + 5 = ?', correctAnswer: 8),
-        ),
-      ],
+    final topic = LearningContent.topics.firstWhere(
+      (topic) => topic.id == widget.topicId,
     );
+
+    return _attemptGenerator.generate(topic);
   }
-  //-------------temporary-------------
 
   void _onAnswerSelected(int answer) {
     final currentTask = _attempt.currentTask;
