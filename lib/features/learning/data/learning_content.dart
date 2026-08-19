@@ -33,6 +33,11 @@ abstract final class LearningContent {
         LearningTaskType.choice: 2,
         LearningTaskType.numericInput: 2,
       },
+      firstMin: 1,
+      firstMax: 8,
+      secondMin: 1,
+      secondMax: 8,
+      maxSum: 9,
     ),
   ];
 }

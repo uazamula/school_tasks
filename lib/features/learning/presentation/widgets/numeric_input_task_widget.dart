@@ -26,6 +26,17 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
 
   bool get _isAnswered => widget.result != null;
 
+  @override
+  void didUpdateWidget(covariant NumericInputTaskWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.task != widget.task) {
+      setState(() {
+        _input = '';
+      });
+    }
+  }
+
   void _onDigitPressed(int digit) {
     if (_isAnswered) {
       return;

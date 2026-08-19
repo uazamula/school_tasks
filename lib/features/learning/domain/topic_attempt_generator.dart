@@ -23,19 +23,33 @@ class TopicAttemptGenerator {
 
     taskTypes.shuffle(_random);
 
-    final tasks = taskTypes.map(_generateTask).toList();
+    final tasks = taskTypes.map((type) => _generateTask(type, topic)).toList();
 
     return TopicAttempt(tasks: tasks);
   }
 
-  AttemptTask _generateTask(LearningTaskType type) {
+  AttemptTask _generateTask(LearningTaskType type, Topic topic) {
     switch (type) {
       case LearningTaskType.choice:
-        return AttemptTask(task: _taskGenerator.generateAdditionWithin10());
+        return AttemptTask(
+          task: _taskGenerator.generateAdditionChoice(
+            firstMin: topic.firstMin,
+            firstMax: topic.firstMax,
+            secondMin: topic.secondMin,
+            secondMax: topic.secondMax,
+            maxSum: topic.maxSum,
+          ),
+        );
 
       case LearningTaskType.numericInput:
         return AttemptTask(
-          task: _taskGenerator.generateAdditionWithin10NumericInput(),
+          task: _taskGenerator.generateAdditionNumericInput(
+            firstMin: topic.firstMin,
+            firstMax: topic.firstMax,
+            secondMin: topic.secondMin,
+            secondMax: topic.secondMax,
+            maxSum: topic.maxSum,
+          ),
         );
     }
   }
