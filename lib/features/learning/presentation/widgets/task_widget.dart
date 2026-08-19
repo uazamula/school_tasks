@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
 import '../../domain/choice_task.dart';
 import '../../domain/learning_task.dart';
 import '../../domain/numeric_input_task.dart';
@@ -28,7 +29,11 @@ class TaskWidget extends StatelessWidget {
     }
 
     if (task is NumericInputTask) {
-      return const Text('NumericInputTask');
+      return NumericInputTaskWidget(
+        task: task as NumericInputTask,
+        result: result,
+        onAnswerSelected: onAnswerSelected,
+      );
     }
 
     return const SizedBox.shrink();
