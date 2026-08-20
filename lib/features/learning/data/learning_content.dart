@@ -1,6 +1,7 @@
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/task_data.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 abstract final class LearningContent {
@@ -39,5 +40,13 @@ abstract final class LearningContent {
       secondMax: 8,
       maxSum: 9,
     ),
+  ];
+
+  static const List<TaskData> additionWithin10Data = [
+    TaskData(condition: 'Скільки буде 2 + 2?', correctAnswer: 4),
+    TaskData(condition: 'Скільки буде 3 + 4?', correctAnswer: 7),
+    TaskData(condition: 'Скільки буде 1 + 5?', correctAnswer: 6),
+    TaskData(condition: 'Скільки буде 2 + 6?', correctAnswer: 8),
+    TaskData(condition: 'Скільки буде 1 + 1?', correctAnswer: 2),
   ];
 }

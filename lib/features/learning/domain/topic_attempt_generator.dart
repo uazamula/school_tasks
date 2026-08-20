@@ -15,7 +15,7 @@ class TopicAttemptGenerator {
   final LearningTaskGenerator _taskGenerator;
   final Random _random;
 
-  TopicAttempt generate(Topic topic) {
+  TopicAttempt generate(Topic topic, {List<TaskData>? taskData}) {
     final taskTypes = <LearningTaskType>[];
 
     for (final entry in topic.taskTypeCounts.entries) {
@@ -24,8 +24,9 @@ class TopicAttemptGenerator {
 
     taskTypes.shuffle(_random);
 
-    final dataPool = _createDataPool(topic);
-
+    final dataPool = taskData != null
+        ? TaskDataPool<TaskData>(items: taskData, random: _random)
+        : _createDataPool(topic);
     final tasks = taskTypes
         .map((type) => _generateTask(type, dataPool))
         .toList();

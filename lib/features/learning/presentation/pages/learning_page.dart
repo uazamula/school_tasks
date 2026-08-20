@@ -78,7 +78,10 @@ class _LearningPageState extends State<LearningPage> {
       (topic) => topic.id == widget.topicId,
     );
 
-    return _attemptGenerator.generate(topic);
+    return _attemptGenerator.generate(
+      topic,
+      taskData: LearningContent.additionWithin10Data,
+    );
   }
 
   void _onAnswerSelected(int answer) {
