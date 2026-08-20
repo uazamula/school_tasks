@@ -1,10 +1,11 @@
 import 'dart:math';
-
-import 'package:school_tasks/features/learning/domain/learning_type_task.dart';
+import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/task_data.dart';
 import 'attempt_task.dart';
 import 'learning_task_generator.dart';
 import 'topic.dart';
 import 'topic_attempt.dart';
+import 'task_data_pool.dart';
 
 class TopicAttemptGenerator {
   TopicAttemptGenerator({LearningTaskGenerator? taskGenerator, Random? random})
@@ -23,34 +24,54 @@ class TopicAttemptGenerator {
 
     taskTypes.shuffle(_random);
 
-    final tasks = taskTypes.map((type) => _generateTask(type, topic)).toList();
+    final dataPool = _createDataPool(topic);
+
+    final tasks = taskTypes
+        .map((type) => _generateTask(type, dataPool))
+        .toList();
 
     return TopicAttempt(tasks: tasks);
   }
 
-  AttemptTask _generateTask(LearningTaskType type, Topic topic) {
+  TaskDataPool<TaskData> _createDataPool(Topic topic) {
+    final data = <TaskData>[];
+
+    final requiredDataCount = topic.taskTypeCounts.values.fold(
+      0,
+      (sum, count) => sum + count,
+    );
+
+    for (var i = 0; i < requiredDataCount; i++) {
+      data.add(
+        _taskGenerator.generateAdditionData(
+          firstMin: topic.firstMin,
+          firstMax: topic.firstMax,
+          secondMin: topic.secondMin,
+          secondMax: topic.secondMax,
+          maxSum: topic.maxSum,
+        ),
+      );
+    }
+
+    return TaskDataPool(items: data, random: _random);
+  }
+
+  AttemptTask _generateTask(
+    LearningTaskType type,
+    TaskDataPool<TaskData> dataPool,
+  ) {
+    final data = dataPool.takeRandom();
+
     switch (type) {
       case LearningTaskType.choice:
-        return AttemptTask(
-          task: _taskGenerator.generateAdditionChoice(
-            firstMin: topic.firstMin,
-            firstMax: topic.firstMax,
-            secondMin: topic.secondMin,
-            secondMax: topic.secondMax,
-            maxSum: topic.maxSum,
-          ),
+        final taskData = data.copyWith(
+          answers: _taskGenerator.generateChoiceAnswers(data.correctAnswer),
         );
 
+        return AttemptTask(task: _taskGenerator.createChoiceTask(taskData));
+
       case LearningTaskType.numericInput:
-        return AttemptTask(
-          task: _taskGenerator.generateAdditionNumericInput(
-            firstMin: topic.firstMin,
-            firstMax: topic.firstMax,
-            secondMin: topic.secondMin,
-            secondMax: topic.secondMax,
-            maxSum: topic.maxSum,
-          ),
-        );
+        return AttemptTask(task: _taskGenerator.createNumericInputTask(data));
     }
   }
 }

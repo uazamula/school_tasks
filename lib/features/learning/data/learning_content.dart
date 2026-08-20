@@ -1,6 +1,6 @@
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
-import 'package:school_tasks/features/learning/domain/learning_type_task.dart';
+import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 abstract final class LearningContent {

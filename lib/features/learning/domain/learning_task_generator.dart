@@ -1,57 +1,14 @@
 import 'dart:math';
 import 'package:school_tasks/features/learning/domain/choice_task.dart';
 import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
-import 'addition_task_data.dart';
+import 'task_data.dart';
 
 class LearningTaskGenerator {
   LearningTaskGenerator({Random? random}) : _random = random ?? Random();
 
   final Random _random;
 
-  ChoiceTask generateAdditionChoice({
-    required int firstMin,
-    required int firstMax,
-    required int secondMin,
-    required int secondMax,
-    required int maxSum,
-  }) {
-    final data = _generateAdditionData(
-      firstMin: firstMin,
-      firstMax: firstMax,
-      secondMin: secondMin,
-      secondMax: secondMax,
-      maxSum: maxSum,
-    );
-
-    return ChoiceTask(
-      condition: data.condition,
-      correctAnswer: data.correctAnswer,
-      answers: _generateChoiceAnswers(data.correctAnswer),
-    );
-  }
-
-  NumericInputTask generateAdditionNumericInput({
-    required int firstMin,
-    required int firstMax,
-    required int secondMin,
-    required int secondMax,
-    required int maxSum,
-  }) {
-    final data = _generateAdditionData(
-      firstMin: firstMin,
-      firstMax: firstMax,
-      secondMin: secondMin,
-      secondMax: secondMax,
-      maxSum: maxSum,
-    );
-
-    return NumericInputTask(
-      condition: data.condition,
-      correctAnswer: data.correctAnswer,
-    );
-  }
-
-  AdditionTaskData _generateAdditionData({
+  TaskData generateAdditionData({
     required int firstMin,
     required int firstMax,
     required int secondMin,
@@ -66,14 +23,30 @@ class LearningTaskGenerator {
       secondNumber = secondMin + _random.nextInt(secondMax - secondMin + 1);
     } while (firstNumber + secondNumber > maxSum);
 
-    return AdditionTaskData(
-      firstNumber: firstNumber,
-      secondNumber: secondNumber,
+    final correctAnswer = firstNumber + secondNumber;
+
+    return TaskData(
+      condition: '$firstNumber + $secondNumber = ?',
+      correctAnswer: correctAnswer,
     );
   }
 
-  // TODO частина нижче потребує переробки
-  List<int> _generateChoiceAnswers(int correctAnswer) {
+  ChoiceTask createChoiceTask(TaskData data) {
+    return ChoiceTask(
+      condition: data.condition,
+      correctAnswer: data.correctAnswer,
+      answers: data.answers!,
+    );
+  }
+
+  NumericInputTask createNumericInputTask(TaskData data) {
+    return NumericInputTask(
+      condition: data.condition,
+      correctAnswer: data.correctAnswer,
+    );
+  }
+
+  List<int> generateChoiceAnswers(int correctAnswer) {
     final answers = <int>{correctAnswer};
 
     while (answers.length < 4) {

@@ -1,7 +1,7 @@
 //Тут ми поки що явно описуємо саме правила генерації додавання.
 // Це нормально для нашого мінімального робочого прикладу.
 // Коли з'являться інші види навчального матеріалу, винесемо ці правила в окрему модель.
-import 'package:school_tasks/features/learning/domain/learning_type_task.dart';
+import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
 
 class Topic {
   const Topic({
