@@ -27,6 +27,34 @@ abstract final class LearningContent {
     ),
   ];
 
+  static const List<TaskData> additionWithin10Data = [
+    TaskData(
+      condition: 'Скільки буде 2 + 2?',
+      correctAnswer: 4,
+      answers: [1, 3, 4, 7],
+    ),
+    TaskData(
+      condition: 'Скільки буде 3 + 4?',
+      correctAnswer: 7,
+      answers: [3, 5, 7, 8],
+    ),
+    TaskData(
+      condition: 'Скільки буде 1 + 5?',
+      correctAnswer: 6,
+      answers: [4, 5, 6, 8],
+    ),
+    TaskData(
+      condition: 'Скільки буде 2 + 6?',
+      correctAnswer: 8,
+      answers: [5, 6, 7, 8],
+    ),
+    TaskData(
+      condition: 'Скільки буде 1 + 1?',
+      correctAnswer: 2,
+      answers: [1, 2, 3, 4],
+    ),
+  ];
+
   static const List<Topic> topics = [
     Topic(
       id: 'addition_within_10',
@@ -34,19 +62,7 @@ abstract final class LearningContent {
         LearningTaskType.choice: 2,
         LearningTaskType.numericInput: 2,
       },
-      firstMin: 1,
-      firstMax: 8,
-      secondMin: 1,
-      secondMax: 8,
-      maxSum: 9,
+      taskData: additionWithin10Data,
     ),
-  ];
-
-  static const List<TaskData> additionWithin10Data = [
-    TaskData(condition: 'Скільки буде 2 + 2?', correctAnswer: 4),
-    TaskData(condition: 'Скільки буде 3 + 4?', correctAnswer: 7),
-    TaskData(condition: 'Скільки буде 1 + 5?', correctAnswer: 6),
-    TaskData(condition: 'Скільки буде 2 + 6?', correctAnswer: 8),
-    TaskData(condition: 'Скільки буде 1 + 1?', correctAnswer: 2),
   ];
 }

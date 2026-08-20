@@ -1,21 +1,19 @@
 import 'dart:math';
+import 'package:school_tasks/features/learning/domain/attempt_task.dart';
+import 'package:school_tasks/features/learning/domain/choice_task.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/task_data.dart';
-import 'attempt_task.dart';
-import 'learning_task_generator.dart';
-import 'topic.dart';
-import 'topic_attempt.dart';
-import 'task_data_pool.dart';
+import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
+import 'package:school_tasks/features/learning/domain/topic.dart';
+import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
 
 class TopicAttemptGenerator {
-  TopicAttemptGenerator({LearningTaskGenerator? taskGenerator, Random? random})
-    : _taskGenerator = taskGenerator ?? LearningTaskGenerator(),
-      _random = random ?? Random();
+  TopicAttemptGenerator({Random? random}) : _random = random ?? Random();
 
-  final LearningTaskGenerator _taskGenerator;
   final Random _random;
 
-  TopicAttempt generate(Topic topic, {List<TaskData>? taskData}) {
+  TopicAttempt generate(Topic topic) {
     final taskTypes = <LearningTaskType>[];
 
     for (final entry in topic.taskTypeCounts.entries) {
@@ -24,55 +22,37 @@ class TopicAttemptGenerator {
 
     taskTypes.shuffle(_random);
 
-    final dataPool = taskData != null
-        ? TaskDataPool<TaskData>(items: taskData, random: _random)
-        : _createDataPool(topic);
+    final dataPool = TaskDataPool<TaskData>(
+      items: topic.taskData,
+      random: _random,
+    );
+
     final tasks = taskTypes
-        .map((type) => _generateTask(type, dataPool))
+        .map((type) => _createTask(type, dataPool.takeRandom()))
         .toList();
 
     return TopicAttempt(tasks: tasks);
   }
 
-  TaskDataPool<TaskData> _createDataPool(Topic topic) {
-    final data = <TaskData>[];
-
-    final requiredDataCount = topic.taskTypeCounts.values.fold(
-      0,
-      (sum, count) => sum + count,
-    );
-
-    for (var i = 0; i < requiredDataCount; i++) {
-      data.add(
-        _taskGenerator.generateAdditionData(
-          firstMin: topic.firstMin,
-          firstMax: topic.firstMax,
-          secondMin: topic.secondMin,
-          secondMax: topic.secondMax,
-          maxSum: topic.maxSum,
-        ),
-      );
-    }
-
-    return TaskDataPool(items: data, random: _random);
-  }
-
-  AttemptTask _generateTask(
-    LearningTaskType type,
-    TaskDataPool<TaskData> dataPool,
-  ) {
-    final data = dataPool.takeRandom();
-
+  AttemptTask _createTask(LearningTaskType type, TaskData data) {
     switch (type) {
       case LearningTaskType.choice:
-        final taskData = data.copyWith(
-          answers: _taskGenerator.generateChoiceAnswers(data.correctAnswer),
+        assert(data.answers != null);
+        return AttemptTask(
+          task: ChoiceTask(
+            condition: data.condition,
+            correctAnswer: data.correctAnswer,
+            answers: data.answers!,
+          ),
         );
 
-        return AttemptTask(task: _taskGenerator.createChoiceTask(taskData));
-
       case LearningTaskType.numericInput:
-        return AttemptTask(task: _taskGenerator.createNumericInputTask(data));
+        return AttemptTask(
+          task: NumericInputTask(
+            condition: data.condition,
+            correctAnswer: data.correctAnswer,
+          ),
+        );
     }
   }
 }

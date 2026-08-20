@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
+import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_generator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../domain/topic_attempt.dart';
 
 class LearningPage extends StatefulWidget {
   const LearningPage({super.key, required this.topicId});
@@ -78,10 +78,7 @@ class _LearningPageState extends State<LearningPage> {
       (topic) => topic.id == widget.topicId,
     );
 
-    return _attemptGenerator.generate(
-      topic,
-      taskData: LearningContent.additionWithin10Data,
-    );
+    return _attemptGenerator.generate(topic);
   }
 
   void _onAnswerSelected(int answer) {
