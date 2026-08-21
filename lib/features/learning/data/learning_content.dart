@@ -17,6 +17,11 @@ abstract final class LearningContent {
           type: LearningNodeType.section,
           children: [
             LearningNode(
+              id: 'addition_digits',
+              titleKey: 'additionDigits',
+              type: LearningNodeType.topic,
+            ),
+            LearningNode(
               id: 'addition_within_10',
               titleKey: 'additionWithin10',
               type: LearningNodeType.topic,
@@ -55,6 +60,23 @@ abstract final class LearningContent {
     ),
   ];
 
+  static const List<TaskData> additionDigitsData = [
+    TaskData(
+      condition: 'Скільки буде 2 + 9?',
+      correctAnswer: 11,
+      answers: [11, 13, 14, 17],
+    ),
+    TaskData(
+      condition: 'Скільки буде 3 + 10?',
+      correctAnswer: 13,
+      answers: [3, 10, 11, 13],
+    ),
+    TaskData(
+      condition: 'Скільки буде 6 + 5?',
+      correctAnswer: 11,
+      answers: [10, 11, 12, 13],
+    ),
+  ];
   static const List<Topic> topics = [
     Topic(
       id: 'addition_within_10',
@@ -63,6 +85,11 @@ abstract final class LearningContent {
         LearningTaskType.numericInput: 2,
       },
       taskData: additionWithin10Data,
+    ),
+    Topic(
+      id: 'addition_digits',
+      taskTypeCounts: {LearningTaskType.choice: 2},
+      taskData: additionDigitsData,
     ),
   ];
 }
