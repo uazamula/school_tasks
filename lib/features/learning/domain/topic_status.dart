@@ -1,1 +1,1 @@
-enum TopicStatus { notStarted, completed }
+enum TopicStatus { notStarted, partiallyCompleted, completed }

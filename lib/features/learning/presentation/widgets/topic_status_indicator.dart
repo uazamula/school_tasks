@@ -12,6 +12,9 @@ class TopicStatusIndicator extends StatelessWidget {
       case TopicStatus.notStarted:
         return const Icon(Icons.circle_outlined, size: 20);
 
+      case TopicStatus.partiallyCompleted:
+        return const Icon(Icons.circle, size: 20);
+
       case TopicStatus.completed:
         return const Icon(Icons.check_circle, size: 20);
     }

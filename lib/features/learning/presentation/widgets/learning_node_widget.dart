@@ -80,16 +80,16 @@ class LearningNodeWidget extends StatelessWidget {
   }
 
   TopicStatus _getTopicStatus() {
-    return getTopicResult?.call(node.id) == null
-        ? TopicStatus.notStarted
-        : TopicStatus.completed;
-  }
+    final result = getTopicResult?.call(node.id);
 
-  // TopicAttemptResult? _getTopicResult(LearningNode node) {
-  //   if (node.type != LearningNodeType.topic) {
-  //     return null;
-  //   }
-  //
-  //   return node.id == node.id ? topicResult : null;
-  // }
+    if (result == null) {
+      return TopicStatus.notStarted;
+    }
+
+    if (!result.isFinished) {
+      return TopicStatus.partiallyCompleted;
+    }
+
+    return TopicStatus.completed;
+  }
 }

@@ -77,7 +77,36 @@ class TopicDialog extends StatelessWidget {
   }
 
   void _showResult(BuildContext context) {
-    // Поки що нічого не робимо.
-    // Реалізуємо на наступному кроці.
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Результат'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Виконано: '
+                '${result!.completedTasks} / ${result!.totalTasks}',
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Правильних: '
+                '${result!.correctTasks} / ${result!.totalTasks}',
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text('Результат: ${(result!.score * 100).round()}%'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => context.pop(),
+              child: const Text('Закрити'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
