@@ -85,11 +85,13 @@ abstract final class LearningContent {
         LearningTaskType.numericInput: 2,
       },
       taskData: additionWithin10Data,
+      help: 'Тут буде довідка про додавання в межах 10.',
     ),
     Topic(
       id: 'addition_digits',
       taskTypeCounts: {LearningTaskType.choice: 2},
       taskData: additionDigitsData,
+      help: 'Тут буде довідка про додавання одноцифрових чисел.',
     ),
   ];
 }

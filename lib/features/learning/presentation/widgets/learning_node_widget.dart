@@ -35,15 +35,14 @@ class LearningNodeWidget extends StatelessWidget {
           _buildNode(),
 
           if (node.hasChildren)
-            if (node.hasChildren)
-              ...node.children.map(
-                (child) => LearningNodeWidget(
-                  node: child,
-                  level: level + 1,
-                  onTopicPressed: onTopicPressed,
-                  getTopicResult: getTopicResult,
-                ),
+            ...node.children.map(
+              (child) => LearningNodeWidget(
+                node: child,
+                level: level + 1,
+                onTopicPressed: onTopicPressed,
+                getTopicResult: getTopicResult,
               ),
+            ),
         ],
       ),
     );

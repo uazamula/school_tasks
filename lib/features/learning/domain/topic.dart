@@ -6,13 +6,13 @@ class Topic {
     required this.id,
     required this.taskTypeCounts,
     required this.taskData,
+    required this.help,
   });
 
   final String id;
-
   final Map<LearningTaskType, int> taskTypeCounts;
-
   final List<TaskData> taskData;
+  final String help;
 
   int get totalTasks {
     return taskTypeCounts.values.fold(0, (sum, count) => sum + count);

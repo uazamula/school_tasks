@@ -32,11 +32,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _onTopicPressed(LearningNode topic) async {
+  Future<void> _onTopicPressed(LearningNode topicNode) async {
+    final topic = LearningContent.topics.firstWhere(
+      (topic) => topic.id == topicNode.id,
+    );
+
     final result = await showDialog<TopicAttemptResult>(
       context: context,
       builder: (_) {
-        return TopicDialog(topic: topic);
+        return TopicDialog(
+          topicNode: topicNode,
+          topic: topic,
+          result: _topicResults[topicNode.id],
+        );
       },
     );
 
@@ -45,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
-      _topicResults[topic.id] = result;
+      _topicResults[topicNode.id] = result;
     });
   }
 }
