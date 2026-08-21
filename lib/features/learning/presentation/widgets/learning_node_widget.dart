@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
-import 'package:school_tasks/features/learning/domain/topic_status.dart';
-
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/learning_node.dart';
 import '../../domain/learning_node_type.dart';
-import 'topic_status_indicator.dart';
+import 'topic_result_indicator.dart';
 
 class LearningNodeWidget extends StatelessWidget {
   const LearningNodeWidget({
@@ -67,7 +65,7 @@ class LearningNodeWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             child: Row(
               children: [
-                TopicStatusIndicator(status: _getTopicStatus()),
+                TopicResultIndicator(result: getTopicResult?.call(node.id)),
 
                 const SizedBox(width: AppSpacing.sm),
 
@@ -77,19 +75,5 @@ class LearningNodeWidget extends StatelessWidget {
           ),
         );
     }
-  }
-
-  TopicStatus _getTopicStatus() {
-    final result = getTopicResult?.call(node.id);
-
-    if (result == null) {
-      return TopicStatus.notStarted;
-    }
-
-    if (!result.isFinished) {
-      return TopicStatus.partiallyCompleted;
-    }
-
-    return TopicStatus.completed;
   }
 }
