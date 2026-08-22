@@ -11,28 +11,32 @@ class TaskWidget extends StatelessWidget {
     super.key,
     required this.task,
     required this.result,
-    required this.onAnswerSelected,
+    required this.onTaskAnswered,
   });
 
-  final LearningTask<int> task;
-  final TaskResult<int>? result;
-  final ValueChanged<int> onAnswerSelected;
+  final LearningTask<dynamic> task;
+  final TaskResult<dynamic>? result;
+  final ValueChanged<TaskResult<dynamic>> onTaskAnswered;
 
   @override
   Widget build(BuildContext context) {
     if (task is ChoiceTask) {
       return ChoiceTaskWidget(
         task: task as ChoiceTask,
-        result: result,
-        onAnswerSelected: onAnswerSelected,
+        result: result as TaskResult<int>?,
+        onTaskAnswered: (result) {
+          onTaskAnswered(result);
+        },
       );
     }
 
     if (task is NumericInputTask) {
       return NumericInputTaskWidget(
         task: task as NumericInputTask,
-        result: result,
-        onAnswerSelected: onAnswerSelected,
+        result: result as TaskResult<int>?,
+        onTaskAnswered: (result) {
+          onTaskAnswered(result);
+        },
       );
     }
 

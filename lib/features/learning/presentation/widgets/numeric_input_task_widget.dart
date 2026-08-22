@@ -10,13 +10,12 @@ class NumericInputTaskWidget extends StatefulWidget {
     super.key,
     required this.task,
     required this.result,
-    required this.onAnswerSelected,
+    required this.onTaskAnswered,
   });
 
   final NumericInputTask task;
   final TaskResult<int>? result;
-  final ValueChanged<int> onAnswerSelected;
-
+  final ValueChanged<TaskResult<int>> onTaskAnswered;
   @override
   State<NumericInputTaskWidget> createState() => _NumericInputTaskWidgetState();
 }
@@ -62,7 +61,9 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
       return;
     }
 
-    widget.onAnswerSelected(int.parse(_input));
+    final answer = int.parse(_input);
+
+    widget.onTaskAnswered(widget.task.checkAnswer(answer));
   }
 
   @override

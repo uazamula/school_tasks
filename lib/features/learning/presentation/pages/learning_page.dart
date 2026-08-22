@@ -4,6 +4,7 @@ import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_generator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
@@ -47,7 +48,7 @@ class _LearningPageState extends State<LearningPage> {
             TaskWidget(
               task: currentTask.task,
               result: result,
-              onAnswerSelected: _onAnswerSelected,
+              onTaskAnswered: _onTaskAnswered,
             ),
 
             if (result != null) ...[
@@ -81,7 +82,7 @@ class _LearningPageState extends State<LearningPage> {
     return _attemptGenerator.generate(topic);
   }
 
-  void _onAnswerSelected(int answer) {
+  void _onTaskAnswered(TaskResult<dynamic> result) {
     final currentTask = _attempt.currentTask;
 
     if (currentTask.isAnswered) {
@@ -89,7 +90,7 @@ class _LearningPageState extends State<LearningPage> {
     }
 
     setState(() {
-      _attempt.recordResult(currentTask.task.checkAnswer(answer));
+      _attempt.recordResult(result);
     });
   }
 

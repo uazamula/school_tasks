@@ -3,6 +3,8 @@ import 'package:school_tasks/features/learning/domain/attempt_task.dart';
 import 'package:school_tasks/features/learning/domain/choice_task.dart';
 import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/multi_choice_task.dart';
+import 'package:school_tasks/features/learning/domain/multi_choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
@@ -33,6 +35,11 @@ class TopicAttemptGenerator {
       random: _random,
     );
 
+    final multiChoiceDataPool = TaskDataPool<MultiChoiceTaskData>(
+      items: topic.taskData.whereType<MultiChoiceTaskData>().toList(),
+      random: _random,
+    );
+
     final tasks = taskTypes.map((type) {
       switch (type) {
         case LearningTaskType.choice:
@@ -43,6 +50,10 @@ class TopicAttemptGenerator {
         case LearningTaskType.numericInput:
           return AttemptTask(
             task: _createNumericInputTask(numericInputDataPool.takeRandom()),
+          );
+        case LearningTaskType.multiChoice:
+          return AttemptTask(
+            task: _createMultiChoiceTask(multiChoiceDataPool.takeRandom()),
           );
       }
     }).toList();
@@ -62,6 +73,15 @@ class TopicAttemptGenerator {
     return NumericInputTask(
       condition: data.condition,
       correctAnswer: data.correctAnswer,
+    );
+  }
+
+  MultiChoiceTask _createMultiChoiceTask(MultiChoiceTaskData data) {
+    return MultiChoiceTask(
+      condition: data.condition,
+      imagePath: data.imagePath,
+      answers: data.answers,
+      correctAnswers: data.correctAnswers,
     );
   }
 }

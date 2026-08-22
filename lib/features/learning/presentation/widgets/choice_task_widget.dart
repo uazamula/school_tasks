@@ -11,12 +11,12 @@ class ChoiceTaskWidget extends StatelessWidget {
   const ChoiceTaskWidget({
     super.key,
     required this.task,
-    required this.onAnswerSelected,
+    required this.onTaskAnswered,
     this.result,
   });
 
   final ChoiceTask task;
-  final ValueChanged<int> onAnswerSelected;
+  final ValueChanged<TaskResult<int>> onTaskAnswered;
   final TaskResult<int>? result;
 
   @override
@@ -34,7 +34,9 @@ class ChoiceTaskWidget extends StatelessWidget {
             child: ChoiceAnswerButton(
               answer: answer,
               state: _getAnswerState(answer),
-              onPressed: isAnswered ? null : () => onAnswerSelected(answer),
+              onPressed: isAnswered
+                  ? null
+                  : () => onTaskAnswered(task.checkAnswer(answer)),
             ),
           ),
         ),

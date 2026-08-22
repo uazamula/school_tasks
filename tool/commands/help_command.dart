@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import '../cli/base_command.dart';
 import '../cli/command.dart';
 import '../cli/command_registry.dart';
