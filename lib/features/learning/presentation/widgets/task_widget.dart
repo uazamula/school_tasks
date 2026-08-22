@@ -14,7 +14,7 @@ class TaskWidget extends StatelessWidget {
     required this.onAnswerSelected,
   });
 
-  final LearningTask task;
+  final LearningTask<int> task;
   final TaskResult<int>? result;
   final ValueChanged<int> onAnswerSelected;
 

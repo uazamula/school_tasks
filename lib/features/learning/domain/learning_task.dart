@@ -1,10 +1,9 @@
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 
-abstract class LearningTask {
-  const LearningTask({required this.condition, required this.correctAnswer});
+abstract class LearningTask<TAnswer> {
+  const LearningTask({required this.condition});
 
   final String condition;
-  final int correctAnswer;
 
-  TaskResult<int> checkAnswer(int answer);
+  TaskResult<TAnswer> checkAnswer(TAnswer answer);
 }
