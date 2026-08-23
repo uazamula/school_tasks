@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/multi_choice_task.dart';
-import '../../domain/task_answer_state.dart';
-import '../../domain/task_result.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_text_styles.dart';
+import '../../domain/multi_choice_task.dart';
+import '../../domain/task_result.dart';
+import 'multi_choice_answers.dart';
+import 'multi_choice_question.dart';
 
 class MultiChoiceTaskWidget extends StatefulWidget {
   const MultiChoiceTaskWidget({
@@ -51,55 +51,24 @@ class _MultiChoiceTaskWidgetState extends State<MultiChoiceTaskWidget> {
     widget.onTaskAnswered(result);
   }
 
-  TaskAnswerState _getAnswerState(String answer) {
-    final result = widget.result;
-
-    if (result == null) {
-      return TaskAnswerState.neutral;
-    }
-
-    final correctAnswers = result.correctAnswer ?? [];
-    final selectedAnswers = result.selectedAnswer ?? [];
-
-    if (correctAnswers.contains(answer)) {
-      return TaskAnswerState.correct;
-    }
-
-    if (selectedAnswers.contains(answer)) {
-      return TaskAnswerState.incorrect;
-    }
-
-    return TaskAnswerState.neutral;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.task.condition,
-          style: AppTextStyles.headline,
-          textAlign: TextAlign.center,
+        MultiChoiceQuestion(
+          condition: widget.task.condition,
+          imagePath: widget.task.imagePath,
         ),
 
         const SizedBox(height: AppSpacing.lg),
 
-        if (widget.task.imagePath != null) ...[
-          Image.asset(widget.task.imagePath!),
-          const SizedBox(height: AppSpacing.lg),
-        ],
-
-        ...widget.task.answers.map(
-          (answer) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: _MultiChoiceAnswerButton(
-              answer: answer,
-              state: _getAnswerState(answer),
-              isSelected: _selectedAnswers.contains(answer),
-              onPressed: _isAnswered ? null : () => _toggleAnswer(answer),
-            ),
-          ),
+        MultiChoiceAnswers(
+          answers: widget.task.answers,
+          selectedAnswers: _selectedAnswers,
+          result: widget.result,
+          onAnswerSelected: _toggleAnswer,
+          enabled: !_isAnswered,
         ),
 
         const SizedBox(height: AppSpacing.lg),
@@ -111,55 +80,6 @@ class _MultiChoiceTaskWidgetState extends State<MultiChoiceTaskWidget> {
           child: const Text('Підтвердити'),
         ),
       ],
-    );
-  }
-}
-
-class _MultiChoiceAnswerButton extends StatelessWidget {
-  const _MultiChoiceAnswerButton({
-    required this.answer,
-    required this.state,
-    required this.isSelected,
-    required this.onPressed,
-  });
-
-  final String answer;
-  final TaskAnswerState state;
-  final bool isSelected;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    IconData icon;
-
-    if (state == TaskAnswerState.correct) {
-      icon = Icons.check_box;
-    } else if (state == TaskAnswerState.incorrect) {
-      icon = Icons.close;
-    } else if (isSelected) {
-      icon = Icons.check_box;
-    } else {
-      icon = Icons.check_box_outline_blank;
-    }
-
-    return SizedBox(
-      width: 280,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppSpacing.md,
-            horizontal: AppSpacing.md,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(child: Text(answer, textAlign: TextAlign.center)),
-          ],
-        ),
-      ),
     );
   }
 }
