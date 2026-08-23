@@ -77,10 +77,13 @@ class TopicAttemptGenerator {
   }
 
   MultiChoiceTask _createMultiChoiceTask(MultiChoiceTaskData data) {
+    final answers = [...data.correctAnswers, ...data.wrongAnswers]
+      ..shuffle(_random);
+
     return MultiChoiceTask(
       condition: data.condition,
       imagePath: data.imagePath,
-      answers: data.answers,
+      answers: answers,
       correctAnswers: data.correctAnswers,
     );
   }

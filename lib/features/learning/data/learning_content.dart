@@ -82,13 +82,13 @@ abstract final class LearningContent {
     MultiChoiceTaskData(
       condition: 'Що зображено на малюнку?',
       imagePath: 'assets/images/tasks/square.png',
-      answers: ['Прямокутник', 'Ромб', 'Паралелограм', 'Коло'],
       correctAnswers: ['Прямокутник', 'Ромб', 'Паралелограм'],
+      wrongAnswers: ['Коло'],
     ),
     MultiChoiceTaskData(
       condition: 'Що є паралелограмом завжди?',
-      answers: ['Прямокутник', 'Квадрат', 'Трапеція', 'Коло'],
       correctAnswers: ['Прямокутник', 'Квадрат'],
+      wrongAnswers: ['Трапеція', 'Коло'],
     ),
   ];
   static const List<Topic> topics = [

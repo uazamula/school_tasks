@@ -4,11 +4,11 @@ class MultiChoiceTaskData extends TaskData {
   const MultiChoiceTaskData({
     required super.condition,
     this.imagePath,
-    required this.answers,
     required this.correctAnswers,
+    required this.wrongAnswers,
   });
 
   final String? imagePath;
-  final List<String> answers;
   final List<String> correctAnswers;
+  final List<String> wrongAnswers;
 }
