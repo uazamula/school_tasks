@@ -85,14 +85,10 @@ class _MultiChoiceTaskWidgetState extends State<MultiChoiceTaskWidget> {
 
         const SizedBox(height: AppSpacing.lg),
 
-        Image.asset(
-          widget.task.imagePath,
-          width: 200,
-          height: 200,
-          fit: BoxFit.contain,
-        ),
-
-        const SizedBox(height: AppSpacing.lg),
+        if (widget.task.imagePath != null) ...[
+          Image.asset(widget.task.imagePath!),
+          const SizedBox(height: AppSpacing.lg),
+        ],
 
         ...widget.task.answers.map(
           (answer) => Padding(

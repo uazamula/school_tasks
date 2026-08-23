@@ -85,6 +85,11 @@ abstract final class LearningContent {
       answers: ['Прямокутник', 'Ромб', 'Паралелограм', 'Коло'],
       correctAnswers: ['Прямокутник', 'Ромб', 'Паралелограм'],
     ),
+    MultiChoiceTaskData(
+      condition: 'Що є паралелограмом завжди?',
+      answers: ['Прямокутник', 'Квадрат', 'Трапеція', 'Коло'],
+      correctAnswers: ['Прямокутник', 'Квадрат'],
+    ),
   ];
   static const List<Topic> topics = [
     Topic(

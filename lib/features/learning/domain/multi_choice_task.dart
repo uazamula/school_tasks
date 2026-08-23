@@ -5,12 +5,12 @@ import 'task_result.dart';
 class MultiChoiceTask extends LearningTask<List<String>> {
   const MultiChoiceTask({
     required super.condition,
-    required this.imagePath,
+    this.imagePath,
     required this.answers,
     required this.correctAnswers,
   });
 
-  final String imagePath;
+  final String? imagePath;
   final List<String> answers;
   final List<String> correctAnswers;
 
