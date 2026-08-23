@@ -2,6 +2,7 @@ import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/multi_choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
@@ -26,6 +27,11 @@ abstract final class LearningContent {
             LearningNode(
               id: 'addition_within_10',
               titleKey: 'additionWithin10',
+              type: LearningNodeType.topic,
+            ),
+            LearningNode(
+              id: 'shapes',
+              titleKey: 'shape',
               type: LearningNodeType.topic,
             ),
           ],
@@ -71,6 +77,15 @@ abstract final class LearningContent {
       answers: [10, 11, 12, 13],
     ),
   ];
+
+  static const List<TaskData> shapeData = [
+    MultiChoiceTaskData(
+      condition: 'Що зображено на малюнку?',
+      imagePath: 'assets/images/tasks/square.png',
+      answers: ['Прямокутник', 'Ромб', 'Паралелограм', 'Коло'],
+      correctAnswers: ['Прямокутник', 'Ромб', 'Паралелограм'],
+    ),
+  ];
   static const List<Topic> topics = [
     Topic(
       id: 'addition_within_10',
@@ -86,6 +101,15 @@ abstract final class LearningContent {
       taskTypeCounts: {LearningTaskType.choice: 2},
       taskData: additionDigitsData,
       help: 'Тут буде довідка про додавання одноцифрових чисел.',
+    ),
+    Topic(
+      id: 'shapes',
+      taskTypeCounts: {
+        LearningTaskType.multiChoice: 1,
+        LearningTaskType.choice: 1,
+      },
+      taskData: [...shapeData, ...additionDigitsData],
+      help: 'Розпізнавання геометричних фігур.',
     ),
   ];
 }

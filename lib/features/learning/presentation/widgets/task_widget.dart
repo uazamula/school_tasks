@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/multi_choice_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/multi_choice_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
 import '../../domain/choice_task.dart';
 import '../../domain/learning_task.dart';
@@ -34,6 +36,16 @@ class TaskWidget extends StatelessWidget {
       return NumericInputTaskWidget(
         task: task as NumericInputTask,
         result: result as TaskResult<int>?,
+        onTaskAnswered: (result) {
+          onTaskAnswered(result);
+        },
+      );
+    }
+
+    if (task is MultiChoiceTask) {
+      return MultiChoiceTaskWidget(
+        task: task as MultiChoiceTask,
+        result: result as TaskResult<List<String>>?,
         onTaskAnswered: (result) {
           onTaskAnswered(result);
         },

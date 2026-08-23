@@ -33,42 +33,44 @@ class _LearningPageState extends State<LearningPage> {
     final result = currentTask.result;
 
     return AppScaffold(
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Завдання ${_attempt.currentTaskIndex + 1} '
-              'з ${_attempt.tasks.length}',
-              style: AppTextStyles.body,
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            TaskWidget(
-              task: currentTask.task,
-              result: result,
-              onTaskAnswered: _onTaskAnswered,
-            ),
-
-            if (result != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-
+      child: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               Text(
-                result.isCorrect ? 'Правильно!' : 'Неправильно!',
-                style: AppTextStyles.title,
+                'Завдання ${_attempt.currentTaskIndex + 1} '
+                'з ${_attempt.tasks.length}',
+                style: AppTextStyles.body,
               ),
 
               const SizedBox(height: AppSpacing.lg),
 
-              FilledButton(
-                onPressed: _finishCurrentTask,
-                child: Text(
-                  _attempt.isFinished ? 'Завершити тему' : 'Наступне',
-                ),
+              TaskWidget(
+                task: currentTask.task,
+                result: result,
+                onTaskAnswered: _onTaskAnswered,
               ),
+
+              if (result != null) ...[
+                const SizedBox(height: AppSpacing.lg),
+
+                Text(
+                  result.isCorrect ? 'Правильно!' : 'Неправильно!',
+                  style: AppTextStyles.title,
+                ),
+
+                const SizedBox(height: AppSpacing.lg),
+
+                FilledButton(
+                  onPressed: _finishCurrentTask,
+                  child: Text(
+                    _attempt.isFinished ? 'Завершити тему' : 'Наступне',
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
