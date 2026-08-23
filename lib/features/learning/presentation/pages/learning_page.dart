@@ -51,24 +51,6 @@ class _LearningPageState extends State<LearningPage> {
                 result: result,
                 onTaskAnswered: _onTaskAnswered,
               ),
-
-              if (result != null) ...[
-                const SizedBox(height: AppSpacing.lg),
-
-                Text(
-                  result.isCorrect ? 'Правильно!' : 'Неправильно!',
-                  style: AppTextStyles.title,
-                ),
-
-                const SizedBox(height: AppSpacing.lg),
-
-                FilledButton(
-                  onPressed: _finishCurrentTask,
-                  child: Text(
-                    _attempt.isFinished ? 'Завершити тему' : 'Наступне',
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -91,22 +73,16 @@ class _LearningPageState extends State<LearningPage> {
       return;
     }
 
-    setState(() {
-      _attempt.recordResult(result);
-    });
-  }
+    _attempt.recordResult(result);
 
-  void _finishCurrentTask() {
-    if (!_attempt.isFinished) {
-      setState(() {
-        _attempt.moveToNextTask();
-      });
-
+    if (_attempt.isFinished) {
+      final topicResult = _attempt.getResult();
+      context.pop(topicResult);
       return;
     }
 
-    final result = _attempt.getResult();
-
-    context.pop(result);
+    setState(() {
+      _attempt.moveToNextTask();
+    });
   }
 }
