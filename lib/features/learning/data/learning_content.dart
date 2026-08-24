@@ -103,7 +103,10 @@ abstract final class LearningContent {
       taskData: additionWithin10Data,
       help: 'Тут буде довідка про додавання в межах 10.',
       evaluation: EvaluationConfig(
-        weights: {EvaluationCriterionType.accuracy: 1.0},
+        weights: {
+          EvaluationCriterionType.accuracy: 1.0,
+          EvaluationCriterionType.time: 3,
+        },
       ),
     ),
     Topic(
@@ -112,7 +115,10 @@ abstract final class LearningContent {
       taskData: additionDigitsData,
       help: 'Тут буде довідка про додавання одноцифрових чисел.',
       evaluation: EvaluationConfig(
-        weights: {EvaluationCriterionType.accuracy: 1.0},
+        weights: {
+          EvaluationCriterionType.accuracy: 1.0,
+          EvaluationCriterionType.time: 3,
+        },
       ),
     ),
     Topic(
@@ -124,7 +130,10 @@ abstract final class LearningContent {
       taskData: [...shapeData, ...additionDigitsData],
       help: 'Розпізнавання геометричних фігур.',
       evaluation: EvaluationConfig(
-        weights: {EvaluationCriterionType.accuracy: 1.0},
+        weights: {
+          EvaluationCriterionType.accuracy: 1.0,
+          EvaluationCriterionType.time: 3,
+        },
       ),
     ),
   ];
