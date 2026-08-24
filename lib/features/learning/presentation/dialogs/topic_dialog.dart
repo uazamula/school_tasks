@@ -106,7 +106,7 @@ class TopicDialog extends StatelessWidget {
                 '${result!.correctTasks} / ${result!.totalTasks}',
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text('Оцінка: ${(evaluation * 100).round()}%'),
+              Text('Оцінка: ${(evaluation.finalScore * 100).round()}%'),
             ],
           ),
           actions: [

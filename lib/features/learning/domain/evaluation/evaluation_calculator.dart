@@ -1,22 +1,32 @@
 import '../topic.dart';
 import '../topic_attempt_result.dart';
 import 'accuracy_criterion.dart';
+import 'criterion_evaluation_result.dart';
 import 'evaluation_criterion_type.dart';
+import 'evaluation_result.dart';
 import 'time_criterion.dart';
 
 class EvaluationCalculator {
   const EvaluationCalculator();
 
-  double calculate({
+  EvaluationResult calculate({
     required Topic topic,
     required TopicAttemptResult result,
     Duration? elapsedTime,
   }) {
-    final criterionResults = <EvaluationCriterionType, double>{};
+    final criterionResults =
+        <EvaluationCriterionType, CriterionEvaluationResult>{};
 
     final accuracyResult = const AccuracyCriterion().calculate(result);
 
-    criterionResults[EvaluationCriterionType.accuracy] = accuracyResult.score;
+    _addCriterionResult(
+      criterionResults: criterionResults,
+      criterion: EvaluationCriterionType.accuracy,
+      measurement: accuracyResult.measurement,
+      score: accuracyResult.score,
+      configuredWeight:
+          topic.evaluation.weights[EvaluationCriterionType.accuracy] ?? 0,
+    );
 
     final timeConfig = topic.evaluation.time;
 
@@ -28,31 +38,71 @@ class EvaluationCalculator {
         maximumTime: timeConfig.maximumTime,
       ).calculate(elapsedTime);
 
-      criterionResults[EvaluationCriterionType.time] = timeResult.score;
+      _addCriterionResult(
+        criterionResults: criterionResults,
+        criterion: EvaluationCriterionType.time,
+        measurement: timeResult.measurement,
+        score: timeResult.score,
+        configuredWeight:
+            topic.evaluation.weights[EvaluationCriterionType.time] ?? 0,
+      );
     }
 
-    if (criterionResults.isEmpty) {
-      return 0;
-    }
-
-    final availableWeight = criterionResults.keys.fold(
+    final availableWeight = criterionResults.values.fold(
       0.0,
-      (sum, type) => sum + (topic.evaluation.weights[type] ?? 0),
+      (sum, result) => sum + result.weight,
     );
 
     if (availableWeight <= 0) {
-      return 0;
+      return const EvaluationResult(criterionResults: {}, finalScore: 0);
     }
+
+    final normalizedResults =
+        <EvaluationCriterionType, CriterionEvaluationResult>{};
 
     var finalScore = 0.0;
 
     for (final entry in criterionResults.entries) {
-      final weight = topic.evaluation.weights[entry.key] ?? 0;
-      final normalizedWeight = weight / availableWeight;
+      final result = entry.value;
 
-      finalScore += entry.value * normalizedWeight;
+      final normalizedWeight = result.weight / availableWeight;
+      final weightedScore = result.score * normalizedWeight;
+
+      normalizedResults[entry.key] = CriterionEvaluationResult(
+        criterion: result.criterion,
+        measurement: result.measurement,
+        score: result.score,
+        weight: normalizedWeight,
+        weightedScore: weightedScore,
+      );
+
+      finalScore += weightedScore;
     }
 
-    return finalScore;
+    return EvaluationResult(
+      criterionResults: Map.unmodifiable(normalizedResults),
+      finalScore: finalScore,
+    );
+  }
+
+  void _addCriterionResult({
+    required Map<EvaluationCriterionType, CriterionEvaluationResult>
+    criterionResults,
+    required EvaluationCriterionType criterion,
+    required double measurement,
+    required double score,
+    required double configuredWeight,
+  }) {
+    if (configuredWeight <= 0) {
+      return;
+    }
+
+    criterionResults[criterion] = CriterionEvaluationResult(
+      criterion: criterion,
+      measurement: measurement,
+      score: score,
+      weight: configuredWeight,
+      weightedScore: 0,
+    );
   }
 }
