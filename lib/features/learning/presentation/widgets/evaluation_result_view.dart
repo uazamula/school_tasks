@@ -28,7 +28,7 @@ class EvaluationResultView extends StatelessWidget {
 
         if (time != null) ...[
           const SizedBox(height: AppSpacing.sm),
-          Text('Час: ${time.measurement.round()} с'),
+          Text('Час: ${time.measurement.toStringAsFixed(1)} с'),
           const SizedBox(height: AppSpacing.sm),
           Text('Оцінка за час: ${(time.score * 100).round()}%'),
           const SizedBox(height: AppSpacing.sm),

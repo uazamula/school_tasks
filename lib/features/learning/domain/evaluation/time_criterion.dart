@@ -11,7 +11,10 @@ class TimeCriterion {
 
   CriterionResult calculate(Duration elapsedTime) {
     if (elapsedTime <= targetTime) {
-      return const CriterionResult(measurement: 0, score: 1);
+      return CriterionResult(
+        measurement: elapsedTime.inMilliseconds / 1000,
+        score: 1,
+      );
     }
 
     if (elapsedTime >= maximumTime) {

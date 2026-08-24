@@ -96,6 +96,18 @@ abstract final class LearningContent {
   ];
   static const List<Topic> topics = [
     Topic(
+      id: 'addition_digits',
+      taskTypeCounts: {LearningTaskType.choice: 2},
+      taskData: additionDigitsData,
+      help: 'Тут буде довідка про додавання одноцифрових чисел.',
+      evaluation: EvaluationConfig(
+        weights: {
+          EvaluationCriterionType.accuracy: 1.0,
+          EvaluationCriterionType.time: 0,
+        },
+      ),
+    ),
+    Topic(
       id: 'addition_within_10',
       taskTypeCounts: {
         LearningTaskType.choice: 2,
@@ -109,23 +121,12 @@ abstract final class LearningContent {
           EvaluationCriterionType.time: 3,
         },
         time: TimeEvaluationConfig(
-          targetTime: Duration(seconds: 30),
-          maximumTime: Duration(seconds: 90),
+          targetTime: Duration(seconds: 5),
+          maximumTime: Duration(seconds: 20),
         ),
       ),
     ),
-    Topic(
-      id: 'addition_digits',
-      taskTypeCounts: {LearningTaskType.choice: 2},
-      taskData: additionDigitsData,
-      help: 'Тут буде довідка про додавання одноцифрових чисел.',
-      evaluation: EvaluationConfig(
-        weights: {
-          EvaluationCriterionType.accuracy: 1.0,
-          EvaluationCriterionType.time: 3,
-        },
-      ),
-    ),
+
     Topic(
       id: 'shapes',
       taskTypeCounts: {

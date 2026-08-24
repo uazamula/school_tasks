@@ -24,6 +24,7 @@ class _LearningPageState extends State<LearningPage> {
   late final Topic _topic;
   final EvaluationCalculator _evaluationCalculator =
       const EvaluationCalculator();
+  late final DateTime _startedAt;
 
   final TopicAttemptGenerator _attemptGenerator = TopicAttemptGenerator();
   @override
@@ -33,6 +34,8 @@ class _LearningPageState extends State<LearningPage> {
     _topic = LearningContent.topics.firstWhere(
       (topic) => topic.id == widget.topicId,
     );
+
+    _startedAt = DateTime.now();
 
     _attempt = _attemptGenerator.generate(_topic);
   }
@@ -88,9 +91,14 @@ class _LearningPageState extends State<LearningPage> {
     if (_attempt.isFinished) {
       final topicResult = _attempt.getResult();
 
+      final elapsedTime = DateTime.now().difference(_startedAt);
+      debugPrint('STARTED: $_startedAt');
+      debugPrint('NOW: ${DateTime.now()}');
+      debugPrint('ELAPSED: ${elapsedTime.inMilliseconds} ms');
       final evaluation = _evaluationCalculator.calculate(
         topic: _topic,
         result: topicResult,
+        elapsedTime: elapsedTime,
       );
 
       final evaluatedResult = TopicAttemptResult(
