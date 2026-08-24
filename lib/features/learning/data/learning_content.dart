@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
@@ -101,14 +102,18 @@ abstract final class LearningContent {
       },
       taskData: additionWithin10Data,
       help: 'Тут буде довідка про додавання в межах 10.',
-      evaluation: EvaluationConfig(accuracyWeight: 1.0),
+      evaluation: EvaluationConfig(
+        weights: {EvaluationCriterionType.accuracy: 1.0},
+      ),
     ),
     Topic(
       id: 'addition_digits',
       taskTypeCounts: {LearningTaskType.choice: 2},
       taskData: additionDigitsData,
       help: 'Тут буде довідка про додавання одноцифрових чисел.',
-      evaluation: EvaluationConfig(accuracyWeight: 1.0),
+      evaluation: EvaluationConfig(
+        weights: {EvaluationCriterionType.accuracy: 1.0},
+      ),
     ),
     Topic(
       id: 'shapes',
@@ -118,7 +123,9 @@ abstract final class LearningContent {
       },
       taskData: [...shapeData, ...additionDigitsData],
       help: 'Розпізнавання геометричних фігур.',
-      evaluation: EvaluationConfig(accuracyWeight: 1.0),
+      evaluation: EvaluationConfig(
+        weights: {EvaluationCriterionType.accuracy: 1.0},
+      ),
     ),
   ];
 }

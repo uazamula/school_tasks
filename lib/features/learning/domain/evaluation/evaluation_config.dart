@@ -1,9 +1,17 @@
-class EvaluationConfig {
-  const EvaluationConfig({required this.accuracyWeight});
+import 'evaluation_criterion_type.dart';
 
-  /// Вага критерію точності.
-  ///
-  /// Значення від 0 до 1.
-  /// Наприклад: 0.7 = 70%.
-  final double accuracyWeight;
+class EvaluationConfig {
+  const EvaluationConfig({required this.weights});
+
+  final Map<EvaluationCriterionType, double> weights;
+
+  double normalizedWeight(EvaluationCriterionType type) {
+    final totalWeight = weights.values.fold(0.0, (sum, weight) => sum + weight);
+
+    if (totalWeight <= 0) {
+      return 0;
+    }
+
+    return (weights[type] ?? 0) / totalWeight;
+  }
 }
