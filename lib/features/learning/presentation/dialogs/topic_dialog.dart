@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/accuracy_criterion.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
 
@@ -18,6 +19,8 @@ class TopicDialog extends StatelessWidget {
   final LearningNode topicNode;
   final Topic topic;
   final TopicAttemptResult? result;
+
+  final AccuracyCriterion _accuracyCriterion = const AccuracyCriterion();
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +80,10 @@ class TopicDialog extends StatelessWidget {
   }
 
   void _showResult(BuildContext context) {
+    final accuracyCriterion = const AccuracyCriterion();
+
+    final accuracy = accuracyCriterion.calculate(result!);
+
     showDialog<void>(
       context: context,
       builder: (context) {
@@ -96,7 +103,7 @@ class TopicDialog extends StatelessWidget {
                 '${result!.correctTasks} / ${result!.totalTasks}',
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text('Результат: ${(result!.score * 100).round()}%'),
+              Text('Точність: ${(accuracy.score * 100).round()}%'),
             ],
           ),
           actions: [

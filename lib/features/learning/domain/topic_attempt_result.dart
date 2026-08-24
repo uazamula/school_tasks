@@ -11,11 +11,11 @@ class TopicAttemptResult {
 
   bool get isFinished => completedTasks == totalTasks;
 
-  double get score {
-    if (totalTasks == 0) {
-      return 0;
-    }
-
-    return correctTasks / totalTasks;
-  }
+  // double get score {
+  //   if (totalTasks == 0) {
+  //     return 0;
+  //   }
+  //
+  //   return correctTasks / totalTasks;
+  // }
 }
