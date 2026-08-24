@@ -4,9 +4,12 @@ import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_generator.dart';
+import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 
 class LearningPage extends StatefulWidget {
@@ -18,13 +21,20 @@ class LearningPage extends StatefulWidget {
 
 class _LearningPageState extends State<LearningPage> {
   late final TopicAttempt _attempt;
+  late final Topic _topic;
+  final EvaluationCalculator _evaluationCalculator =
+      const EvaluationCalculator();
 
   final TopicAttemptGenerator _attemptGenerator = TopicAttemptGenerator();
   @override
   void initState() {
     super.initState();
 
-    _attempt = _createAttempt();
+    _topic = LearningContent.topics.firstWhere(
+      (topic) => topic.id == widget.topicId,
+    );
+
+    _attempt = _attemptGenerator.generate(_topic);
   }
 
   @override
@@ -58,13 +68,13 @@ class _LearningPageState extends State<LearningPage> {
     );
   }
 
-  TopicAttempt _createAttempt() {
-    final topic = LearningContent.topics.firstWhere(
-      (topic) => topic.id == widget.topicId,
-    );
-
-    return _attemptGenerator.generate(topic);
-  }
+  // TopicAttempt _createAttempt() {
+  //   final topic = LearningContent.topics.firstWhere(
+  //     (topic) => topic.id == widget.topicId,
+  //   );
+  //
+  //   return _attemptGenerator.generate(topic);
+  // }
 
   void _onTaskAnswered(TaskResult<dynamic> result) {
     final currentTask = _attempt.currentTask;
@@ -77,7 +87,20 @@ class _LearningPageState extends State<LearningPage> {
 
     if (_attempt.isFinished) {
       final topicResult = _attempt.getResult();
-      context.pop(topicResult);
+
+      final evaluation = _evaluationCalculator.calculate(
+        topic: _topic,
+        result: topicResult,
+      );
+
+      final evaluatedResult = TopicAttemptResult(
+        totalTasks: topicResult.totalTasks,
+        completedTasks: topicResult.completedTasks,
+        correctTasks: topicResult.correctTasks,
+        evaluation: evaluation,
+      );
+
+      context.pop(evaluatedResult);
       return;
     }
 

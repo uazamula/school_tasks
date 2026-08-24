@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:school_tasks/features/learning/domain/evaluation/accuracy_criterion.dart';
-import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/evaluation_result_view.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../routing/app_routes.dart';
@@ -20,8 +19,6 @@ class TopicDialog extends StatelessWidget {
   final LearningNode topicNode;
   final Topic topic;
   final TopicAttemptResult? result;
-
-  final AccuracyCriterion _accuracyCriterion = const AccuracyCriterion();
 
   @override
   Widget build(BuildContext context) {
@@ -81,15 +78,11 @@ class TopicDialog extends StatelessWidget {
   }
 
   void _showResult(BuildContext context) {
-    final accuracyCriterion = const AccuracyCriterion();
-
-    final evaluation = const EvaluationCalculator().calculate(
-      topic: topic,
-      result: result!,
-    );
     showDialog<void>(
       context: context,
       builder: (context) {
+        final evaluation = result!.evaluation;
+
         return AlertDialog(
           title: const Text('Результат'),
           content: Column(
@@ -105,8 +98,11 @@ class TopicDialog extends StatelessWidget {
                 'Правильних: '
                 '${result!.correctTasks} / ${result!.totalTasks}',
               ),
-              const SizedBox(height: AppSpacing.sm),
-              Text('Оцінка: ${(evaluation.finalScore * 100).round()}%'),
+
+              if (evaluation != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                EvaluationResultView(evaluation: evaluation),
+              ],
             ],
           ),
           actions: [

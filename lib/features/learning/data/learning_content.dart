@@ -1,6 +1,7 @@
 import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
@@ -104,9 +105,13 @@ abstract final class LearningContent {
       help: 'Тут буде довідка про додавання в межах 10.',
       evaluation: EvaluationConfig(
         weights: {
-          EvaluationCriterionType.accuracy: 1.0,
+          EvaluationCriterionType.accuracy: 7,
           EvaluationCriterionType.time: 3,
         },
+        time: TimeEvaluationConfig(
+          targetTime: Duration(seconds: 30),
+          maximumTime: Duration(seconds: 90),
+        ),
       ),
     ),
     Topic(
@@ -131,9 +136,13 @@ abstract final class LearningContent {
       help: 'Розпізнавання геометричних фігур.',
       evaluation: EvaluationConfig(
         weights: {
-          EvaluationCriterionType.accuracy: 1.0,
+          EvaluationCriterionType.accuracy: 7,
           EvaluationCriterionType.time: 3,
         },
+        time: TimeEvaluationConfig(
+          targetTime: Duration(seconds: 30),
+          maximumTime: Duration(seconds: 90),
+        ),
       ),
     ),
   ];

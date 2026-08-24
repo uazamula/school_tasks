@@ -9,12 +9,12 @@ class TopicResultIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (result == null) {
+    if (result == null || result!.evaluation == null) {
       return const Text('-', style: AppTextStyles.body);
     }
 
     return Text(
-      '${result!.correctTasks}/${result!.totalTasks}',
+      '${(result!.evaluation!.finalScore * 100).round()}%',
       style: AppTextStyles.body,
     );
   }
