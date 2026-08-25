@@ -8,4 +8,7 @@ abstract final class PreferenceValues {
   static const uk = 'uk';
   static const en = 'en';
   static const tr = 'tr';
+
+  static const gradeScaleHundred = 'hundred';
+  static const gradeScaleTwelve = 'twelve';
 }

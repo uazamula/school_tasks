@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/model/usage_statistics.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/profile/model/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,6 +47,26 @@ class AppPreferences {
 
   Future<bool> setLocale(Locale locale) {
     return _prefs.setString(PreferenceKeys.languageCode, locale.languageCode);
+  }
+
+  GradeScale getGradeScale() {
+    final value = _prefs.getString(PreferenceKeys.gradeScale);
+
+    switch (value) {
+      case PreferenceValues.gradeScaleTwelve:
+        return GradeScale.twelve;
+
+      case PreferenceValues.gradeScaleHundred:
+      default:
+        return GradeScale.hundred;
+    }
+  }
+
+  Future<bool> setGradeScale(GradeScale scale) {
+    return _prefs.setString(PreferenceKeys.gradeScale, switch (scale) {
+      GradeScale.hundred => PreferenceValues.gradeScaleHundred,
+      GradeScale.twelve => PreferenceValues.gradeScaleTwelve,
+    });
   }
 
   UserProfile getUserProfile() {
