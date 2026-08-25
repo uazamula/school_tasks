@@ -1,4 +1,5 @@
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/task_data.dart';
 
@@ -9,14 +10,15 @@ class Topic {
     required this.taskData,
     required this.help,
     required this.evaluation,
+    this.passingCriteria,
   });
 
   final String id;
   final Map<LearningTaskType, int> taskTypeCounts;
   final List<TaskData> taskData;
   final String help;
-
   final EvaluationConfig evaluation;
+  final PassingCriteria? passingCriteria;
 
   int get totalTasks {
     return taskTypeCounts.values.fold(0, (sum, count) => sum + count);
