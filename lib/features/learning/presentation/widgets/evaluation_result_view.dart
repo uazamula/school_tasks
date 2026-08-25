@@ -41,6 +41,8 @@ class EvaluationResultView extends StatelessWidget {
           'Загальна оцінка: '
           '${(evaluation.finalScore * 100).round()}%',
         ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(evaluation.isPassed ? 'Зараховано' : 'Не зараховано'),
       ],
     );
   }

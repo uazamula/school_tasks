@@ -54,9 +54,12 @@ class EvaluationCalculator {
     );
 
     if (availableWeight <= 0) {
-      return const EvaluationResult(criterionResults: {}, finalScore: 0);
+      return EvaluationResult(
+        criterionResults: const {},
+        finalScore: 0,
+        isPassed: _isPassed(topic: topic, result: result),
+      );
     }
-
     final normalizedResults =
         <EvaluationCriterionType, CriterionEvaluationResult>{};
 
@@ -79,9 +82,12 @@ class EvaluationCalculator {
       finalScore += weightedScore;
     }
 
+    final isPassed = _isPassed(topic: topic, result: result);
+
     return EvaluationResult(
       criterionResults: Map.unmodifiable(normalizedResults),
       finalScore: finalScore,
+      isPassed: isPassed,
     );
   }
 
@@ -104,5 +110,21 @@ class EvaluationCalculator {
       weight: configuredWeight,
       weightedScore: 0,
     );
+  }
+
+  bool _isPassed({required Topic topic, required TopicAttemptResult result}) {
+    final criteria = topic.passingCriteria;
+
+    if (criteria == null) {
+      return true;
+    }
+
+    final minimumAccuracy = criteria.minimumAccuracy;
+
+    if (minimumAccuracy != null && result.score < minimumAccuracy) {
+      return false;
+    }
+
+    return true;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
@@ -125,6 +126,7 @@ abstract final class LearningContent {
           maximumTime: Duration(seconds: 20),
         ),
       ),
+      passingCriteria: PassingCriteria(minimumAccuracy: 0.0),
     ),
 
     Topic(
