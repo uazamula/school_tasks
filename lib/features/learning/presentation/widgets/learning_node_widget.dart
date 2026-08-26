@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/learning_node.dart';
@@ -18,7 +18,7 @@ class LearningNodeWidget extends StatelessWidget {
   final LearningNode node;
   final int level;
   final ValueChanged<LearningNode>? onTopicPressed;
-  final TopicAttemptResult? Function(String topicId)? getTopicResult;
+  final TopicResult? Function(String topicId)? getTopicResult;
 
   @override
   Widget build(BuildContext context) {

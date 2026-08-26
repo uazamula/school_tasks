@@ -25,8 +25,8 @@ class TopicResult {
   final double bestScore;
 
   /// Момент встановлення найкращого результату.
-  final DateTime bestAt;
+  final DateTime? bestAt;
 
   /// Тривалість найкращого проходження.
-  final Duration bestDuration;
+  final Duration? bestDuration;
 }

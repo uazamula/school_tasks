@@ -1,32 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:school_tasks/core/theme/app_text_styles.dart';
-import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
-import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
+import 'package:school_tasks/features/learning/domain/topic_result.dart';
 
-class TopicResultIndicator extends ConsumerWidget {
+class TopicResultIndicator extends StatelessWidget {
   const TopicResultIndicator({super.key, required this.result});
 
-  final TopicAttemptResult? result;
+  final TopicResult? result;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (result == null || result!.evaluation == null) {
+  Widget build(BuildContext context) {
+    if (result == null) {
       return const Text('-', style: AppTextStyles.body);
     }
 
-    final gradeScale = ref.watch(gradeScaleControllerProvider);
-
-    return gradeScale.when(
-      loading: () => const Text('-', style: AppTextStyles.body),
-      error: (_, __) => const Text('-', style: AppTextStyles.body),
-      data: (scale) {
-        final grade = scale.convert(result!.evaluation!.finalScore);
-
-        return Text('$grade', style: AppTextStyles.body);
-      },
+    return Text(
+      '${(result!.currentScore * 100).round()}%',
+      style: AppTextStyles.body,
     );
   }
 }

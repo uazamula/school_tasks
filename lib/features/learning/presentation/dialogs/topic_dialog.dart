@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/evaluation_result_view.dart';
-
+import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../routing/app_routes.dart';
 import '../../domain/learning_node.dart';
@@ -18,7 +17,7 @@ class TopicDialog extends StatelessWidget {
 
   final LearningNode topicNode;
   final Topic topic;
-  final TopicAttemptResult? result;
+  final TopicResult? result;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +38,9 @@ class TopicDialog extends StatelessWidget {
           },
           child: const Text('Почати'),
         ),
+
         const SizedBox(height: AppSpacing.sm),
+
         FilledButton(
           onPressed: result == null
               ? null
@@ -48,7 +49,9 @@ class TopicDialog extends StatelessWidget {
                 },
           child: const Text('Результати'),
         ),
+
         const SizedBox(height: AppSpacing.sm),
+
         FilledButton(
           onPressed: () {
             _showHelp(context);
@@ -81,8 +84,6 @@ class TopicDialog extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) {
-        final evaluation = result!.evaluation;
-
         return AlertDialog(
           title: const Text('Результат'),
           content: Column(
@@ -90,18 +91,39 @@ class TopicDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Виконано: '
-                '${result!.completedTasks} / ${result!.totalTasks}',
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Правильних: '
-                '${result!.correctTasks} / ${result!.totalTasks}',
+                'Поточний результат: '
+                '${(result!.currentScore * 100).round()}%',
               ),
 
-              if (evaluation != null) ...[
-                const SizedBox(height: AppSpacing.md),
-                EvaluationResultView(evaluation: evaluation),
+              const SizedBox(height: AppSpacing.sm),
+
+              Text(
+                'Зараховано: '
+                '${result!.currentIsPassed ? 'так' : 'ні'}',
+              ),
+
+              const SizedBox(height: AppSpacing.sm),
+
+              Text(
+                'Час: '
+                '${result!.currentDuration.inMilliseconds / 1000}'
+                ' с',
+              ),
+
+              const SizedBox(height: AppSpacing.md),
+
+              Text(
+                'Найкращий результат: '
+                '${(result!.bestScore * 100).round()}%',
+              ),
+
+              if (result!.bestDuration != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Час найкращого результату: '
+                  '${result!.bestDuration!.inMilliseconds / 1000}'
+                  ' с',
+                ),
               ],
             ],
           ),

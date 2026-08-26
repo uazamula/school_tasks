@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
 import 'package:school_tasks/features/learning/presentation/dialogs/topic_dialog.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_node_widget.dart';
 
@@ -15,7 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final Map<String, TopicAttemptResult> _topicResults = {};
+  final Map<String, TopicResult> _topicResults = {};
+
+  final _topicResultUpdater = const TopicResultUpdater();
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,7 @@ class _HomePageState extends State<HomePage> {
       (topic) => topic.id == topicNode.id,
     );
 
-    final result = await showDialog<TopicAttemptResult>(
+    final attemptResult = await showDialog<TopicAttemptResult>(
       context: context,
       builder: (_) {
         return TopicDialog(
@@ -48,12 +52,18 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    if (result == null || !mounted) {
+    if (attemptResult == null || !mounted) {
       return;
     }
 
+    final topicResult = _topicResultUpdater.update(
+      attempt: attemptResult,
+      currentAt: DateTime.now(),
+      previous: _topicResults[topicNode.id],
+    );
+
     setState(() {
-      _topicResults[topicNode.id] = result;
+      _topicResults[topicNode.id] = topicResult;
     });
   }
 }
