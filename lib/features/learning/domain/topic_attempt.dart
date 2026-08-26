@@ -30,7 +30,7 @@ class TopicAttempt {
     return true;
   }
 
-  TopicAttemptResult getResult() {
+  TopicAttemptResult getResult({required Duration duration}) {
     final completedTasks = tasks.where((task) => task.isAnswered).length;
 
     final correctTasks = tasks
@@ -41,6 +41,7 @@ class TopicAttempt {
       totalTasks: tasks.length,
       completedTasks: completedTasks,
       correctTasks: correctTasks,
+      duration: duration,
     );
   }
 }

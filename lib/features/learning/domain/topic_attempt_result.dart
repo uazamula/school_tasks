@@ -5,12 +5,14 @@ class TopicAttemptResult {
     required this.totalTasks,
     required this.completedTasks,
     required this.correctTasks,
+    required this.duration,
     this.evaluation,
   });
 
   final int totalTasks;
   final int completedTasks;
   final int correctTasks;
+  final Duration duration;
 
   final EvaluationResult? evaluation;
 

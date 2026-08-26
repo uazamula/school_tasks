@@ -89,12 +89,14 @@ class _LearningPageState extends State<LearningPage> {
     _attempt.recordResult(result);
 
     if (_attempt.isFinished) {
-      final topicResult = _attempt.getResult();
-
       final elapsedTime = DateTime.now().difference(_startedAt);
+
+      final topicResult = _attempt.getResult(duration: elapsedTime);
+
       debugPrint('STARTED: $_startedAt');
       debugPrint('NOW: ${DateTime.now()}');
       debugPrint('ELAPSED: ${elapsedTime.inMilliseconds} ms');
+
       final evaluation = _evaluationCalculator.calculate(
         topic: _topic,
         result: topicResult,
@@ -105,6 +107,7 @@ class _LearningPageState extends State<LearningPage> {
         totalTasks: topicResult.totalTasks,
         completedTasks: topicResult.completedTasks,
         correctTasks: topicResult.correctTasks,
+        duration: topicResult.duration,
         evaluation: evaluation,
       );
 
