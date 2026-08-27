@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/preferences/preferences_provider.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
@@ -7,7 +8,6 @@ import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
 import 'package:school_tasks/features/learning/presentation/dialogs/topic_dialog.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_node_widget.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/app_scaffold.dart';
 
@@ -80,6 +80,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           topicNode: topicNode,
           topic: topic,
           result: _topicResults[topicNode.id],
+          onResetResult: () {
+            _resetTopicResult(topicNode.id);
+          },
         );
       },
     );
@@ -104,6 +107,20 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     setState(() {
       _topicResults[topicNode.id] = topicResult;
+    });
+  }
+
+  Future<void> _resetTopicResult(String topicId) async {
+    final preferences = await ref.read(appPreferencesProvider.future);
+
+    await preferences.clearTopicResult(topicId);
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _topicResults.remove(topicId);
     });
   }
 }

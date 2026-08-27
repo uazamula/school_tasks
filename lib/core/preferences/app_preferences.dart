@@ -180,7 +180,7 @@ class AppPreferences {
     );
   }
 
-  Future<bool> removeTopicResult(String topicId) {
+  Future<bool> clearTopicResult(String topicId) {
     return _prefs.remove(PreferenceKeys.topicResult(topicId));
   }
 }

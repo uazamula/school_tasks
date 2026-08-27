@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
+
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../routing/app_routes.dart';
 import '../../domain/learning_node.dart';
@@ -13,11 +14,13 @@ class TopicDialog extends StatelessWidget {
     required this.topicNode,
     required this.topic,
     this.result,
+    this.onResetResult,
   });
 
   final LearningNode topicNode;
   final Topic topic;
   final TopicResult? result;
+  final VoidCallback? onResetResult;
 
   @override
   Widget build(BuildContext context) {
@@ -129,8 +132,47 @@ class TopicDialog extends StatelessWidget {
           ),
           actions: [
             TextButton(
+              onPressed: () async {
+                final shouldReset = await _confirmReset(context);
+
+                if (shouldReset != true || !context.mounted) {
+                  return;
+                }
+
+                Navigator.pop(context);
+                onResetResult?.call();
+              },
+              child: const Text('Скасувати'),
+            ),
+
+            TextButton(
               onPressed: () => context.pop(),
               child: const Text('Закрити'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool?> _confirmReset(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Скинути результат?'),
+          content: const Text(
+            'Поточний і найкращий результат цієї теми '
+            'буде видалено назавжди. ',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => context.pop(false),
+              child: const Text('Ні'),
+            ),
+            FilledButton(
+              onPressed: () => context.pop(true),
+              child: const Text('Так, скинути'),
             ),
           ],
         );
