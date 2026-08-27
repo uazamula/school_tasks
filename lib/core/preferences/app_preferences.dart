@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/model/usage_statistics.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/profile/model/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -152,5 +155,32 @@ class AppPreferences {
     }
 
     return DateTime.tryParse(value);
+  }
+
+  TopicResult? getTopicResult(String topicId) {
+    final value = _prefs.getString(PreferenceKeys.topicResult(topicId));
+
+    if (value == null) {
+      return null;
+    }
+
+    try {
+      final json = jsonDecode(value) as Map<String, dynamic>;
+
+      return TopicResult.fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<bool> setTopicResult(String topicId, TopicResult result) {
+    return _prefs.setString(
+      PreferenceKeys.topicResult(topicId),
+      jsonEncode(result.toJson()),
+    );
+  }
+
+  Future<bool> removeTopicResult(String topicId) {
+    return _prefs.remove(PreferenceKeys.topicResult(topicId));
   }
 }

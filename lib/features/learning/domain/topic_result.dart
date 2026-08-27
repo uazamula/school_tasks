@@ -29,4 +29,32 @@ class TopicResult {
 
   /// Тривалість найкращого проходження.
   final Duration? bestDuration;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'currentScore': currentScore,
+      'currentIsPassed': currentIsPassed,
+      'currentAt': currentAt.toIso8601String(),
+      'currentDurationMs': currentDuration.inMilliseconds,
+      'bestScore': bestScore,
+      'bestAt': bestAt?.toIso8601String(),
+      'bestDurationMs': bestDuration?.inMilliseconds,
+    };
+  }
+
+  factory TopicResult.fromJson(Map<String, dynamic> json) {
+    return TopicResult(
+      currentScore: (json['currentScore'] as num).toDouble(),
+      currentIsPassed: json['currentIsPassed'] as bool,
+      currentAt: DateTime.parse(json['currentAt'] as String),
+      currentDuration: Duration(milliseconds: json['currentDurationMs'] as int),
+      bestScore: (json['bestScore'] as num).toDouble(),
+      bestAt: json['bestAt'] == null
+          ? null
+          : DateTime.parse(json['bestAt'] as String),
+      bestDuration: json['bestDurationMs'] == null
+          ? null
+          : Duration(milliseconds: json['bestDurationMs'] as int),
+    );
+  }
 }

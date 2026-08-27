@@ -9,4 +9,8 @@ abstract final class PreferenceKeys {
   static const usageTotalSeconds = 'usage_total_seconds';
   static const usageTodaySeconds = 'usage_today_seconds';
   static const usageDate = 'usage_date';
+
+  static String topicResult(String topicId) {
+    return 'topic_result_$topicId';
+  }
 }
