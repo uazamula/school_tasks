@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/core/preferences/preferences_provider.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
@@ -6,20 +7,51 @@ import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
 import 'package:school_tasks/features/learning/presentation/dialogs/topic_dialog.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_node_widget.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/app_scaffold.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final Map<String, TopicResult> _topicResults = {};
 
   final _topicResultUpdater = const TopicResultUpdater();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTopicResults();
+  }
+
+  Future<void> _loadTopicResults() async {
+    final preferences = await ref.read(appPreferencesProvider.future);
+
+    final results = <String, TopicResult>{};
+
+    for (final topic in LearningContent.topics) {
+      final result = preferences.getTopicResult(topic.id);
+
+      if (result != null) {
+        results[topic.id] = result;
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _topicResults
+        ..clear()
+        ..addAll(results);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +93,14 @@ class _HomePageState extends State<HomePage> {
       currentAt: DateTime.now(),
       previous: _topicResults[topicNode.id],
     );
+
+    final preferences = await ref.read(appPreferencesProvider.future);
+
+    await preferences.setTopicResult(topicNode.id, topicResult);
+
+    if (!mounted) {
+      return;
+    }
 
     setState(() {
       _topicResults[topicNode.id] = topicResult;
