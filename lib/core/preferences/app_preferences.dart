@@ -93,11 +93,6 @@ class AppPreferences {
     return nameSaved && avatarSaved;
   }
 
-  /// Повертає накопичену статистику використання.
-  ///
-  /// Містить:
-  /// - загальний час використання застосунку;
-  /// - час використання за поточний день.
   UsageStatistics getUsageStatistics() {
     return UsageStatistics(
       totalUsage: Duration(
@@ -129,10 +124,6 @@ class AppPreferences {
     );
   }
 
-  /// Повертає дату, до якої належить збережена денна статистика використання.
-  ///
-  /// Якщо дата ще не була збережена або її не вдалося розпізнати,
-  /// повертає `null`.
   DateTime? getUsageDate() {
     final value = _prefs.getString(PreferenceKeys.usageDate);
 
@@ -143,10 +134,6 @@ class AppPreferences {
     return DateTime.tryParse(value);
   }
 
-  /// Повертає дату, до якої належить значення `todayUsage`.
-  ///
-  /// Використовується для визначення, чи потрібно
-  /// скидати денну статистику.
   DateTime? getUsageTodayDate() {
     final value = _prefs.getString(PreferenceKeys.usageDate);
 

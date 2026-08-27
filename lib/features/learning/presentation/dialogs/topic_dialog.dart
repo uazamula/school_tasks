@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
+import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../routing/app_routes.dart';
@@ -87,71 +90,99 @@ class TopicDialog extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Результат'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Поточний результат: '
-                '${(result!.currentScore * 100).round()}%',
-              ),
-
-              const SizedBox(height: AppSpacing.sm),
-
-              Text(
-                'Зараховано: '
-                '${result!.currentIsPassed ? 'так' : 'ні'}',
-              ),
-
-              const SizedBox(height: AppSpacing.sm),
-
-              Text(
-                'Час: '
-                '${result!.currentDuration.inMilliseconds / 1000}'
-                ' с',
-              ),
-
-              const SizedBox(height: AppSpacing.md),
-
-              Text(
-                'Найкращий результат: '
-                '${(result!.bestScore * 100).round()}%',
-              ),
-
-              if (result!.bestDuration != null) ...[
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Час найкращого результату: '
-                  '${result!.bestDuration!.inMilliseconds / 1000}'
-                  ' с',
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                final shouldReset = await _confirmReset(context);
-
-                if (shouldReset != true || !context.mounted) {
-                  return;
-                }
-
-                Navigator.pop(context);
-                onResetResult?.call();
-              },
-              child: const Text('Скасувати'),
-            ),
-
-            TextButton(
-              onPressed: () => context.pop(),
-              child: const Text('Закрити'),
-            ),
-          ],
+        return _TopicResultDialog(
+          result: result!,
+          onResetResult: onResetResult,
         );
       },
+    );
+  }
+}
+
+class _TopicResultDialog extends ConsumerWidget {
+  const _TopicResultDialog({required this.result, required this.onResetResult});
+
+  final TopicResult result;
+  final VoidCallback? onResetResult;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gradeScaleAsync = ref.watch(gradeScaleControllerProvider);
+
+    return AlertDialog(
+      title: const Text('Результат'),
+      content: gradeScaleAsync.when(
+        loading: () => const SizedBox(
+          height: 50,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (error, stackTrace) => Text('Помилка: $error'),
+        data: (scale) => _buildContent(scale),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            final shouldReset = await _confirmReset(context);
+
+            if (shouldReset != true || !context.mounted) {
+              return;
+            }
+
+            Navigator.pop(context);
+            onResetResult?.call();
+          },
+          child: const Text('Скасувати'),
+        ),
+
+        TextButton(
+          onPressed: () => context.pop(),
+          child: const Text('Закрити'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContent(GradeScale scale) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Поточний результат: '
+          '${scale.formatScore(result.currentScore)}',
+        ),
+
+        const SizedBox(height: AppSpacing.sm),
+
+        Text(
+          'Зараховано: '
+          '${result.currentIsPassed ? 'так' : 'ні'}',
+        ),
+
+        const SizedBox(height: AppSpacing.sm),
+
+        Text(
+          'Час: '
+          '${result.currentDuration.inMilliseconds / 1000}'
+          ' с',
+        ),
+
+        const SizedBox(height: AppSpacing.md),
+
+        Text(
+          'Найкращий результат: '
+          '${scale.formatScore(result.bestScore)}',
+        ),
+
+        if (result.bestDuration != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Час найкращого результату: '
+            '${result.bestDuration!.inMilliseconds / 1000}'
+            ' с',
+          ),
+        ],
+      ],
     );
   }
 
@@ -163,7 +194,7 @@ class TopicDialog extends StatelessWidget {
           title: const Text('Скинути результат?'),
           content: const Text(
             'Поточний і найкращий результат цієї теми '
-            'буде видалено назавжди. ',
+            'буде видалено назавжди.',
           ),
           actions: [
             TextButton(
