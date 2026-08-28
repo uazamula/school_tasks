@@ -1,0 +1,30 @@
+import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
+import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/topic.dart';
+import '../task_data/addition.dart';
+
+abstract final class AdditionWithin10 {
+  static const Topic topic = Topic(
+    id: 'addition_within_10',
+    taskTypeCounts: {
+      LearningTaskType.choice: 2,
+      LearningTaskType.numericInput: 2,
+    },
+    taskData: AdditionTaskData.within10,
+    help: 'Тут буде довідка про додавання в межах 10.',
+    evaluation: EvaluationConfig(
+      weights: {
+        EvaluationCriterionType.accuracy: 7,
+        EvaluationCriterionType.time: 3,
+      },
+      time: TimeEvaluationConfig(
+        targetTime: Duration(seconds: 5),
+        maximumTime: Duration(seconds: 20),
+      ),
+    ),
+    passingCriteria: PassingCriteria(minimumAccuracy: 0.0),
+  );
+}
