@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/preferences/preferences_provider.dart';
+import 'package:school_tasks/features/learning/providers/learning_results_controller.dart';
 
 class LearningDataSection extends ConsumerWidget {
   const LearningDataSection({super.key});
@@ -48,6 +49,8 @@ class LearningDataSection extends ConsumerWidget {
     final preferences = await ref.read(appPreferencesProvider.future);
 
     await preferences.clearLearningData();
+
+    ref.read(learningResultsControllerProvider.notifier).clearAll();
 
     if (!context.mounted) {
       return;
