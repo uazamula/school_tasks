@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
+
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/learning_node.dart';
 import '../../domain/learning_node_type.dart';
 import 'topic_result_indicator.dart';
 
-class LearningNodeWidget extends StatelessWidget {
+class LearningNodeWidget extends StatefulWidget {
   const LearningNodeWidget({
     super.key,
     required this.node,
@@ -21,10 +22,17 @@ class LearningNodeWidget extends StatelessWidget {
   final TopicResult? Function(String topicId)? getTopicResult;
 
   @override
+  State<LearningNodeWidget> createState() => _LearningNodeWidgetState();
+}
+
+class _LearningNodeWidgetState extends State<LearningNodeWidget> {
+  bool _isExpanded = true;
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: level * AppSpacing.lg,
+        left: widget.level * AppSpacing.lg,
         bottom: AppSpacing.sm,
       ),
       child: Column(
@@ -32,13 +40,13 @@ class LearningNodeWidget extends StatelessWidget {
         children: [
           _buildNode(),
 
-          if (node.hasChildren)
-            ...node.children.map(
+          if (widget.node.hasChildren && _isExpanded)
+            ...widget.node.children.map(
               (child) => LearningNodeWidget(
                 node: child,
-                level: level + 1,
-                onTopicPressed: onTopicPressed,
-                getTopicResult: getTopicResult,
+                level: widget.level + 1,
+                onTopicPressed: widget.onTopicPressed,
+                getTopicResult: widget.getTopicResult,
               ),
             ),
         ],
@@ -47,33 +55,70 @@ class LearningNodeWidget extends StatelessWidget {
   }
 
   Widget _buildNode() {
-    switch (node.type) {
+    switch (widget.node.type) {
       case LearningNodeType.knowledgeLevel:
-        return Text(node.titleKey, style: AppTextStyles.headline);
+        return _buildExpandableNode(
+          child: Text(widget.node.titleKey, style: AppTextStyles.headline),
+        );
 
       case LearningNodeType.section:
-        return Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.sm),
-          child: Text(node.titleKey, style: AppTextStyles.title),
+        return _buildExpandableNode(
+          child: Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: Text(widget.node.titleKey, style: AppTextStyles.title),
+          ),
         );
 
       case LearningNodeType.topic:
         return InkWell(
-          onTap: () => onTopicPressed?.call(node),
+          onTap: () => widget.onTopicPressed?.call(widget.node),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             child: Row(
               children: [
-                TopicResultIndicator(result: getTopicResult?.call(node.id)),
+                TopicResultIndicator(
+                  result: widget.getTopicResult?.call(widget.node.id),
+                ),
 
                 const SizedBox(width: AppSpacing.sm),
 
-                Expanded(child: Text(node.titleKey, style: AppTextStyles.body)),
+                Expanded(
+                  child: Text(widget.node.titleKey, style: AppTextStyles.body),
+                ),
               ],
             ),
           ),
         );
     }
+  }
+
+  Widget _buildExpandableNode({required Widget child}) {
+    if (!widget.node.hasChildren) {
+      return child;
+    }
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _isExpanded = !_isExpanded;
+        });
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _isExpanded
+                ? Icons.keyboard_arrow_down
+                : Icons.keyboard_arrow_right,
+          ),
+
+          const SizedBox(width: AppSpacing.xs),
+
+          child,
+        ],
+      ),
+    );
   }
 }

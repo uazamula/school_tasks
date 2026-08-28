@@ -33,6 +33,14 @@ abstract final class LearningContent {
               titleKey: 'additionWithin10',
               type: LearningNodeType.topic,
             ),
+          ],
+        ),
+
+        LearningNode(
+          id: 'geometry',
+          titleKey: 'geometry',
+          type: LearningNodeType.section,
+          children: [
             LearningNode(
               id: 'shapes',
               titleKey: 'shape',
@@ -40,10 +48,15 @@ abstract final class LearningContent {
             ),
           ],
         ),
+
+        LearningNode(
+          id: 'test_section',
+          titleKey: 'testSection',
+          type: LearningNodeType.section,
+        ),
       ],
     ),
   ];
-
   static const List<TaskData> additionWithin10Data = [
     ChoiceTaskData(
       condition: 'Скільки буде 2 + 2?',
@@ -149,4 +162,8 @@ abstract final class LearningContent {
       ),
     ),
   ];
+
+  static Topic getTopic(String topicId) {
+    return topics.firstWhere((topic) => topic.id == topicId);
+  }
 }

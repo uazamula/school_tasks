@@ -31,10 +31,7 @@ class _LearningPageState extends State<LearningPage> {
   void initState() {
     super.initState();
 
-    _topic = LearningContent.topics.firstWhere(
-      (topic) => topic.id == widget.topicId,
-    );
-
+    _topic = LearningContent.getTopic(widget.topicId);
     _startedAt = DateTime.now();
 
     _attempt = _attemptGenerator.generate(_topic);
@@ -70,14 +67,6 @@ class _LearningPageState extends State<LearningPage> {
       ),
     );
   }
-
-  // TopicAttempt _createAttempt() {
-  //   final topic = LearningContent.topics.firstWhere(
-  //     (topic) => topic.id == widget.topicId,
-  //   );
-  //
-  //   return _attemptGenerator.generate(topic);
-  // }
 
   void _onTaskAnswered(TaskResult<dynamic> result) {
     final currentTask = _attempt.currentTask;
