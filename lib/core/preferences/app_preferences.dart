@@ -175,7 +175,7 @@ class AppPreferences {
     final keys = _prefs.getKeys();
 
     final topicResultKeys = keys.where(
-          (key) => key.startsWith(PreferenceKeys.topicResultPrefix),
+      (key) => key.startsWith(PreferenceKeys.topicResultPrefix),
     );
 
     for (final key in topicResultKeys) {
