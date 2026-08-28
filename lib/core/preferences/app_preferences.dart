@@ -170,4 +170,16 @@ class AppPreferences {
   Future<bool> clearTopicResult(String topicId) {
     return _prefs.remove(PreferenceKeys.topicResult(topicId));
   }
+
+  Future<void> clearLearningData() async {
+    final keys = _prefs.getKeys();
+
+    final topicResultKeys = keys.where(
+          (key) => key.startsWith(PreferenceKeys.topicResultPrefix),
+    );
+
+    for (final key in topicResultKeys) {
+      await _prefs.remove(key);
+    }
+  }
 }
