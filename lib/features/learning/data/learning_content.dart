@@ -50,13 +50,13 @@ abstract final class LearningContent {
     ),
   ];
 
-  static const List<Topic> topics = [
-    AdditionDigits.topic,
-    AdditionWithin10.topic,
-    Shapes.topic,
-  ];
+  static const Map<String, Topic> topics = {
+    'addition_digits': AdditionDigits.topic,
+    'addition_within_10': AdditionWithin10.topic,
+    'shapes': Shapes.topic,
+  };
 
   static Topic getTopic(String topicId) {
-    return topics.firstWhere((topic) => topic.id == topicId);
+    return topics[topicId]!;
   }
 }

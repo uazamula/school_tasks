@@ -31,7 +31,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final preferences = await ref.read(appPreferencesProvider.future);
     final controller = ref.read(learningResultsControllerProvider.notifier);
 
-    for (final topic in LearningContent.topics) {
+    for (final topic in LearningContent.topics.values) {
       final result = preferences.getTopicResult(topic.id);
 
       if (result != null) {
@@ -58,9 +58,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _onTopicPressed(LearningNode topicNode) async {
-    final topic = LearningContent.topics.firstWhere(
-      (topic) => topic.id == topicNode.id,
-    );
+    final topic = LearningContent.topics[topicNode.id]!;
 
     final topicResults = ref.read(learningResultsControllerProvider);
 
