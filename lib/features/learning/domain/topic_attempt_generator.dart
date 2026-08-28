@@ -25,18 +25,20 @@ class TopicAttemptGenerator {
 
     taskTypes.shuffle(_random);
 
+    final data = topic.dataSource.getData();
+
     final choiceDataPool = TaskDataPool<ChoiceTaskData>(
-      items: topic.taskData.whereType<ChoiceTaskData>().toList(),
+      items: data.whereType<ChoiceTaskData>().toList(),
       random: _random,
     );
 
     final numericInputDataPool = TaskDataPool<NumericInputTaskData>(
-      items: topic.taskData.whereType<NumericInputTaskData>().toList(),
+      items: data.whereType<NumericInputTaskData>().toList(),
       random: _random,
     );
 
     final multiChoiceDataPool = TaskDataPool<MultiChoiceTaskData>(
-      items: topic.taskData.whereType<MultiChoiceTaskData>().toList(),
+      items: data.whereType<MultiChoiceTaskData>().toList(),
       random: _random,
     );
 

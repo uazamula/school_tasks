@@ -2,6 +2,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/evaluation_conf
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
+import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import '../task_data/addition.dart';
@@ -13,7 +14,7 @@ abstract final class AdditionWithin10 {
       LearningTaskType.choice: 2,
       LearningTaskType.numericInput: 2,
     },
-    taskData: AdditionTaskData.within10,
+    dataSource: FixedTaskDataSource(AdditionTaskData.within10),
     help: 'Тут буде довідка про додавання в межах 10.',
     evaluation: EvaluationConfig(
       weights: {
