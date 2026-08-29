@@ -1,6 +1,7 @@
 import 'package:school_tasks/features/learning/data/generation/addition/addition_generator_config.dart';
 import 'package:school_tasks/features/learning/data/generation/addition/addition_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
+import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
@@ -17,9 +18,12 @@ abstract final class AdditionDigits {
           maxA: 9,
           minB: 1,
           maxB: 9,
-          minimumResult: 2,
+          minimumResult: 11,
           maximumResult: 18,
-          wrongAnswerCount: 3,
+          wrongAnswerMinimumResult: 10,
+          wrongAnswerMaximumResult: 19,
+          wrongAnswerStrategy: WrongAnswerStrategy.randomInRange,
+          wrongAnswerCount: 4,
         ),
       ),
     ),

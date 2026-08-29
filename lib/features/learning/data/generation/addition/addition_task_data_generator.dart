@@ -28,6 +28,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
       for (var b = config.minB; b <= config.maxB; b++) {
         final correctAnswer = a + b;
 
+        // Перевіряємо саме діапазон правильних відповідей.
         if (correctAnswer < config.minimumResult ||
             correctAnswer > config.maximumResult) {
           continue;
@@ -35,9 +36,10 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
 
         final wrongAnswers = _wrongAnswerGenerator.generate(
           correctAnswer: correctAnswer,
-          minimumResult: config.minimumResult,
-          maximumResult: config.maximumResult,
+          minimumResult: config.effectiveWrongAnswerMinimumResult,
+          maximumResult: config.effectiveWrongAnswerMaximumResult,
           count: config.wrongAnswerCount,
+          strategy: config.wrongAnswerStrategy,
           random: _random,
         );
 
