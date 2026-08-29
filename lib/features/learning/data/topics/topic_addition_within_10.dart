@@ -8,7 +8,7 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 import '../task_data/addition.dart';
 
 abstract final class AdditionWithin10 {
-  static const Topic topic = Topic(
+  static final Topic topic = Topic(
     id: 'addition_within_10',
     taskTypeCounts: {
       LearningTaskType.choice: 2,

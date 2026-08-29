@@ -8,7 +8,7 @@ import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 abstract final class Shapes {
-  static const Topic topic = Topic(
+  static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
       LearningTaskType.multiChoice: 1,

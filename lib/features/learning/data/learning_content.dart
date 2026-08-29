@@ -50,7 +50,7 @@ abstract final class LearningContent {
     ),
   ];
 
-  static const Map<String, Topic> topics = {
+  static final Map<String, Topic> topics = {
     'addition_digits': AdditionDigits.topic,
     'addition_within_10': AdditionWithin10.topic,
     'shapes': Shapes.topic,

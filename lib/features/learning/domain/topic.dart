@@ -4,7 +4,7 @@ import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/task_data_source.dart';
 
 class Topic {
-  const Topic({
+  Topic({
     required this.id,
     required this.taskTypeCounts,
     required this.dataSource,
