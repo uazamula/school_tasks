@@ -8,30 +8,33 @@ class AdditionGeneratorConfig {
     required this.maxB,
     required this.minimumResult,
     required this.maximumResult,
+    this.divisibilityA,
+    this.divisibilityB,
+    this.resultDivisibility,
     this.wrongAnswerMinimumResult,
     this.wrongAnswerMaximumResult,
+    this.wrongAnswerDivisibility,
     this.wrongAnswerCount = 3,
     this.wrongAnswerStrategy = WrongAnswerStrategy.randomInRange,
   });
 
   final int minA;
   final int maxA;
+  final int? divisibilityA;
 
   final int minB;
   final int maxB;
+  final int? divisibilityB;
 
-  /// Допустимий діапазон правильних відповідей.
   final int minimumResult;
   final int maximumResult;
+  final int? resultDivisibility;
 
-  /// Допустимий діапазон неправильних відповідей.
-  ///
-  /// Якщо не заданий, використовується діапазон правильних відповідей.
   final int? wrongAnswerMinimumResult;
   final int? wrongAnswerMaximumResult;
+  final int? wrongAnswerDivisibility;
 
   final int wrongAnswerCount;
-
   final WrongAnswerStrategy wrongAnswerStrategy;
 
   int get effectiveWrongAnswerMinimumResult =>

@@ -10,6 +10,7 @@ class WrongAnswerGenerator {
     required int minimumResult,
     required int maximumResult,
     required int count,
+    int? divisibility,
     WrongAnswerStrategy strategy = WrongAnswerStrategy.randomInRange,
     Random? random,
   }) {
@@ -23,10 +24,15 @@ class WrongAnswerGenerator {
       );
     }
 
+    if (divisibility != null && divisibility <= 0) {
+      throw ArgumentError('divisibility must be greater than zero.');
+    }
+
     final candidates = _buildCandidates(
       correctAnswer: correctAnswer,
       minimumResult: minimumResult,
       maximumResult: maximumResult,
+      divisibility: divisibility,
       strategy: strategy,
     );
 
@@ -48,36 +54,63 @@ class WrongAnswerGenerator {
     required int correctAnswer,
     required int minimumResult,
     required int maximumResult,
+    required int? divisibility,
     required WrongAnswerStrategy strategy,
   }) {
     switch (strategy) {
       case WrongAnswerStrategy.randomInRange:
         return [
           for (var value = minimumResult; value <= maximumResult; value++)
-            if (value != correctAnswer) value,
+            if (value != correctAnswer &&
+                (divisibility == null || value % divisibility == 0))
+              value,
         ];
 
       case WrongAnswerStrategy.nearest:
-        final result = <int>[];
-
-        for (
-          var distance = 1;
-          result.length < maximumResult - minimumResult;
-          distance++
-        ) {
-          final lower = correctAnswer - distance;
-          final upper = correctAnswer + distance;
-
-          if (lower >= minimumResult) {
-            result.add(lower);
-          }
-
-          if (upper <= maximumResult) {
-            result.add(upper);
-          }
-        }
-
-        return result;
+        return _buildNearestCandidates(
+          correctAnswer: correctAnswer,
+          minimumResult: minimumResult,
+          maximumResult: maximumResult,
+          divisibility: divisibility,
+        );
     }
+  }
+
+  List<int> _buildNearestCandidates({
+    required int correctAnswer,
+    required int minimumResult,
+    required int maximumResult,
+    required int? divisibility,
+  }) {
+    final candidates = <int>[];
+
+    for (
+      var distance = 1;
+      candidates.length < maximumResult - minimumResult;
+      distance++
+    ) {
+      final lower = correctAnswer - distance;
+      final upper = correctAnswer + distance;
+
+      if (lower >= minimumResult &&
+          lower <= maximumResult &&
+          lower != correctAnswer &&
+          (divisibility == null || lower % divisibility == 0)) {
+        candidates.add(lower);
+      }
+
+      if (upper >= minimumResult &&
+          upper <= maximumResult &&
+          upper != correctAnswer &&
+          (divisibility == null || upper % divisibility == 0)) {
+        candidates.add(upper);
+      }
+
+      if (lower < minimumResult && upper > maximumResult) {
+        break;
+      }
+    }
+
+    return candidates;
   }
 }

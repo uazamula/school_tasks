@@ -24,8 +24,20 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
   List<TaskData> generate() {
     final result = <ChoiceTaskData>[];
 
-    for (var a = config.minA; a <= config.maxA; a++) {
-      for (var b = config.minB; b <= config.maxB; b++) {
+    final valuesA = _generateValues(
+      minimum: config.minA,
+      maximum: config.maxA,
+      divisibility: config.divisibilityA,
+    );
+
+    final valuesB = _generateValues(
+      minimum: config.minB,
+      maximum: config.maxB,
+      divisibility: config.divisibilityB,
+    );
+
+    for (final a in valuesA) {
+      for (final b in valuesB) {
         final correctAnswer = a + b;
 
         // Перевіряємо саме діапазон правильних відповідей.
@@ -34,11 +46,17 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
           continue;
         }
 
+        if (config.resultDivisibility != null &&
+            correctAnswer % config.resultDivisibility! != 0) {
+          continue;
+        }
+
         final wrongAnswers = _wrongAnswerGenerator.generate(
           correctAnswer: correctAnswer,
           minimumResult: config.effectiveWrongAnswerMinimumResult,
           maximumResult: config.effectiveWrongAnswerMaximumResult,
           count: config.wrongAnswerCount,
+          divisibility: config.wrongAnswerDivisibility,
           strategy: config.wrongAnswerStrategy,
           random: _random,
         );
@@ -56,5 +74,28 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
     }
 
     return result;
+  }
+
+  List<int> _generateValues({
+    required int minimum,
+    required int maximum,
+    int? divisibility,
+  }) {
+    if (minimum > maximum) {
+      return [];
+    }
+
+    if (divisibility == null) {
+      return [for (var value = minimum; value <= maximum; value++) value];
+    }
+
+    if (divisibility <= 0) {
+      throw ArgumentError('Divisibility must be greater than zero.');
+    }
+
+    return [
+      for (var value = minimum; value <= maximum; value++)
+        if (value % divisibility == 0) value,
+    ];
   }
 }

@@ -131,7 +131,7 @@ class _TopicResultDialog extends ConsumerWidget {
             Navigator.pop(context);
             onResetResult?.call();
           },
-          child: const Text('Скасувати'),
+          child: const Text('Скинути'),
         ),
 
         TextButton(
