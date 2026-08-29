@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data.dart';
 
 import '../wrong_answer_generator.dart';
 import 'addition_generator_config.dart';
 
-class AdditionTaskDataGenerator {
+class AdditionTaskDataGenerator extends TaskDataGenerator {
   AdditionTaskDataGenerator({
     required this.config,
     WrongAnswerGenerator? wrongAnswerGenerator,
@@ -18,7 +20,8 @@ class AdditionTaskDataGenerator {
   final WrongAnswerGenerator _wrongAnswerGenerator;
   final Random _random;
 
-  List<ChoiceTaskData> generate() {
+  @override
+  List<TaskData> generate() {
     final result = <ChoiceTaskData>[];
 
     for (var a = config.minA; a <= config.maxA; a++) {
