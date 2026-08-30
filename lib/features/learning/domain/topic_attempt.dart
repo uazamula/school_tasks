@@ -4,20 +4,20 @@ import 'attempt_task.dart';
 import 'task_result.dart';
 
 class TopicAttempt {
-  TopicAttempt({required List<AttemptTask<dynamic>> tasks})
+  TopicAttempt({required List<AttemptTask<dynamic, dynamic>> tasks})
     : tasks = List.unmodifiable(tasks);
 
-  final List<AttemptTask<dynamic>> tasks;
+  final List<AttemptTask<dynamic, dynamic>> tasks;
 
   int currentTaskIndex = 0;
 
-  AttemptTask<dynamic> get currentTask => tasks[currentTaskIndex];
+  AttemptTask<dynamic, dynamic> get currentTask => tasks[currentTaskIndex];
 
   bool get isFinished => tasks.every((task) => task.isAnswered);
 
   int get completedTasks => tasks.where((task) => task.isAnswered).length;
 
-  void recordResult(TaskResult<dynamic> result) {
+  void recordResult(TaskResult<dynamic, dynamic> result) {
     currentTask.result = result;
   }
 

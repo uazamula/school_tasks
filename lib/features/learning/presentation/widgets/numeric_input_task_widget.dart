@@ -16,8 +16,8 @@ class NumericInputTaskWidget extends StatefulWidget {
   });
 
   final NumericInputTask task;
-  final TaskResult<int>? result;
-  final ValueChanged<TaskResult<int>> onTaskAnswered;
+  final TaskResult<int, int>? result;
+  final ValueChanged<TaskResult<int, int>> onTaskAnswered;
 
   @override
   State<NumericInputTaskWidget> createState() => _NumericInputTaskWidgetState();

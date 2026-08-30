@@ -1,15 +1,12 @@
+import 'solution.dart';
 import 'task_answer_state.dart';
 
-class TaskResult<TAnswer> {
-  const TaskResult({
-    required this.state,
-    this.selectedAnswer,
-    this.correctAnswer,
-  });
+class TaskResult<TAnswer, TSolution> {
+  const TaskResult({required this.state, this.selectedAnswer, this.solution});
 
   final TaskAnswerState state;
   final TAnswer? selectedAnswer;
-  final TAnswer? correctAnswer;
+  final Solution<TAnswer, TSolution>? solution;
 
   bool get isAnswered => state != TaskAnswerState.neutral;
 

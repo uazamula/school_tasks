@@ -68,7 +68,7 @@ class _LearningPageState extends State<LearningPage> {
     );
   }
 
-  void _onTaskAnswered(TaskResult<dynamic> result) {
+  void _onTaskAnswered(TaskResult<dynamic, dynamic> result) {
     final currentTask = _attempt.currentTask;
 
     if (currentTask.isAnswered) {

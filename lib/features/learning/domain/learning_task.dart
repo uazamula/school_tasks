@@ -1,12 +1,18 @@
-import 'task_interaction.dart';
-import 'task_prompt.dart';
-import 'task_result.dart';
+import 'package:school_tasks/features/learning/domain/solution.dart';
+import 'package:school_tasks/features/learning/domain/task_interaction.dart';
+import 'package:school_tasks/features/learning/domain/task_prompt.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
 
-abstract class LearningTask<TAnswer> {
-  const LearningTask({required this.prompt, required this.interaction});
+abstract class LearningTask<TAnswer, TSolution> {
+  const LearningTask({
+    required this.prompt,
+    required this.interaction,
+    required this.solution,
+  });
 
   final TaskPrompt prompt;
   final TaskInteraction interaction;
+  final Solution<TAnswer, TSolution> solution;
 
-  TaskResult<TAnswer> checkAnswer(TAnswer answer);
+  TaskResult<TAnswer, TSolution> checkAnswer(TAnswer answer);
 }
