@@ -1,5 +1,7 @@
-abstract class TaskData {
-  const TaskData({required this.condition});
+import 'task_prompt.dart';
 
-  final String condition;
+abstract class TaskData {
+  const TaskData({required this.prompt});
+
+  final TaskPrompt prompt;
 }

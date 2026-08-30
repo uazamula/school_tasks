@@ -2,7 +2,7 @@ import 'task_data.dart';
 
 class NumericInputTaskData extends TaskData {
   const NumericInputTaskData({
-    required super.condition,
+    required super.prompt,
     required this.correctAnswer,
   });
 

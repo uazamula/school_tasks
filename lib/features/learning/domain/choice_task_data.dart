@@ -2,7 +2,7 @@ import 'task_data.dart';
 
 class ChoiceTaskData extends TaskData {
   const ChoiceTaskData({
-    required super.condition,
+    required super.prompt,
     required this.correctAnswer,
     required this.answers,
   });

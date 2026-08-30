@@ -9,8 +9,6 @@ import 'package:school_tasks/features/learning/domain/multi_choice_task_data.dar
 import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
-import 'package:school_tasks/features/learning/domain/task_content.dart';
-import 'package:school_tasks/features/learning/domain/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
 
@@ -69,7 +67,7 @@ class TopicAttemptGenerator {
 
   ChoiceTask _createChoiceTask(ChoiceTaskData data) {
     return ChoiceTask(
-      prompt: TaskPrompt(content: [TextContent(data.condition)]),
+      prompt: data.prompt,
       correctAnswer: data.correctAnswer,
       answers: data.answers,
     );
@@ -77,7 +75,7 @@ class TopicAttemptGenerator {
 
   NumericInputTask _createNumericInputTask(NumericInputTaskData data) {
     return NumericInputTask(
-      prompt: TaskPrompt(content: [TextContent(data.condition)]),
+      prompt: data.prompt,
       correctAnswer: data.correctAnswer,
     );
   }
@@ -86,14 +84,8 @@ class TopicAttemptGenerator {
     final answers = [...data.correctAnswers, ...data.wrongAnswers]
       ..shuffle(_random);
 
-    final content = <TaskContent>[TextContent(data.condition)];
-
-    if (data.imagePath != null) {
-      content.add(ImageContent(data.imagePath!));
-    }
-
     return MultiChoiceTask(
-      prompt: TaskPrompt(content: content),
+      prompt: data.prompt,
       answers: answers,
       correctAnswers: data.correctAnswers,
     );

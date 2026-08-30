@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_content.dart';
 import 'package:school_tasks/features/learning/domain/task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_prompt.dart';
 
 import '../wrong_answer_generator.dart';
 import 'addition_generator_config.dart';
@@ -65,7 +67,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
 
         result.add(
           ChoiceTaskData(
-            condition: 'Скільки буде $a + $b?',
+            prompt: TaskPrompt(content: [TextContent('Скільки буде $a + $b?')]),
             correctAnswer: correctAnswer,
             answers: answers,
           ),
