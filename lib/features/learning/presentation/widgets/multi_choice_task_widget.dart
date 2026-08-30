@@ -4,7 +4,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../domain/multi_choice_task.dart';
 import '../../domain/task_result.dart';
 import 'multi_choice_answers.dart';
-import 'multi_choice_question.dart';
+import 'task_prompt_widget.dart';
 
 class MultiChoiceTaskWidget extends StatefulWidget {
   const MultiChoiceTaskWidget({
@@ -56,10 +56,7 @@ class _MultiChoiceTaskWidgetState extends State<MultiChoiceTaskWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        MultiChoiceQuestion(
-          condition: widget.task.condition,
-          imagePath: widget.task.imagePath,
-        ),
+        TaskPromptWidget(prompt: widget.task.prompt),
 
         const SizedBox(height: AppSpacing.lg),
 

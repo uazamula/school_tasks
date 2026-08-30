@@ -1,16 +1,17 @@
 import 'learning_task.dart';
+import 'selection_interaction.dart';
 import 'task_answer_state.dart';
 import 'task_result.dart';
 
 class MultiChoiceTask extends LearningTask<List<String>> {
   const MultiChoiceTask({
-    required super.condition,
-    this.imagePath,
+    required super.prompt,
     required this.answers,
     required this.correctAnswers,
-  });
+  }) : super(
+         interaction: const SelectionInteraction(mode: SelectionMode.multiple),
+       );
 
-  final String? imagePath;
   final List<String> answers;
   final List<String> correctAnswers;
 

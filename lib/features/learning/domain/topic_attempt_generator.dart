@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:school_tasks/features/learning/domain/attempt_task.dart';
 import 'package:school_tasks/features/learning/domain/choice_task.dart';
 import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
@@ -8,6 +9,8 @@ import 'package:school_tasks/features/learning/domain/multi_choice_task_data.dar
 import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
+import 'package:school_tasks/features/learning/domain/task_content.dart';
+import 'package:school_tasks/features/learning/domain/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
 
@@ -53,6 +56,7 @@ class TopicAttemptGenerator {
           return AttemptTask(
             task: _createNumericInputTask(numericInputDataPool.takeRandom()),
           );
+
         case LearningTaskType.multiChoice:
           return AttemptTask(
             task: _createMultiChoiceTask(multiChoiceDataPool.takeRandom()),
@@ -65,7 +69,7 @@ class TopicAttemptGenerator {
 
   ChoiceTask _createChoiceTask(ChoiceTaskData data) {
     return ChoiceTask(
-      condition: data.condition,
+      prompt: TaskPrompt(content: [TextContent(data.condition)]),
       correctAnswer: data.correctAnswer,
       answers: data.answers,
     );
@@ -73,7 +77,7 @@ class TopicAttemptGenerator {
 
   NumericInputTask _createNumericInputTask(NumericInputTaskData data) {
     return NumericInputTask(
-      condition: data.condition,
+      prompt: TaskPrompt(content: [TextContent(data.condition)]),
       correctAnswer: data.correctAnswer,
     );
   }
@@ -82,9 +86,14 @@ class TopicAttemptGenerator {
     final answers = [...data.correctAnswers, ...data.wrongAnswers]
       ..shuffle(_random);
 
+    final content = <TaskContent>[TextContent(data.condition)];
+
+    if (data.imagePath != null) {
+      content.add(ImageContent(data.imagePath!));
+    }
+
     return MultiChoiceTask(
-      condition: data.condition,
-      imagePath: data.imagePath,
+      prompt: TaskPrompt(content: content),
       answers: answers,
       correctAnswers: data.correctAnswers,
     );

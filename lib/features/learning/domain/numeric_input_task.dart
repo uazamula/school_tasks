@@ -1,12 +1,11 @@
 import 'learning_task.dart';
+import 'numeric_input_interaction.dart';
 import 'task_answer_state.dart';
 import 'task_result.dart';
 
 class NumericInputTask extends LearningTask<int> {
-  const NumericInputTask({
-    required super.condition,
-    required this.correctAnswer,
-  });
+  const NumericInputTask({required super.prompt, required this.correctAnswer})
+    : super(interaction: const NumericInputInteraction());
 
   final int correctAnswer;
 

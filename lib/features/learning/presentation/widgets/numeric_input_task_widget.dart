@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:school_tasks/core/theme/app_spacing.dart';
-import 'package:school_tasks/core/theme/app_text_styles.dart';
+
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/numeric_input_task.dart';
 import '../../domain/task_result.dart';
 import 'numeric_keyboard.dart';
+import 'task_prompt_widget.dart';
 
 class NumericInputTaskWidget extends StatefulWidget {
   const NumericInputTaskWidget({
@@ -16,6 +18,7 @@ class NumericInputTaskWidget extends StatefulWidget {
   final NumericInputTask task;
   final TaskResult<int>? result;
   final ValueChanged<TaskResult<int>> onTaskAnswered;
+
   @override
   State<NumericInputTaskWidget> createState() => _NumericInputTaskWidgetState();
 }
@@ -71,7 +74,7 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(widget.task.condition, style: AppTextStyles.headline),
+        TaskPromptWidget(prompt: widget.task.prompt),
 
         const SizedBox(height: AppSpacing.lg),
 

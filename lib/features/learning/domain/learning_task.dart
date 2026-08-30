@@ -1,9 +1,12 @@
-import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'task_interaction.dart';
+import 'task_prompt.dart';
+import 'task_result.dart';
 
 abstract class LearningTask<TAnswer> {
-  const LearningTask({required this.condition});
+  const LearningTask({required this.prompt, required this.interaction});
 
-  final String condition;
+  final TaskPrompt prompt;
+  final TaskInteraction interaction;
 
   TaskResult<TAnswer> checkAnswer(TAnswer answer);
 }
