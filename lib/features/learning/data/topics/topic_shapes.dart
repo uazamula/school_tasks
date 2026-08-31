@@ -10,10 +10,7 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 abstract final class Shapes {
   static final Topic topic = Topic(
     id: 'shapes',
-    taskTypeCounts: {
-      LearningTaskType.multiChoice: 1,
-      LearningTaskType.singleChoice: 1,
-    },
+    taskTypeCounts: {LearningTaskType.selection: 2},
     dataSource: FixedTaskDataSource([
       ...GeometryShapesData.simpleShapes,
       ...AdditionTaskData.within10,

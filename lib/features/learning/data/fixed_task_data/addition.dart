@@ -10,7 +10,6 @@ abstract final class AdditionTaskData {
       prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 2?')]),
       correctAnswers: ['4'],
       wrongAnswers: ['1', '3', '7'],
-      correctAnswerCount: 1,
       wrongAnswerCount: 3,
     ),
 
@@ -23,7 +22,6 @@ abstract final class AdditionTaskData {
       prompt: TaskPrompt(content: [TextContent('Скільки буде 1 + 5?')]),
       correctAnswers: ['6'],
       wrongAnswers: ['4', '5', '8'],
-      correctAnswerCount: 1,
       wrongAnswerCount: 3,
     ),
 
@@ -43,7 +41,6 @@ abstract final class AdditionTaskData {
       prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 9?')]),
       correctAnswers: ['11'],
       wrongAnswers: ['13', '14', '17'],
-      correctAnswerCount: 1,
       wrongAnswerCount: 3,
     ),
 
@@ -51,7 +48,6 @@ abstract final class AdditionTaskData {
       prompt: TaskPrompt(content: [TextContent('Скільки буде 3 + 10?')]),
       correctAnswers: ['13'],
       wrongAnswers: ['3', '10', '11'],
-      correctAnswerCount: 1,
       wrongAnswerCount: 3,
     ),
 
@@ -59,7 +55,6 @@ abstract final class AdditionTaskData {
       prompt: TaskPrompt(content: [TextContent('Скільки буде 6 + 5?')]),
       correctAnswers: ['11'],
       wrongAnswers: ['10', '12', '13'],
-      correctAnswerCount: 1,
       wrongAnswerCount: 3,
     ),
   ];

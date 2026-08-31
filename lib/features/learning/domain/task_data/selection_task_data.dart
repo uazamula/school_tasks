@@ -5,7 +5,7 @@ class SelectionTaskData<TOption> extends TaskData {
     required super.prompt,
     required this.correctAnswers,
     required this.wrongAnswers,
-    required this.correctAnswerCount,
+    this.correctAnswerCount = 1,
     required this.wrongAnswerCount,
   });
 

@@ -48,19 +48,12 @@ class TopicAttemptGenerator {
 
     final tasks = taskTypes.map((type) {
       switch (type) {
-        case LearningTaskType.singleChoice:
-          return AttemptTask<String, String>(
-            task: _createSingleChoiceTask(selectionDataPool.takeRandom()),
-          );
+        case LearningTaskType.selection:
+          return _createSelectionTask(selectionDataPool.takeRandom());
 
         case LearningTaskType.numericInput:
           return AttemptTask<int, int>(
             task: _createNumericInputTask(numericInputDataPool.takeRandom()),
-          );
-
-        case LearningTaskType.multiChoice:
-          return AttemptTask<List<String>, List<String>>(
-            task: _createMultiChoiceTask(selectionDataPool.takeRandom()),
           );
       }
     }).toList();
@@ -68,45 +61,7 @@ class TopicAttemptGenerator {
     return TopicAttempt(tasks: tasks);
   }
 
-  SelectionTask<String, String, String> _createSingleChoiceTask(
-    SelectionTaskData<String> data,
-  ) {
-    final correctAnswers = _answerSelector.select(
-      items: data.correctAnswers,
-      count: 1,
-      random: _random,
-    );
-
-    final wrongAnswers = _answerSelector.select(
-      items: data.wrongAnswers,
-      count: data.wrongAnswerCount,
-      random: _random,
-    );
-
-    final options = [...correctAnswers, ...wrongAnswers]..shuffle(_random);
-
-    return SelectionTask<String, String, String>(
-      prompt: data.prompt,
-      options: options,
-      solution: Solution<String, String>(
-        value: correctAnswers.single,
-        evaluator: const EqualsEvaluator<String>(),
-      ),
-      mode: SelectionMode.single,
-    );
-  }
-
-  NumericInputTask _createNumericInputTask(NumericInputTaskData data) {
-    return NumericInputTask(
-      prompt: data.prompt,
-      solution: Solution<int, int>(
-        value: data.correctAnswer,
-        evaluator: const EqualsEvaluator<int>(),
-      ),
-    );
-  }
-
-  SelectionTask<String, List<String>, List<String>> _createMultiChoiceTask(
+  AttemptTask<dynamic, dynamic> _createSelectionTask(
     SelectionTaskData<String> data,
   ) {
     final correctAnswers = _answerSelector.select(
@@ -123,14 +78,40 @@ class TopicAttemptGenerator {
 
     final options = [...correctAnswers, ...wrongAnswers]..shuffle(_random);
 
-    return SelectionTask<String, List<String>, List<String>>(
-      prompt: data.prompt,
-      options: options,
-      solution: Solution<List<String>, List<String>>(
-        value: correctAnswers,
-        evaluator: const SetEqualsEvaluator<String>(),
+    if (data.correctAnswerCount == 1) {
+      return AttemptTask<String, String>(
+        task: SelectionTask<String, String, String>(
+          prompt: data.prompt,
+          options: options,
+          solution: Solution<String, String>(
+            value: correctAnswers.single,
+            evaluator: const EqualsEvaluator<String>(),
+          ),
+          mode: SelectionMode.single,
+        ),
+      );
+    }
+
+    return AttemptTask<List<String>, List<String>>(
+      task: SelectionTask<String, List<String>, List<String>>(
+        prompt: data.prompt,
+        options: options,
+        solution: Solution<List<String>, List<String>>(
+          value: correctAnswers,
+          evaluator: const SetEqualsEvaluator<String>(),
+        ),
+        mode: SelectionMode.multiple,
       ),
-      mode: SelectionMode.multiple,
+    );
+  }
+
+  NumericInputTask _createNumericInputTask(NumericInputTaskData data) {
+    return NumericInputTask(
+      prompt: data.prompt,
+      solution: Solution<int, int>(
+        value: data.correctAnswer,
+        evaluator: const EqualsEvaluator<int>(),
+      ),
     );
   }
 }
