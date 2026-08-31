@@ -1,7 +1,9 @@
 import 'package:school_tasks/features/learning/data/fixed_task_data/addition.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/geometry_shapes.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/multiplication.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
@@ -14,6 +16,7 @@ abstract final class Shapes {
     dataSource: FixedTaskDataSource([
       ...GeometryShapesData.simpleShapes,
       ...AdditionTaskData.within10,
+      ...MultiplicationTaskData.multiplicationTable,
     ]),
     help: 'Розпізнавання геометричних фігур.',
     evaluation: EvaluationConfig(
@@ -26,5 +29,6 @@ abstract final class Shapes {
         maximumTime: Duration(seconds: 90),
       ),
     ),
+    passingCriteria: PassingCriteria(minimumAccuracy: 0.7),
   );
 }
