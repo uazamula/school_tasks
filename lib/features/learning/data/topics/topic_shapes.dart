@@ -1,10 +1,10 @@
-import 'package:school_tasks/features/learning/data/task_data/addition.dart';
-import 'package:school_tasks/features/learning/data/task_data/geometry_shapes.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/addition.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/geometry_shapes.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
-import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 abstract final class Shapes {

@@ -1,5 +1,5 @@
-import 'learning_task.dart';
-import 'task_result.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 
 class AttemptTask<TAnswer, TSolution> {
   AttemptTask({required this.task});

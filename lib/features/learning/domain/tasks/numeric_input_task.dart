@@ -1,7 +1,7 @@
-import 'learning_task.dart';
-import 'numeric_input_interaction.dart';
-import 'task_answer_state.dart';
-import 'task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/numeric_input_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 
 class NumericInputTask extends LearningTask<int, int> {
   const NumericInputTask({required super.prompt, required super.solution})

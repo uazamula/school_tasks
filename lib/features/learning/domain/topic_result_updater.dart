@@ -1,5 +1,5 @@
-import 'topic_attempt_result.dart';
-import 'topic_result.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result.dart';
 
 class TopicResultUpdater {
   const TopicResultUpdater();

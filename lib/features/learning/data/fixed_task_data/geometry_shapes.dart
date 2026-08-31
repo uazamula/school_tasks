@@ -1,7 +1,7 @@
-import 'package:school_tasks/features/learning/domain/multi_choice_task_data.dart';
-import 'package:school_tasks/features/learning/domain/task_content.dart';
-import 'package:school_tasks/features/learning/domain/task_data.dart';
-import 'package:school_tasks/features/learning/domain/task_prompt.dart';
+import 'package:school_tasks/features/learning/domain/task_data/multi_choice_task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
+import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 
 abstract final class GeometryShapesData {
   static const List<TaskData> simpleShapes = [

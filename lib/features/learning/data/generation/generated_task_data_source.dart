@@ -1,4 +1,4 @@
-import 'package:school_tasks/features/learning/domain/task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_source.dart';
 
 import 'task_data_generator.dart';

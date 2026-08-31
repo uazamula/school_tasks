@@ -1,7 +1,7 @@
-import 'learning_task.dart';
-import 'selection_interaction.dart';
-import 'task_answer_state.dart';
-import 'task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 
 class SelectionTask<TOption, TAnswer, TSolution>
     extends LearningTask<TAnswer, TSolution> {

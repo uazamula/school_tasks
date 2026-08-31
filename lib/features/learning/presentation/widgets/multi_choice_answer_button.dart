@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_spacing.dart';
-import '../../domain/task_answer_state.dart';
+import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
 class MultiChoiceAnswerButton extends StatelessWidget {
   const MultiChoiceAnswerButton({

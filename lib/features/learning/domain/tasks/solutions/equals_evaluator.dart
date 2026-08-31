@@ -1,4 +1,4 @@
-import 'solution_evaluator.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/solution_evaluator.dart';
 
 class EqualsEvaluator<T> extends SolutionEvaluator<T, T> {
   const EqualsEvaluator();

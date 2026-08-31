@@ -1,19 +1,19 @@
 import 'dart:math';
 
-import 'package:school_tasks/features/learning/domain/attempt_task.dart';
-import 'package:school_tasks/features/learning/domain/choice_task_data.dart';
-import 'package:school_tasks/features/learning/domain/equals_evaluator.dart';
-import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
-import 'package:school_tasks/features/learning/domain/multi_choice_task_data.dart';
-import 'package:school_tasks/features/learning/domain/numeric_input_task.dart';
-import 'package:school_tasks/features/learning/domain/numeric_input_task_data.dart';
-import 'package:school_tasks/features/learning/domain/selection_task.dart';
-import 'package:school_tasks/features/learning/domain/selection_interaction.dart';
-import 'package:school_tasks/features/learning/domain/set_equals_evaluator.dart';
-import 'package:school_tasks/features/learning/domain/solution.dart';
+import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart';
+import 'package:school_tasks/features/learning/domain/task_data/choice_task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/equals_evaluator.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/task_data/multi_choice_task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
+import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/set_equals_evaluator.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
 
 class TopicAttemptGenerator {
   TopicAttemptGenerator({Random? random}) : _random = random ?? Random();

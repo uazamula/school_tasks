@@ -1,7 +1,6 @@
-import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
-
-import 'attempt_task.dart';
-import 'task_result.dart';
+import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
 
 class TopicAttempt {
   TopicAttempt({required List<AttemptTask<dynamic, dynamic>> tasks})

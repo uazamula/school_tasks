@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../domain/task_content.dart';
-import '../../domain/task_prompt.dart';
+import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/core/theme/app_text_styles.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 
 class TaskPromptWidget extends StatelessWidget {
   const TaskPromptWidget({super.key, required this.prompt});

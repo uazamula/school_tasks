@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_spacing.dart';
-import '../../domain/selection_interaction.dart';
-import '../../domain/selection_task.dart';
-import '../../domain/task_answer_state.dart';
-import '../../domain/task_result.dart';
-import 'choice_answer_button.dart';
-import 'multi_choice_answer_button.dart';
-import 'task_prompt_widget.dart';
+import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/multi_choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
   const SelectionTaskWidget({

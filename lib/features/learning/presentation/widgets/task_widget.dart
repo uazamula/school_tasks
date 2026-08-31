@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../domain/learning_task.dart';
-import '../../domain/numeric_input_task.dart';
-import '../../domain/selection_task.dart';
-import '../../domain/task_result.dart';
-import 'numeric_input_task_widget.dart';
-import 'selection_task_widget.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
 
 class TaskWidget extends StatelessWidget {
   const TaskWidget({

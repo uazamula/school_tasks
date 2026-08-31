@@ -4,7 +4,7 @@ import 'package:school_tasks/features/learning/data/generation/generated_task_da
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
-import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 abstract final class AdditionDigits {

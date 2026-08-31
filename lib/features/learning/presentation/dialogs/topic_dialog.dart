@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
-
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../routing/app_routes.dart';
-import '../../domain/learning_node.dart';
+import 'package:school_tasks/routing/app_routes.dart';
 
 class TopicDialog extends StatelessWidget {
   const TopicDialog({

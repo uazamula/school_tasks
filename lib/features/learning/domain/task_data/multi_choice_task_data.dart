@@ -1,4 +1,4 @@
-import 'task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 
 class MultiChoiceTaskData extends TaskData {
   const MultiChoiceTaskData({

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/preferences/preferences_provider.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
 import 'package:school_tasks/features/learning/presentation/dialogs/topic_dialog.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_node_widget.dart';

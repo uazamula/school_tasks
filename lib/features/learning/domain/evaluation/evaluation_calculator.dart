@@ -1,10 +1,10 @@
-import '../topic.dart';
-import '../topic_attempt_result.dart';
-import 'accuracy_criterion.dart';
-import 'criterion_evaluation_result.dart';
-import 'evaluation_criterion_type.dart';
-import 'evaluation_result.dart';
-import 'time_criterion.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/accuracy_criterion.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/criterion_evaluation_result.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/evaluation_result.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/time_criterion.dart';
+import 'package:school_tasks/features/learning/domain/topic.dart';
 
 class EvaluationCalculator {
   const EvaluationCalculator();

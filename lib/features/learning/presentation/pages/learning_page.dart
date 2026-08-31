@@ -7,9 +7,9 @@ import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt_generator.dart';
-import 'package:school_tasks/features/learning/domain/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_generator.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 
 class LearningPage extends StatefulWidget {

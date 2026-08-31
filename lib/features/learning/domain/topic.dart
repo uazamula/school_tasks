@@ -1,6 +1,6 @@
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
-import 'package:school_tasks/features/learning/domain/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/task_data_source.dart';
 
 class Topic {

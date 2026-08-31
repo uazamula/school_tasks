@@ -1,5 +1,5 @@
-import 'solution.dart';
-import 'task_answer_state.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
 class TaskResult<TAnswer, TSolution> {
   const TaskResult({required this.state, this.selectedAnswer, this.solution});

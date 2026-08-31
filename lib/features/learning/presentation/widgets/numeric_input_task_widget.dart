@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../domain/numeric_input_task.dart';
-import '../../domain/task_result.dart';
-import 'numeric_keyboard.dart';
-import 'task_prompt_widget.dart';
+import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/core/theme/app_text_styles.dart';
+import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/numeric_keyboard.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class NumericInputTaskWidget extends StatefulWidget {
   const NumericInputTaskWidget({
