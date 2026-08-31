@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
-import 'package:school_tasks/features/learning/domain/task_data/choice_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/single_choice_task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
@@ -24,7 +24,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
 
   @override
   List<TaskData> generate() {
-    final result = <ChoiceTaskData>[];
+    final result = <SingleChoiceTaskData>[];
 
     final valuesA = _generateValues(
       minimum: config.minA,
@@ -66,7 +66,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
         final answers = [correctAnswer, ...wrongAnswers]..shuffle(_random);
 
         result.add(
-          ChoiceTaskData(
+          SingleChoiceTaskData(
             prompt: TaskPrompt(content: [TextContent('Скільки буде $a + $b?')]),
             correctAnswer: correctAnswer,
             answers: answers,

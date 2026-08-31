@@ -14,11 +14,15 @@ abstract final class GeometryShapesData {
       ),
       correctAnswers: ['Прямокутник', 'Ромб', 'Паралелограм'],
       wrongAnswers: ['Коло'],
+      correctAnswerCount: 3,
+      wrongAnswerCount: 1,
     ),
     MultiChoiceTaskData(
       prompt: TaskPrompt(content: [TextContent('Що є паралелограмом завжди?')]),
       correctAnswers: ['Прямокутник', 'Квадрат'],
-      wrongAnswers: ['Трапеція', 'Коло'],
+      wrongAnswers: ['Трапеція', 'Коло', 'Трикутник'],
+      correctAnswerCount: 2,
+      wrongAnswerCount: 2,
     ),
   ];
 }

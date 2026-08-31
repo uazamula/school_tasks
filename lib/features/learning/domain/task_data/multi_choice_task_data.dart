@@ -6,9 +6,15 @@ class MultiChoiceTaskData extends TaskData {
     this.imagePath,
     required this.correctAnswers,
     required this.wrongAnswers,
+    required this.correctAnswerCount,
+    required this.wrongAnswerCount,
   });
 
   final String? imagePath;
+
   final List<String> correctAnswers;
   final List<String> wrongAnswers;
+
+  final int correctAnswerCount;
+  final int wrongAnswerCount;
 }
