@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:school_tasks/core/theme/app_spacing.dart';
-import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/multi_choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
@@ -77,6 +78,9 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
     final solution = result.solution?.value;
 
+    // Multiple choice:
+    // правильні варіанти показуємо зеленими,
+    // вибрані неправильні — червоними.
     if (_isMultiple && solution is List) {
       if (solution.contains(option)) {
         return TaskAnswerState.correct;
@@ -91,6 +95,9 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       return TaskAnswerState.neutral;
     }
 
+    // Single choice:
+    // правильна відповідь — зелена,
+    // вибрана неправильна — червона.
     if (solution == option) {
       return TaskAnswerState.correct;
     }
@@ -108,24 +115,22 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     bool isSelected,
     VoidCallback? onPressed,
   ) {
-    if (option is int) {
-      return ChoiceAnswerButton(
-        answer: option,
-        state: state,
-        onPressed: onPressed,
-      );
-    }
+    final answer = option.toString();
 
-    if (option is String) {
+    if (_isMultiple) {
       return MultiChoiceAnswerButton(
-        answer: option,
+        answer: answer,
         state: state,
         isSelected: isSelected,
         onPressed: onPressed,
       );
     }
 
-    return const SizedBox.shrink();
+    return ChoiceAnswerButton(
+      answer: answer,
+      state: state,
+      onPressed: onPressed,
+    );
   }
 
   @override

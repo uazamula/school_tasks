@@ -1,1 +1,1 @@
-enum LearningTaskType { choice, numericInput, multiChoice }
+enum LearningTaskType { singleChoice, numericInput, multiChoice }

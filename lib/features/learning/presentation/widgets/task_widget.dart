@@ -20,14 +20,13 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (task is SelectionTask<int, int, int>) {
-      return SelectionTaskWidget<int, int, int>(
-        task: task as SelectionTask<int, int, int>,
-        result: result as TaskResult<int, int>?,
+    if (task is SelectionTask<String, String, String>) {
+      return SelectionTaskWidget<String, String, String>(
+        task: task as SelectionTask<String, String, String>,
+        result: result as TaskResult<String, String>?,
         onTaskAnswered: onTaskAnswered,
       );
     }
-
     if (task is SelectionTask<String, List<String>, List<String>>) {
       return SelectionTaskWidget<String, List<String>, List<String>>(
         task: task as SelectionTask<String, List<String>, List<String>>,
@@ -35,7 +34,6 @@ class TaskWidget extends StatelessWidget {
         onTaskAnswered: onTaskAnswered,
       );
     }
-
     if (task is NumericInputTask) {
       return NumericInputTaskWidget(
         task: task as NumericInputTask,
@@ -43,7 +41,6 @@ class TaskWidget extends StatelessWidget {
         onTaskAnswered: onTaskAnswered,
       );
     }
-
     return const SizedBox.shrink();
   }
 }

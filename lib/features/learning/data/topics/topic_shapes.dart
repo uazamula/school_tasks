@@ -12,7 +12,7 @@ abstract final class Shapes {
     id: 'shapes',
     taskTypeCounts: {
       LearningTaskType.multiChoice: 1,
-      LearningTaskType.choice: 1,
+      LearningTaskType.singleChoice: 1,
     },
     dataSource: FixedTaskDataSource([
       ...GeometryShapesData.simpleShapes,

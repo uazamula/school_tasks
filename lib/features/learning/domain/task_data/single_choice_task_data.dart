@@ -3,10 +3,10 @@ import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 class SingleChoiceTaskData extends TaskData {
   const SingleChoiceTaskData({
     required super.prompt,
-    required this.correctAnswer,
-    required this.answers,
+    required this.correctAnswers,
+    required this.wrongAnswers,
   });
 
-  final int correctAnswer;
-  final List<int> answers;
+  final List<String> correctAnswers;
+  final List<String> wrongAnswers;
 }

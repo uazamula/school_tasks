@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
-import 'package:school_tasks/features/learning/domain/task_data/single_choice_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
@@ -24,7 +24,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
 
   @override
   List<TaskData> generate() {
-    final result = <SingleChoiceTaskData>[];
+    final result = <SelectionTaskData<String>>[];
 
     final valuesA = _generateValues(
       minimum: config.minA,
@@ -42,7 +42,6 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
       for (final b in valuesB) {
         final correctAnswer = a + b;
 
-        // Перевіряємо саме діапазон правильних відповідей.
         if (correctAnswer < config.minimumResult ||
             correctAnswer > config.maximumResult) {
           continue;
@@ -63,13 +62,15 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
           random: _random,
         );
 
-        final answers = [correctAnswer, ...wrongAnswers]..shuffle(_random);
-
         result.add(
-          SingleChoiceTaskData(
+          SelectionTaskData<String>(
             prompt: TaskPrompt(content: [TextContent('Скільки буде $a + $b?')]),
-            correctAnswer: correctAnswer,
-            answers: answers,
+            correctAnswers: [correctAnswer.toString()],
+            wrongAnswers: [
+              for (final answer in wrongAnswers) answer.toString(),
+            ],
+            correctAnswerCount: 1,
+            wrongAnswerCount: config.wrongAnswerCount,
           ),
         );
       }

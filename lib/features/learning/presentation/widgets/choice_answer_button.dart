@@ -10,7 +10,7 @@ class ChoiceAnswerButton extends StatelessWidget {
     required this.onPressed,
   });
 
-  final int answer;
+  final String answer;
   final TaskAnswerState state;
   final VoidCallback? onPressed;
 
@@ -21,7 +21,7 @@ class ChoiceAnswerButton extends StatelessWidget {
       child: FilledButton(
         onPressed: onPressed,
         style: _buttonStyle(context),
-        child: Text('$answer', style: AppTextStyles.title),
+        child: Text(answer, style: AppTextStyles.title),
       ),
     );
   }
@@ -30,7 +30,6 @@ class ChoiceAnswerButton extends StatelessWidget {
     switch (state) {
       case TaskAnswerState.neutral:
         return FilledButton.styleFrom();
-
       case TaskAnswerState.correct:
         return FilledButton.styleFrom(
           backgroundColor: Colors.green,
@@ -38,7 +37,6 @@ class ChoiceAnswerButton extends StatelessWidget {
           foregroundColor: Colors.white,
           disabledForegroundColor: Colors.white,
         );
-
       case TaskAnswerState.incorrect:
         return FilledButton.styleFrom(
           backgroundColor: Colors.red,

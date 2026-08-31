@@ -11,7 +11,7 @@ abstract final class AdditionWithin10 {
   static final Topic topic = Topic(
     id: 'addition_within_10',
     taskTypeCounts: {
-      LearningTaskType.choice: 2,
+      LearningTaskType.singleChoice: 2,
       LearningTaskType.numericInput: 2,
     },
     dataSource: FixedTaskDataSource(AdditionTaskData.within10),

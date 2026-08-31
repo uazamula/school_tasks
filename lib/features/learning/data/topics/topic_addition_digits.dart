@@ -10,7 +10,7 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 abstract final class AdditionDigits {
   static final Topic topic = Topic(
     id: 'addition_digits',
-    taskTypeCounts: {LearningTaskType.choice: 2},
+    taskTypeCounts: {LearningTaskType.singleChoice: 2},
     dataSource: GeneratedTaskDataSource(
       AdditionTaskDataGenerator(
         config: AdditionGeneratorConfig(
