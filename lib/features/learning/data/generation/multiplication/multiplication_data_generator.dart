@@ -97,7 +97,7 @@ class MultiplicationTaskDataGenerator extends TaskDataGenerator {
         return TaskPrompt(
           content: [
             TextContent('Скільки предметів на малюнку?'),
-            GeneratedGridContent(rows: a, columns: b, item: gridItem!),
+            GridContent(rows: a, columns: b, item: gridItem!),
           ],
         );
     }

@@ -16,22 +16,9 @@ class ImageContent extends TaskContent {
   final String imagePath;
 }
 
-/// Опис сітки з випадковою кількістю рядків і стовпців.
+/// Конкретна, вже згенерована сітка.
 class GridContent extends TaskContent {
   const GridContent({
-    required this.rows,
-    required this.columns,
-    required this.item,
-  });
-
-  final RandomFrom<int> rows;
-  final RandomFrom<int> columns;
-  final TaskContent item;
-}
-
-/// Конкретна, вже згенерована сітка.
-class GeneratedGridContent extends TaskContent {
-  const GeneratedGridContent({
     required this.rows,
     required this.columns,
     required this.item,

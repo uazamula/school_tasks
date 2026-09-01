@@ -37,14 +37,14 @@ class TaskPromptWidget extends StatelessWidget {
       return Image.asset(content.imagePath, fit: BoxFit.contain);
     }
 
-    if (content is GeneratedGridContent) {
+    if (content is GridContent) {
       return _buildGrid(content);
     }
 
     return const SizedBox.shrink();
   }
 
-  Widget _buildGrid(GeneratedGridContent content) {
+  Widget _buildGrid(GridContent content) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenSize = MediaQuery.sizeOf(context);
