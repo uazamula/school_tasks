@@ -1,17 +1,22 @@
 import 'dart:math';
 
-import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_generator_config.dart';
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
+import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
+import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 
-import '../wrong_answer_generator.dart';
+import 'arithmetic_generator_config.dart';
+import 'arithmetic_operation.dart';
 
-class AdditionTaskDataGenerator extends TaskDataGenerator {
-  AdditionTaskDataGenerator({
+class ArithmeticTaskDataGenerator extends TaskDataGenerator {
+  ArithmeticTaskDataGenerator({
     required this.config,
+    required this.operation,
+    this.imageForGrid,
+    this.useNumericInput = false,
     WrongAnswerGenerator? wrongAnswerGenerator,
     Random? random,
   }) : _wrongAnswerGenerator =
@@ -19,12 +24,16 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
        _random = random ?? Random();
 
   final ArithmeticGeneratorConfig config;
+  final ArithmeticOperation operation;
+  final String? imageForGrid;
+  final bool useNumericInput;
+
   final WrongAnswerGenerator _wrongAnswerGenerator;
   final Random _random;
 
   @override
   List<TaskData> generate() {
-    final result = <SelectionTaskData<String>>[];
+    final result = <TaskData>[];
 
     final valuesA = _generateValues(
       minimum: config.minA,
@@ -40,7 +49,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
 
     for (final a in valuesA) {
       for (final b in valuesB) {
-        final correctAnswer = a + b;
+        final correctAnswer = _calculateResult(a, b);
 
         if (correctAnswer < config.minimumResult ||
             correctAnswer > config.maximumResult) {
@@ -49,6 +58,15 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
 
         if (config.resultDivisibility != null &&
             correctAnswer % config.resultDivisibility! != 0) {
+          continue;
+        }
+
+        final prompt = _createPrompt(a, b);
+
+        if (useNumericInput) {
+          result.add(
+            NumericInputTaskData(prompt: prompt, correctAnswer: correctAnswer),
+          );
           continue;
         }
 
@@ -64,7 +82,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
 
         result.add(
           SelectionTaskData<String>(
-            prompt: TaskPrompt(content: [TextContent('Скільки буде $a + $b?')]),
+            prompt: prompt,
             correctAnswers: [correctAnswer.toString()],
             wrongAnswers: [
               for (final answer in wrongAnswers) answer.toString(),
@@ -77,6 +95,35 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
     }
 
     return result;
+  }
+
+  int _calculateResult(int a, int b) {
+    switch (operation) {
+      case ArithmeticOperation.addition:
+        return a + b;
+
+      case ArithmeticOperation.multiplication:
+        return a * b;
+    }
+  }
+
+  TaskPrompt _createPrompt(int a, int b) {
+    if (operation == ArithmeticOperation.multiplication &&
+        imageForGrid != null) {
+      return TaskPrompt(
+        content: [
+          const TextContent('Скільки предметів на малюнку?'),
+          GridContent(rows: a, columns: b, item: ImageContent(imageForGrid!)),
+        ],
+      );
+    }
+
+    final operator = switch (operation) {
+      ArithmeticOperation.addition => '+',
+      ArithmeticOperation.multiplication => '×',
+    };
+
+    return TaskPrompt(content: [TextContent('Скільки буде $a $operator $b?')]);
   }
 
   List<int> _generateValues({

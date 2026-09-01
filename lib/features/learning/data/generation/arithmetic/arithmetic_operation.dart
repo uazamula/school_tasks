@@ -1,0 +1,1 @@
+enum ArithmeticOperation { addition, multiplication }
