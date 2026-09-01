@@ -1,0 +1,1 @@
+enum MultiplicationPromptType { text, grid }
