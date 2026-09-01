@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/data/topics/topic_addition_digits.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_addition_within_10.dart';
+import 'package:school_tasks/features/learning/data/topics/topic_multiplication_table.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_shapes.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
@@ -42,6 +43,18 @@ abstract final class LearningContent {
           ],
         ),
         LearningNode(
+          id: 'multiplication',
+          titleKey: 'Множення',
+          type: LearningNodeType.section,
+          children: [
+            LearningNode(
+              id: 'multiplication_table',
+              titleKey: 'Таблиця множення',
+              type: LearningNodeType.topic,
+            ),
+          ],
+        ),
+        LearningNode(
           id: 'test_section',
           titleKey: 'testSection',
           type: LearningNodeType.section,
@@ -54,6 +67,7 @@ abstract final class LearningContent {
     'addition_digits': AdditionDigits.topic,
     'addition_within_10': AdditionWithin10.topic,
     'shapes': Shapes.topic,
+    'multiplication_table': MultiplicationTable.topic,
   };
 
   static Topic getTopic(String topicId) {
