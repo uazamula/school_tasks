@@ -1,5 +1,5 @@
-import 'package:school_tasks/features/learning/data/generation/addition/addition_generator_config.dart';
 import 'package:school_tasks/features/learning/data/generation/addition/addition_task_data_generator.dart';
+import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_generator_config.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
@@ -13,7 +13,7 @@ abstract final class AdditionDigits {
     taskTypeCounts: {LearningTaskType.selection: 2},
     dataSource: GeneratedTaskDataSource(
       AdditionTaskDataGenerator(
-        config: AdditionGeneratorConfig(
+        config: ArithmeticGeneratorConfig(
           minA: 1,
           maxA: 9,
           minB: 1,

@@ -1,7 +1,7 @@
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 
-class AdditionGeneratorConfig {
-  const AdditionGeneratorConfig({
+class ArithmeticGeneratorConfig {
+  const ArithmeticGeneratorConfig({
     required this.minA,
     required this.maxA,
     required this.minB,

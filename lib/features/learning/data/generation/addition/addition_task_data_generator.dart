@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_generator_config.dart';
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
@@ -7,7 +8,6 @@ import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 
 import '../wrong_answer_generator.dart';
-import 'addition_generator_config.dart';
 
 class AdditionTaskDataGenerator extends TaskDataGenerator {
   AdditionTaskDataGenerator({
@@ -18,7 +18,7 @@ class AdditionTaskDataGenerator extends TaskDataGenerator {
            wrongAnswerGenerator ?? const WrongAnswerGenerator(),
        _random = random ?? Random();
 
-  final AdditionGeneratorConfig config;
+  final ArithmeticGeneratorConfig config;
   final WrongAnswerGenerator _wrongAnswerGenerator;
   final Random _random;
 
