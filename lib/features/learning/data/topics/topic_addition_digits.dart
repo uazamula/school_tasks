@@ -11,10 +11,13 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 abstract final class AdditionDigits {
   static final Topic topic = Topic(
     id: 'addition_digits',
-    taskTypeCounts: {LearningTaskType.selection: 2},
-    dataSource: GeneratedTaskDataSource(
-      ArithmeticTaskDataGenerator(
-        operation: ArithmeticOperation.addition,
+    taskTypeCounts: {
+      LearningTaskType.numericInput: 2,
+      LearningTaskType.selection: 2,
+    },
+    dataSource: GeneratedTaskDataSource({
+      LearningTaskType.selection: ArithmeticTaskDataGenerator(
+        operation: ArithmeticOperation.multiplication,
         // imageForGrid: 'assets/images/tasks/square.png',
         useNumericInput: false,
         config: ArithmeticGeneratorConfig(
@@ -33,7 +36,27 @@ abstract final class AdditionDigits {
           wrongAnswerDivisibility: 2,
         ),
       ),
-    ),
+      LearningTaskType.numericInput: ArithmeticTaskDataGenerator(
+        operation: ArithmeticOperation.multiplication,
+        imageForGrid: 'assets/images/tasks/square.png',
+        useNumericInput: true,
+        config: ArithmeticGeneratorConfig(
+          minA: 1,
+          maxA: 9,
+          minB: 1,
+          maxB: 9,
+          minimumResult: 2,
+          maximumResult: 18,
+          wrongAnswerMinimumResult: 4,
+          wrongAnswerMaximumResult: 19,
+          wrongAnswerStrategy: WrongAnswerStrategy.randomInRange,
+          wrongAnswerCount: 4,
+          divisibilityA: 2,
+          resultDivisibility: 3,
+          wrongAnswerDivisibility: 2,
+        ),
+      ),
+    }),
     help: 'Тут буде довідка про додавання одноцифрових чисел.',
     evaluation: EvaluationConfig(
       weights: {
