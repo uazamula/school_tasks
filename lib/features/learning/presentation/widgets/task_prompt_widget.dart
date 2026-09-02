@@ -54,13 +54,21 @@ class TaskPromptWidget extends StatelessWidget {
             ? constraints.maxWidth
             : screenSize.width;
 
+        // AppSpacing.sm = 8 px → 50% більше = 12 px.
+        final spacing = AppSpacing.sm * 1.5;
+
+        final horizontalSpacing = spacing * (content.columns - 1);
+
+        final verticalSpacing = spacing * (content.rows - 1);
+
         final cellSize = min(
-          maxWidth / content.columns,
-          maxHeight / content.rows,
+          (maxWidth - horizontalSpacing) / content.columns,
+          (maxHeight - verticalSpacing) / content.rows,
         );
 
-        final width = cellSize * content.columns;
-        final height = cellSize * content.rows;
+        final width = cellSize * content.columns + horizontalSpacing;
+
+        final height = cellSize * content.rows + verticalSpacing;
 
         return SizedBox(
           width: width,
@@ -69,8 +77,8 @@ class TaskPromptWidget extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: content.columns,
-              crossAxisSpacing: AppSpacing.sm,
-              mainAxisSpacing: AppSpacing.sm,
+              crossAxisSpacing: spacing,
+              mainAxisSpacing: spacing,
             ),
             itemCount: content.rows * content.columns,
             itemBuilder: (context, index) {

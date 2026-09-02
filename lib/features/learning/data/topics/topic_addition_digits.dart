@@ -15,8 +15,8 @@ abstract final class AdditionDigits {
       LearningTaskType.numericInput: 2,
       LearningTaskType.selection: 2,
     },
-    dataSource: GeneratedTaskDataSource({
-      LearningTaskType.selection: ArithmeticTaskDataGenerator(
+    dataSource: GeneratedTaskDataSource([
+      ArithmeticTaskDataGenerator(
         operation: ArithmeticOperation.multiplication,
         // imageForGrid: 'assets/images/tasks/square.png',
         useNumericInput: false,
@@ -36,7 +36,7 @@ abstract final class AdditionDigits {
           wrongAnswerDivisibility: 2,
         ),
       ),
-      LearningTaskType.numericInput: ArithmeticTaskDataGenerator(
+      ArithmeticTaskDataGenerator(
         operation: ArithmeticOperation.multiplication,
         imageForGrid: 'assets/images/tasks/square.png',
         useNumericInput: true,
@@ -56,7 +56,7 @@ abstract final class AdditionDigits {
           wrongAnswerDivisibility: 2,
         ),
       ),
-    }),
+    ]),
     help: 'Тут буде довідка про додавання одноцифрових чисел.',
     evaluation: EvaluationConfig(
       weights: {

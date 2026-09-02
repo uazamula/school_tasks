@@ -1,19 +1,27 @@
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_source.dart';
-import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
-
 import 'task_data_generator.dart';
 
 class GeneratedTaskDataSource extends TaskDataSource {
-  GeneratedTaskDataSource(this.generators);
+  const GeneratedTaskDataSource(this.generators);
 
-  final Map<LearningTaskType, TaskDataGenerator> generators;
+  final List<TaskDataGenerator> generators;
 
   @override
   List<TaskData> getData() {
-    return [for (final generator in generators.values) ...generator.generate()];
+    return [for (final generator in generators) ...generator.generate()];
   }
 }
+// class GeneratedTaskDataSource extends TaskDataSource {
+//   GeneratedTaskDataSource(this.generators);
+//
+//   final Map<LearningTaskType, TaskDataGenerator> generators;
+//
+//   @override
+//   List<TaskData> getData() {
+//     return [for (final generator in generators.values) ...generator.generate()];
+//   }
+// }
 
 // class GeneratedTaskDataSource extends TaskDataSource {
 //   GeneratedTaskDataSource(this.generator);
