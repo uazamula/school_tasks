@@ -54,7 +54,6 @@ class TaskPromptWidget extends StatelessWidget {
             ? constraints.maxWidth
             : screenSize.width;
 
-        // AppSpacing.sm = 8 px → 50% більше = 12 px.
         final spacing = AppSpacing.sm * 1.5;
 
         final horizontalSpacing = spacing * (content.columns - 1);
@@ -74,15 +73,21 @@ class TaskPromptWidget extends StatelessWidget {
           width: width,
           height: height,
           child: GridView.builder(
+            padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: content.columns,
               crossAxisSpacing: spacing,
               mainAxisSpacing: spacing,
+              childAspectRatio: 1,
             ),
             itemCount: content.rows * content.columns,
             itemBuilder: (context, index) {
-              return _buildContent(content.item);
+              return SizedBox(
+                width: cellSize,
+                height: cellSize,
+                child: _buildContent(content.item),
+              );
             },
           ),
         );

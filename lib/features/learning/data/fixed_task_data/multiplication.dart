@@ -13,7 +13,7 @@ abstract final class MultiplicationTaskData {
           GridContent(
             rows: 3,
             columns: 4,
-            item: ImageContent('assets/images/tasks/square.png'),
+            item: ImageContent('assets/images/tasks/apple.png'),
           ),
         ],
       ),
@@ -29,7 +29,7 @@ abstract final class MultiplicationTaskData {
           GridContent(
             rows: 5,
             columns: 4,
-            item: ImageContent('assets/images/tasks/square.png'),
+            item: ImageContent('assets/images/tasks/apple.png'),
           ),
         ],
       ),
