@@ -147,17 +147,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
         const SizedBox(height: AppSpacing.xl),
 
-        ...widget.task.options.map(
-          (option) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: _buildOption(
-              option,
-              _getAnswerState(option),
-              _selectedOptions.contains(option),
-              _isAnswered ? null : () => _onOptionSelected(option),
-            ),
-          ),
-        ),
+        _buildOptions(),
 
         if (_isMultiple) ...[
           const SizedBox(height: AppSpacing.lg),
@@ -170,5 +160,40 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         ],
       ],
     );
+  }
+
+  Widget _buildOptions() {
+    final options = widget.task.options;
+
+    final rows = <Widget>[];
+
+    for (var i = 0; i < options.length; i += 2) {
+      final rowOptions = options.skip(i).take(2).toList();
+
+      rows.add(
+        Row(
+          mainAxisAlignment: rowOptions.length == 1
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.center,
+          children: [
+            for (var j = 0; j < rowOptions.length; j++) ...[
+              if (j > 0) const SizedBox(width: AppSpacing.md),
+              _buildOption(
+                rowOptions[j],
+                _getAnswerState(rowOptions[j]),
+                _selectedOptions.contains(rowOptions[j]),
+                _isAnswered ? null : () => _onOptionSelected(rowOptions[j]),
+              ),
+            ],
+          ],
+        ),
+      );
+
+      if (i + 2 < options.length) {
+        rows.add(const SizedBox(height: AppSpacing.md));
+      }
+    }
+
+    return Column(mainAxisSize: MainAxisSize.min, children: rows);
   }
 }

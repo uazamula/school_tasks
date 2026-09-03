@@ -20,10 +20,9 @@ class ImageAnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      //todo add logic here
       width: 160,
       height: 160,
-      child: FilledButton(
+      child: ElevatedButton(
         onPressed: onPressed,
         style: _buttonStyle(context),
         child: Padding(
@@ -35,25 +34,43 @@ class ImageAnswerButton extends StatelessWidget {
   }
 
   ButtonStyle _buttonStyle(BuildContext context) {
-    switch (state) {
-      case TaskAnswerState.neutral:
-        return FilledButton.styleFrom();
+    final theme = Theme.of(context);
 
-      case TaskAnswerState.correct:
-        return FilledButton.styleFrom(
-          backgroundColor: Colors.green,
-          disabledBackgroundColor: Colors.green,
-          foregroundColor: Colors.white,
-          disabledForegroundColor: Colors.white,
-        );
-
-      case TaskAnswerState.incorrect:
-        return FilledButton.styleFrom(
-          backgroundColor: Colors.red,
-          disabledBackgroundColor: Colors.red,
-          foregroundColor: Colors.white,
-          disabledForegroundColor: Colors.white,
-        );
+    // Після відповіді результат має пріоритет.
+    if (state == TaskAnswerState.correct) {
+      return ElevatedButton.styleFrom(
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.green,
+        disabledForegroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      );
     }
+
+    if (state == TaskAnswerState.incorrect) {
+      return ElevatedButton.styleFrom(
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.red,
+        disabledForegroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      );
+    }
+
+    // Вибраний, але відповідь ще не підтверджена.
+    if (isSelected) {
+      return ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primaryContainer,
+        foregroundColor: theme.colorScheme.onPrimaryContainer,
+        side: BorderSide(color: theme.colorScheme.primary, width: 3),
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      );
+    }
+
+    // Звичайний стан.
+    return ElevatedButton.styleFrom(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    );
   }
 }
