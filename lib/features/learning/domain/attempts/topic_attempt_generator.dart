@@ -36,8 +36,8 @@ class TopicAttemptGenerator {
 
     final data = topic.dataSource.getData();
 
-    final selectionDataPool = TaskDataPool<SelectionTaskData<String>>(
-      items: data.whereType<SelectionTaskData<String>>().toList(),
+    final selectionDataPool = TaskDataPool<SelectionTaskData<dynamic>>(
+      items: data.whereType<SelectionTaskData<dynamic>>().toList(),
       random: _random,
     );
 
@@ -62,7 +62,7 @@ class TopicAttemptGenerator {
   }
 
   AttemptTask<dynamic, dynamic> _createSelectionTask(
-    SelectionTaskData<String> data,
+    SelectionTaskData<dynamic> data,
   ) {
     final correctAnswers = _answerSelector.select(
       items: data.correctAnswers,
@@ -79,26 +79,26 @@ class TopicAttemptGenerator {
     final options = [...correctAnswers, ...wrongAnswers]..shuffle(_random);
 
     if (data.correctAnswerCount == 1) {
-      return AttemptTask<String, String>(
-        task: SelectionTask<String, String, String>(
+      return AttemptTask<dynamic, dynamic>(
+        task: SelectionTask<dynamic, dynamic, dynamic>(
           prompt: data.prompt,
           options: options,
-          solution: Solution<String, String>(
+          solution: Solution<dynamic, dynamic>(
             value: correctAnswers.single,
-            evaluator: const EqualsEvaluator<String>(),
+            evaluator: const EqualsEvaluator<dynamic>(),
           ),
           mode: SelectionMode.single,
         ),
       );
     }
 
-    return AttemptTask<List<String>, List<String>>(
-      task: SelectionTask<String, List<String>, List<String>>(
+    return AttemptTask<List<dynamic>, List<dynamic>>(
+      task: SelectionTask<dynamic, List<dynamic>, List<dynamic>>(
         prompt: data.prompt,
         options: options,
-        solution: Solution<List<String>, List<String>>(
+        solution: Solution<List<dynamic>, List<dynamic>>(
           value: correctAnswers,
-          evaluator: const SetEqualsEvaluator<String>(),
+          evaluator: const SetEqualsEvaluator<dynamic>(),
         ),
         mode: SelectionMode.multiple,
       ),

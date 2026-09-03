@@ -15,10 +15,11 @@ abstract final class Shapes {
     id: 'shapes',
     taskTypeCounts: {LearningTaskType.selection: 3},
     dataSource: FixedTaskDataSource([
-      ...GeometryShapesData.simpleShapes,
+      // ...GeometryShapesData.simpleShapes,
+      ...GeometryShapesData.shapes,
       // ...AdditionTaskData.within10,
       //   ...MultiplicationTaskData.multiplicationTable,
-      ...OperationsTaskData.simpleOperations,
+      // ...OperationsTaskData.simpleOperations,
     ]),
     help: 'Розпізнавання геометричних фігур.',
     evaluation: EvaluationConfig(

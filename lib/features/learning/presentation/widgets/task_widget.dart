@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
@@ -20,20 +21,14 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (task is SelectionTask<String, String, String>) {
-      return SelectionTaskWidget<String, String, String>(
-        task: task as SelectionTask<String, String, String>,
-        result: result as TaskResult<String, String>?,
+    if (task is SelectionTask) {
+      return SelectionTaskWidget<dynamic, dynamic, dynamic>(
+        task: task as SelectionTask<dynamic, dynamic, dynamic>,
+        result: result as TaskResult<dynamic, dynamic>?,
         onTaskAnswered: onTaskAnswered,
       );
     }
-    if (task is SelectionTask<String, List<String>, List<String>>) {
-      return SelectionTaskWidget<String, List<String>, List<String>>(
-        task: task as SelectionTask<String, List<String>, List<String>>,
-        result: result as TaskResult<List<String>, List<String>>?,
-        onTaskAnswered: onTaskAnswered,
-      );
-    }
+
     if (task is NumericInputTask) {
       return NumericInputTaskWidget(
         task: task as NumericInputTask,
@@ -41,6 +36,7 @@ class TaskWidget extends StatelessWidget {
         onTaskAnswered: onTaskAnswered,
       );
     }
+
     return const SizedBox.shrink();
   }
 }

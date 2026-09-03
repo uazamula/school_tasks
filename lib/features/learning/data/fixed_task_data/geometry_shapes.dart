@@ -26,4 +26,45 @@ abstract final class GeometryShapesData {
       wrongAnswerCount: 2,
     ),
   ];
+
+  static List<TaskData> shapes = [
+    SelectionTaskData<ImageContent>(
+      prompt: TaskPrompt(
+        content: [TextContent('На якій картинці зображено коло?')],
+      ),
+      correctAnswers: [ImageContent('assets/images/tasks/circle.png')],
+      wrongAnswers: [
+        ImageContent('assets/images/tasks/triangle.png'),
+        ImageContent('assets/images/tasks/ellipse.png'),
+        ImageContent('assets/images/tasks/square.png'),
+      ],
+      wrongAnswerCount: 3,
+    ),
+
+    SelectionTaskData<ImageContent>(
+      prompt: TaskPrompt(
+        content: [TextContent('На якій картинці зображено трикутник?')],
+      ),
+      correctAnswers: [ImageContent('assets/images/tasks/triangle.png')],
+      wrongAnswers: [
+        ImageContent('assets/images/tasks/circle.png'),
+        ImageContent('assets/images/tasks/ellipse.png'),
+        ImageContent('assets/images/tasks/square.png'),
+      ],
+      wrongAnswerCount: 3,
+    ),
+    SelectionTaskData<ImageContent>(
+      prompt: TaskPrompt(content: [TextContent('Вибери багатокутники.')]),
+      correctAnswers: [
+        ImageContent('assets/images/tasks/triangle.png'),
+        ImageContent('assets/images/tasks/square.png'),
+      ],
+      wrongAnswers: [
+        ImageContent('assets/images/tasks/circle.png'),
+        ImageContent('assets/images/tasks/ellipse.png'),
+      ],
+      correctAnswerCount: 2,
+      wrongAnswerCount: 2,
+    ),
+  ];
 }
