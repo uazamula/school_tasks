@@ -109,14 +109,16 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     TOption option,
     TaskAnswerState state,
     bool isSelected,
-    VoidCallback? onPressed,
-  ) {
+    VoidCallback? onPressed, {
+    double? imageSize,
+  }) {
     if (option is ImageContent) {
       return ImageAnswerButton(
         answer: option,
         state: state,
         isSelected: isSelected,
         onPressed: onPressed,
+        size: imageSize ?? 160,
       );
     }
 
@@ -165,35 +167,61 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
   Widget _buildOptions() {
     final options = widget.task.options;
 
-    final rows = <Widget>[];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = AppSpacing.md;
 
-    for (var i = 0; i < options.length; i += 2) {
-      final rowOptions = options.skip(i).take(2).toList();
-
-      rows.add(
-        Row(
-          mainAxisAlignment: rowOptions.length == 1
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.center,
-          children: [
-            for (var j = 0; j < rowOptions.length; j++) ...[
-              if (j > 0) const SizedBox(width: AppSpacing.md),
-              _buildOption(
-                rowOptions[j],
-                _getAnswerState(rowOptions[j]),
-                _selectedOptions.contains(rowOptions[j]),
-                _isAnswered ? null : () => _onOptionSelected(rowOptions[j]),
-              ),
+        // Текстові відповіді — одна кнопка в рядок.
+        if (options.isNotEmpty && options.first is! ImageContent) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < options.length; i++) ...[
+                if (i > 0) const SizedBox(height: spacing),
+                _buildOption(
+                  options[i],
+                  _getAnswerState(options[i]),
+                  _selectedOptions.contains(options[i]),
+                  _isAnswered ? null : () => _onOptionSelected(options[i]),
+                ),
+              ],
             ],
-          ],
-        ),
-      );
+          );
+        }
 
-      if (i + 2 < options.length) {
-        rows.add(const SizedBox(height: AppSpacing.md));
-      }
-    }
+        // Зображення — по два в рядок.
+        final imageSize = (constraints.maxWidth - spacing) / 2;
 
-    return Column(mainAxisSize: MainAxisSize.min, children: rows);
+        final rows = <Widget>[];
+
+        for (var i = 0; i < options.length; i += 2) {
+          final rowOptions = options.skip(i).take(2).toList();
+
+          rows.add(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var j = 0; j < rowOptions.length; j++) ...[
+                  if (j > 0) const SizedBox(width: spacing),
+                  _buildOption(
+                    rowOptions[j],
+                    _getAnswerState(rowOptions[j]),
+                    _selectedOptions.contains(rowOptions[j]),
+                    _isAnswered ? null : () => _onOptionSelected(rowOptions[j]),
+                    imageSize: imageSize,
+                  ),
+                ],
+              ],
+            ),
+          );
+
+          if (i + 2 < options.length) {
+            rows.add(const SizedBox(height: spacing));
+          }
+        }
+
+        return Column(mainAxisSize: MainAxisSize.min, children: rows);
+      },
+    );
   }
 }
