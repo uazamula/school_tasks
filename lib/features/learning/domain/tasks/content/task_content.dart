@@ -1,5 +1,3 @@
-import 'dart:math';
-
 abstract class TaskContent {
   const TaskContent();
 }
@@ -29,16 +27,8 @@ class GridContent extends TaskContent {
   final TaskContent item;
 }
 
-class RandomFrom<T> {
-  const RandomFrom(this.values);
+class EmojiContent extends TaskContent {
+  const EmojiContent(this.emoji);
 
-  final List<T> values;
-
-  T generate(Random random) {
-    if (values.isEmpty) {
-      throw StateError('Cannot select a random value from an empty list.');
-    }
-
-    return values[random.nextInt(values.length)];
-  }
+  final String emoji;
 }
