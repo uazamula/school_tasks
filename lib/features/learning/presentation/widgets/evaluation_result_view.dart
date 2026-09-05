@@ -23,7 +23,7 @@ class EvaluationResultView extends ConsumerWidget {
 
     return gradeScale.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (scale) {
         return Column(
           mainAxisSize: MainAxisSize.min,

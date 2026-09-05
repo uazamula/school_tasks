@@ -55,6 +55,10 @@ class TopicAttemptGenerator {
           return AttemptTask<int, int>(
             task: _createNumericInputTask(numericInputDataPool.takeRandom()),
           );
+        case LearningTaskType.fraction:
+          throw UnimplementedError(
+            'Fraction task generation is not implemented yet',
+          );
       }
     }).toList();
 

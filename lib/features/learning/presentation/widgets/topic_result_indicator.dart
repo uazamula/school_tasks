@@ -20,7 +20,7 @@ class TopicResultIndicator extends ConsumerWidget {
 
     return gradeScale.when(
       loading: () => const Text('-', style: AppTextStyles.body),
-      error: (_, __) => const Text('-', style: AppTextStyles.body),
+      error: (_, _) => const Text('-', style: AppTextStyles.body),
       data: (scale) {
         return Text(
           scale.formatScore(result!.currentScore),
