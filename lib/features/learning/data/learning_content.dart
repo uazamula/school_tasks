@@ -1,7 +1,7 @@
 import 'package:school_tasks/features/learning/data/topics/topic_addition_digits.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_addition_within_10.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_multiplication_table.dart';
-import 'package:school_tasks/features/learning/data/topics/topic_shapes.dart';
+import 'package:school_tasks/features/learning/data/topics/topic_test.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
@@ -66,7 +66,7 @@ abstract final class LearningContent {
   static final Map<String, Topic> topics = {
     'addition_digits': AdditionDigits.topic,
     'addition_within_10': AdditionWithin10.topic,
-    'shapes': Shapes.topic,
+    'shapes': Tests.topic,
     'multiplication_table': MultiplicationTable.topic,
   };
 

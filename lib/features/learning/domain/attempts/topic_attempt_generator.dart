@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:school_tasks/features/learning/data/generation/predefined_answer_selector.dart';
 import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
+import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
+import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
@@ -46,6 +48,11 @@ class TopicAttemptGenerator {
       random: _random,
     );
 
+    final fractionDataPool = TaskDataPool<FractionTaskData>(
+      items: data.whereType<FractionTaskData>().toList(),
+      random: _random,
+    );
+
     final tasks = taskTypes.map((type) {
       switch (type) {
         case LearningTaskType.selection:
@@ -56,9 +63,7 @@ class TopicAttemptGenerator {
             task: _createNumericInputTask(numericInputDataPool.takeRandom()),
           );
         case LearningTaskType.fraction:
-          throw UnimplementedError(
-            'Fraction task generation is not implemented yet',
-          );
+          return _createFractionTask(fractionDataPool.takeRandom());
       }
     }).toList();
 
@@ -115,6 +120,17 @@ class TopicAttemptGenerator {
       solution: Solution<int, int>(
         value: data.correctAnswer,
         evaluator: const EqualsEvaluator<int>(),
+      ),
+    );
+  }
+
+  AttemptTask<Set<int>, int> _createFractionTask(FractionTaskData data) {
+    return AttemptTask<Set<int>, int>(
+      task: FractionTask(
+        prompt: data.prompt,
+        numerator: data.numerator,
+        denominator: data.denominator,
+        parts: data.parts,
       ),
     );
   }

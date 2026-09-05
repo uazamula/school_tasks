@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/fraction_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
 
@@ -24,7 +26,15 @@ class TaskWidget extends StatelessWidget {
     if (task is SelectionTask) {
       return SelectionTaskWidget<dynamic, dynamic, dynamic>(
         task: task as SelectionTask<dynamic, dynamic, dynamic>,
-        result: result as TaskResult<dynamic, dynamic>?,
+        result: result,
+        onTaskAnswered: onTaskAnswered,
+      );
+    }
+
+    if (task is FractionTask) {
+      return FractionTaskWidget(
+        task: task as FractionTask,
+        result: result as TaskResult<Set<int>, int>?,
         onTaskAnswered: onTaskAnswered,
       );
     }
