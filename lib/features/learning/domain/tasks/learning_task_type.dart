@@ -1,1 +1,1 @@
-enum LearningTaskType { selection, numericInput, fraction }
+enum LearningTaskType { selection, numericInput, fraction, positionSelection }

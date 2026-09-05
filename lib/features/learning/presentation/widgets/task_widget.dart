@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/grid_position.dart';
 
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/fraction_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -35,6 +38,14 @@ class TaskWidget extends StatelessWidget {
       return FractionTaskWidget(
         task: task as FractionTask,
         result: result as TaskResult<Set<int>, int>?,
+        onTaskAnswered: onTaskAnswered,
+      );
+    }
+
+    if (task is PositionSelectionTask) {
+      return PositionSelectionTaskWidget(
+        task: task as PositionSelectionTask,
+        result: result as TaskResult<List<GridPosition>, List<GridPosition>>?,
         onTaskAnswered: onTaskAnswered,
       );
     }
