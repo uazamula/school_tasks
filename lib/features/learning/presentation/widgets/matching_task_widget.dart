@@ -7,9 +7,9 @@ import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/matching/matching_column.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class MatchingTaskWidget extends StatefulWidget {
@@ -46,6 +46,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   final Random _random = Random();
 
   late List<int> _rightOrder;
+  late List<int> _leftOrder;
 
   @override
   void initState() {
@@ -54,6 +55,8 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   }
 
   void _createRightOrder() {
+    _leftOrder = List.generate(widget.task.pairs.length, (index) => index);
+
     _rightOrder = List.generate(widget.task.pairs.length, (index) => index)
       ..shuffle(_random);
   }
@@ -81,20 +84,13 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   }
 
   Widget _buildLeftColumn() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var index = 0; index < widget.task.pairs.length; index++)
-          if (!_completedPairIndices.contains(index))
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-              child: _buildSelectableContent(
-                content: widget.task.pairs[index].left,
-                isSelected: _selectedLeftIndex == index,
-                onTap: () => _selectLeft(index),
-              ),
-            ),
-      ],
+    return MatchingColumn(
+      pairs: widget.task.pairs,
+      order: _leftOrder,
+      completedPairIndices: _completedPairIndices,
+      selectedIndex: _selectedLeftIndex,
+      isLeft: true,
+      onItemTap: _selectLeft,
     );
   }
 
@@ -115,69 +111,14 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   }
 
   Widget _buildRightColumn() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final index in _rightOrder)
-          if (!_completedPairIndices.contains(index))
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-              child: _buildSelectableContent(
-                content: widget.task.pairs[index].right,
-                isSelected: _selectedRightIndex == index,
-                onTap: () => _selectRight(index),
-              ),
-            ),
-      ],
+    return MatchingColumn(
+      pairs: widget.task.pairs,
+      order: _rightOrder,
+      completedPairIndices: _completedPairIndices,
+      selectedIndex: _selectedRightIndex,
+      isLeft: false,
+      onItemTap: _selectRight,
     );
-  }
-
-  Widget _buildSelectableContent({
-    required TaskContent content,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minWidth: 100, minHeight: 56),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).dividerColor,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: _buildContent(content),
-      ),
-    );
-  }
-
-  Widget _buildContent(TaskContent content) {
-    if (content is TextContent) {
-      return Text(content.text, textAlign: TextAlign.center);
-    }
-
-    if (content is EmojiContent) {
-      return Text(content.emoji, style: const TextStyle(fontSize: 40));
-    }
-
-    if (content is ImageContent) {
-      return SizedBox(
-        width: 80,
-        height: 80,
-        child: Image.asset(content.imagePath, fit: BoxFit.contain),
-      );
-    }
-
-    return const SizedBox.shrink();
   }
 
   void _selectLeft(int index) {

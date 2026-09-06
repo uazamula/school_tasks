@@ -11,10 +11,16 @@ final matchingTasks = [
     pairs: [
       MatchingPair(left: TextContent('2 × 3'), right: TextContent('6')),
       MatchingPair(left: TextContent('3 × 2'), right: TextContent('6')),
-      MatchingPair(left: TextContent('4 × 2'), right: TextContent('8')),
-      MatchingPair(left: TextContent('10'), right: TextContent('5 × 2')),
+      // MatchingPair(left: TextContent('4 × 2'), right: TextContent('8')),
+      MatchingPair(
+        left: EmojiContent('🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎'),
+        right: TextContent('5 × 2'),
+      ),
       // MatchingPair(left: TextContent('3 × 3'), right: TextContent('9')),
-      MatchingPair(left: TextContent('10'), right: TextContent('2 × 5')),
+      MatchingPair(
+        left: EmojiContent('🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎'),
+        right: TextContent('2 × 5'),
+      ),
     ],
     pairCount: 4,
   ),
