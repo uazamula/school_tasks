@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
@@ -41,6 +43,21 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   /// Індекси пар, які були правильно з'єднані з першої спроби.
   final Set<int> _firstAttemptCorrectPairIndices = {};
 
+  final Random _random = Random();
+
+  late List<int> _rightOrder;
+
+  @override
+  void initState() {
+    super.initState();
+    _createRightOrder();
+  }
+
+  void _createRightOrder() {
+    _rightOrder = List.generate(widget.task.pairs.length, (index) => index)
+      ..shuffle(_random);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -81,11 +98,27 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     );
   }
 
+  @override
+  void didUpdateWidget(covariant MatchingTaskWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.task != widget.task) {
+      _selectedLeftIndex = null;
+      _selectedRightIndex = null;
+
+      _completedPairIndices.clear();
+      _attemptedPairIndices.clear();
+      _firstAttemptCorrectPairIndices.clear();
+
+      _createRightOrder();
+    }
+  }
+
   Widget _buildRightColumn() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (var index = 0; index < widget.task.pairs.length; index++)
+        for (final index in _rightOrder)
           if (!_completedPairIndices.contains(index))
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.md),

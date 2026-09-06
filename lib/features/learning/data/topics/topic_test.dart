@@ -17,12 +17,13 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 1,
+      LearningTaskType.matching: 2,
       LearningTaskType.positionSelection: 1,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
       //...GeometryShapesData.shapes,
+      ...matchingTasks,
       ...matchingTasks,
       ...positionSelectionTasks,
       //...FractionData.fractions,
