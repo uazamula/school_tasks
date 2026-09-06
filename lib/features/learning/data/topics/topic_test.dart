@@ -16,12 +16,15 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
-    taskTypeCounts: {LearningTaskType.matching: 1},
+    taskTypeCounts: {
+      LearningTaskType.matching: 1,
+      LearningTaskType.positionSelection: 1,
+    },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
       //...GeometryShapesData.shapes,
       ...matchingTasks,
-      // ...positionSelectionTasks,
+      ...positionSelectionTasks,
       //...FractionData.fractions,
       // ...AdditionTaskData.within10,
       //   ...MultiplicationTaskData.multiplicationTable,
@@ -30,14 +33,14 @@ abstract final class Tests {
     help: 'Тестування різних типів завдань',
     evaluation: EvaluationConfig(
       weights: {
-        EvaluationCriterionType.accuracy: 7,
-        EvaluationCriterionType.time: 3,
+        EvaluationCriterionType.accuracy: 1,
+        EvaluationCriterionType.time: 0,
       },
       time: TimeEvaluationConfig(
         targetTime: Duration(seconds: 30),
         maximumTime: Duration(seconds: 90),
       ),
     ),
-    passingCriteria: PassingCriteria(minimumAccuracy: 0.4),
+    passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
   );
 }
