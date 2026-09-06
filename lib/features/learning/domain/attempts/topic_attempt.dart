@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 
 class TopicAttempt {
@@ -32,14 +33,32 @@ class TopicAttempt {
   TopicAttemptResult getResult({required Duration duration}) {
     final completedTasks = tasks.where((task) => task.isAnswered).length;
 
-    final correctTasks = tasks
-        .where((task) => task.result?.isCorrect == true)
-        .length;
+    var correct = 0;
+    var total = 0;
+
+    for (final task in tasks) {
+      final result = task.result;
+
+      if (result == null) {
+        continue;
+      }
+
+      if (result.accuracy != null) {
+        correct += result.accuracy!.correct;
+        total += result.accuracy!.total;
+      } else {
+        total += 1;
+
+        if (result.isCorrect) {
+          correct += 1;
+        }
+      }
+    }
 
     return TopicAttemptResult(
       totalTasks: tasks.length,
       completedTasks: completedTasks,
-      correctTasks: correctTasks,
+      accuracy: AccuracyResult(correct: correct, total: total),
       duration: duration,
     );
   }

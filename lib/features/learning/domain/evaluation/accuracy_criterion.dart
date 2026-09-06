@@ -5,11 +5,7 @@ class AccuracyCriterion {
   const AccuracyCriterion();
 
   CriterionResult calculate(TopicAttemptResult result) {
-    if (result.totalTasks == 0) {
-      return const CriterionResult(measurement: 0, score: 0);
-    }
-
-    final accuracy = result.correctTasks / result.totalTasks;
+    final accuracy = result.accuracy.value;
 
     return CriterionResult(measurement: accuracy, score: accuracy);
   }

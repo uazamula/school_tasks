@@ -95,7 +95,7 @@ class _LearningPageState extends State<LearningPage> {
       final evaluatedResult = TopicAttemptResult(
         totalTasks: topicResult.totalTasks,
         completedTasks: topicResult.completedTasks,
-        correctTasks: topicResult.correctTasks,
+        accuracy: topicResult.accuracy,
         duration: topicResult.duration,
         evaluation: evaluation,
       );
