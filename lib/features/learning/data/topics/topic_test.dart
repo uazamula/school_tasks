@@ -2,6 +2,7 @@ import 'package:school_tasks/features/learning/data/fixed_task_data/addition.dar
 import 'package:school_tasks/features/learning/data/fixed_task_data/algebraic_operations.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fraction_data.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/geometry_shapes.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/matching_data.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/multiplication.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/position_selection.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
@@ -15,11 +16,12 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
-    taskTypeCounts: {LearningTaskType.positionSelection: 2},
+    taskTypeCounts: {LearningTaskType.matching: 1},
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
       //...GeometryShapesData.shapes,
-      ...positionSelectionTasks,
+      ...matchingTasks,
+      // ...positionSelectionTasks,
       //...FractionData.fractions,
       // ...AdditionTaskData.within10,
       //   ...MultiplicationTaskData.multiplicationTable,

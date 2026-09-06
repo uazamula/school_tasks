@@ -5,13 +5,17 @@ import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/position_selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
@@ -61,6 +65,11 @@ class TopicAttemptGenerator {
       random: _random,
     );
 
+    final matchingDataPool = TaskDataPool<MatchingTaskData>(
+      items: data.whereType<MatchingTaskData>().toList(),
+      random: _random,
+    );
+
     final tasks = taskTypes.map((type) {
       switch (type) {
         case LearningTaskType.selection:
@@ -77,6 +86,9 @@ class TopicAttemptGenerator {
           return _createPositionSelectionTask(
             positionSelectionDataPool.takeRandom(),
           );
+
+        case LearningTaskType.matching:
+          return _createMatchingTask(matchingDataPool.takeRandom());
       }
     }).toList();
 
@@ -157,6 +169,20 @@ class TopicAttemptGenerator {
         correctPositions: data.correctPositions,
         mode: data.selectionMode,
       ),
+    );
+  }
+
+  AttemptTask<MatchingAnswer, List<MatchingPair>> _createMatchingTask(
+    MatchingTaskData data,
+  ) {
+    final pairs = _answerSelector.select(
+      items: data.pairs,
+      count: data.pairCount,
+      random: _random,
+    );
+
+    return AttemptTask<MatchingAnswer, List<MatchingPair>>(
+      task: MatchingTask(prompt: data.prompt, pairs: pairs),
     );
   }
 }

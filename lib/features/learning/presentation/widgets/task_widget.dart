@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 
 import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/fraction_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/matching_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
@@ -46,6 +50,14 @@ class TaskWidget extends StatelessWidget {
       return PositionSelectionTaskWidget(
         task: task as PositionSelectionTask,
         result: result as TaskResult<List<GridPosition>, List<GridPosition>>?,
+        onTaskAnswered: onTaskAnswered,
+      );
+    }
+
+    if (task is MatchingTask) {
+      return MatchingTaskWidget(
+        task: task as MatchingTask,
+        result: result as TaskResult<MatchingAnswer, List<MatchingPair>>?,
         onTaskAnswered: onTaskAnswered,
       );
     }
