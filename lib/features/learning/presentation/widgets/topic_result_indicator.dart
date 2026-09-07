@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
+import 'package:school_tasks/features/learning/providers/topic_result_display_controller.dart';
 
 class TopicResultIndicator extends ConsumerWidget {
   const TopicResultIndicator({super.key, required this.result});
@@ -16,17 +19,51 @@ class TopicResultIndicator extends ConsumerWidget {
       return const Text('-', style: AppTextStyles.body);
     }
 
-    final gradeScale = ref.watch(gradeScaleControllerProvider);
+    final gradeScaleAsync = ref.watch(gradeScaleControllerProvider);
+    final displayAsync = ref.watch(topicResultDisplayControllerProvider);
 
-    return gradeScale.when(
-      loading: () => const Text('-', style: AppTextStyles.body),
-      error: (_, _) => const Text('-', style: AppTextStyles.body),
-      data: (scale) {
-        return Text(
-          scale.formatScore(result!.currentScore),
-          style: AppTextStyles.body,
-        );
-      },
-    );
+    if (gradeScaleAsync.isLoading || displayAsync.isLoading) {
+      return const Text('-', style: AppTextStyles.body);
+    }
+
+    if (gradeScaleAsync.hasError || displayAsync.hasError) {
+      return const Text('-', style: AppTextStyles.body);
+    }
+
+    final gradeScale = gradeScaleAsync.value!;
+    final display = displayAsync.value!;
+
+    final grade = gradeScale.formatScore(result!.currentScore);
+    final duration = _formatDuration(result!.currentDuration);
+
+    return switch (display) {
+      TopicResultDisplay.grade => Text(grade, style: AppTextStyles.body),
+
+      TopicResultDisplay.duration => Text(duration, style: AppTextStyles.body),
+
+      TopicResultDisplay.gradeAndDuration => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(grade, style: AppTextStyles.body),
+          Text(duration, style: AppTextStyles.body),
+        ],
+      ),
+    };
+  }
+
+  String _formatDuration(Duration duration) {
+    final tenths = duration.inMilliseconds ~/ 100;
+    const maxTenths = 9 * 60 * 10 + 59 * 10 + 9;
+
+    if (tenths > maxTenths) {
+      return '∞';
+    }
+
+    final minutes = tenths ~/ 600;
+    final seconds = (tenths ~/ 10) % 60;
+    final tenth = tenths % 10;
+
+    return '$minutes:${seconds.toString().padLeft(2, '0')}.$tenth';
   }
 }

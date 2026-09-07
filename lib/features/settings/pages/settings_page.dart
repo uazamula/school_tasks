@@ -4,6 +4,7 @@ import 'package:school_tasks/features/settings/widgets/appearance_section.dart';
 import 'package:school_tasks/features/settings/widgets/grade_scale_section.dart';
 import 'package:school_tasks/features/settings/widgets/language_section.dart';
 import 'package:school_tasks/features/settings/widgets/learning_data_section.dart';
+import 'package:school_tasks/features/settings/widgets/topic_result_display_section.dart';
 
 import '../../../core/widgets/app_scaffold.dart';
 
@@ -30,6 +31,10 @@ class SettingsPage extends StatelessWidget {
           Divider(),
 
           GradeScaleSection(),
+
+          Divider(),
+
+          TopicResultDisplaySection(),
 
           Divider(),
 
