@@ -22,6 +22,7 @@
   "notAvailable": "—",
   "hoursShort": "sa",
   "minutesShort": "dk",
+  "secondsShort": "sn",
   "todayUsageTime": "Bugün",
   "totalUsageTime": "Toplam"
 }

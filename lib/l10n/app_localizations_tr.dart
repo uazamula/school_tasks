@@ -78,6 +78,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get minutesShort => 'dk';
 
   @override
+  String get secondsShort => 'sn';
+
+  @override
   String get todayUsageTime => 'Bugün';
 
   @override

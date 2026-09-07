@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:school_tasks/core/formatters/duration_formatter.dart';
 import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
@@ -34,7 +35,10 @@ class TopicResultIndicator extends ConsumerWidget {
     final display = displayAsync.value!;
 
     final grade = gradeScale.formatScore(result!.currentScore);
-    final duration = _formatDuration(result!.currentDuration);
+    final duration = DurationFormatter.formatShort(
+      context,
+      result!.currentDuration,
+    );
 
     return switch (display) {
       TopicResultDisplay.grade => Text(grade, style: AppTextStyles.body),
@@ -50,20 +54,5 @@ class TopicResultIndicator extends ConsumerWidget {
         ],
       ),
     };
-  }
-
-  String _formatDuration(Duration duration) {
-    final tenths = duration.inMilliseconds ~/ 100;
-    const maxTenths = 9 * 60 * 10 + 59 * 10 + 9;
-
-    if (tenths > maxTenths) {
-      return '∞';
-    }
-
-    final minutes = tenths ~/ 600;
-    final seconds = (tenths ~/ 10) % 60;
-    final tenth = tenths % 10;
-
-    return '$minutes:${seconds.toString().padLeft(2, '0')}.$tenth';
   }
 }

@@ -78,6 +78,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get minutesShort => 'хв';
 
   @override
+  String get secondsShort => 'с';
+
+  @override
   String get todayUsageTime => 'Час сьогодні';
 
   @override

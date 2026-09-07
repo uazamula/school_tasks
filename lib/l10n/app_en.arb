@@ -22,6 +22,7 @@
   "notAvailable": "—",
   "hoursShort": "h",
   "minutesShort": "m",
+  "secondsShort": "s",
   "todayUsageTime": "Today",
   "totalUsageTime": "Total"
 }

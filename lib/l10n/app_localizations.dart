@@ -238,6 +238,12 @@ abstract class AppLocalizations {
   /// **'m'**
   String get minutesShort;
 
+  /// No description provided for @secondsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'s'**
+  String get secondsShort;
+
   /// No description provided for @todayUsageTime.
   ///
   /// In en, this message translates to:

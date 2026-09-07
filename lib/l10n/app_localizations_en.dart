@@ -78,6 +78,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get minutesShort => 'm';
 
   @override
+  String get secondsShort => 's';
+
+  @override
   String get todayUsageTime => 'Today';
 
   @override
