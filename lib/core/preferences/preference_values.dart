@@ -11,4 +11,8 @@ abstract final class PreferenceValues {
 
   static const gradeScaleHundred = 'hundred';
   static const gradeScaleTwelve = 'twelve';
+
+  static const topicResultDisplayGrade = 'grade';
+  static const topicResultDisplayDuration = 'duration';
+  static const topicResultDisplayGradeAndDuration = 'grade_and_duration';
 }

@@ -15,4 +15,6 @@ abstract final class PreferenceKeys {
   static String topicResult(String topicId) {
     return '$topicResultPrefix$topicId';
   }
+
+  static const topicResultDisplay = 'topic_result_display';
 }

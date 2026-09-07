@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/model/usage_statistics.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/profile/model/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -181,5 +182,34 @@ class AppPreferences {
     for (final key in topicResultKeys) {
       await _prefs.remove(key);
     }
+  }
+
+  TopicResultDisplay getTopicResultDisplay() {
+    final value = _prefs.getString(PreferenceKeys.topicResultDisplay);
+
+    switch (value) {
+      case PreferenceValues.topicResultDisplayDuration:
+        return TopicResultDisplay.duration;
+
+      case PreferenceValues.topicResultDisplayGradeAndDuration:
+        return TopicResultDisplay.gradeAndDuration;
+
+      case PreferenceValues.topicResultDisplayGrade:
+      default:
+        return TopicResultDisplay.grade;
+    }
+  }
+
+  Future<bool> setTopicResultDisplay(TopicResultDisplay display) {
+    return _prefs.setString(
+      PreferenceKeys.topicResultDisplay,
+      switch (display) {
+        TopicResultDisplay.grade => PreferenceValues.topicResultDisplayGrade,
+        TopicResultDisplay.duration =>
+          PreferenceValues.topicResultDisplayDuration,
+        TopicResultDisplay.gradeAndDuration =>
+          PreferenceValues.topicResultDisplayGradeAndDuration,
+      },
+    );
   }
 }
