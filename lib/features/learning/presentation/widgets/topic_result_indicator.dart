@@ -6,6 +6,7 @@ import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/visual_grade_scale_widget.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
 import 'package:school_tasks/features/learning/providers/topic_result_display_controller.dart';
 
@@ -35,12 +36,13 @@ class TopicResultIndicator extends ConsumerWidget {
     final display = displayAsync.value!;
 
     final grade = gradeScale.formatScore(result!.currentScore);
+
     final duration = DurationFormatter.formatShort(
       context,
       result!.currentDuration,
     );
 
-    return switch (display) {
+    final resultContent = switch (display) {
       TopicResultDisplay.grade => Text(grade, style: AppTextStyles.body),
 
       TopicResultDisplay.duration => Text(duration, style: AppTextStyles.body),
@@ -54,5 +56,16 @@ class TopicResultIndicator extends ConsumerWidget {
         ],
       ),
     };
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        VisualGradeScaleWidget(score: result!.currentScore, size: 32),
+
+        const SizedBox(width: 8),
+
+        resultContent,
+      ],
+    );
   }
 }
