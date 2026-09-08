@@ -60,6 +60,9 @@ class AppPreferences {
       case PreferenceValues.gradeScaleTwelve:
         return GradeScale.twelve;
 
+      case PreferenceValues.gradeScaleVisual:
+        return GradeScale.visual;
+
       case PreferenceValues.gradeScaleHundred:
       default:
         return GradeScale.hundred;
@@ -70,6 +73,7 @@ class AppPreferences {
     return _prefs.setString(PreferenceKeys.gradeScale, switch (scale) {
       GradeScale.hundred => PreferenceValues.gradeScaleHundred,
       GradeScale.twelve => PreferenceValues.gradeScaleTwelve,
+      GradeScale.visual => PreferenceValues.gradeScaleVisual,
     });
   }
 

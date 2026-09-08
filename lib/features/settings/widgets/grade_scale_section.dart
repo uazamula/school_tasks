@@ -41,6 +41,10 @@ class GradeScaleSection extends ConsumerWidget {
                 value: GradeScale.twelve,
                 child: Text('12-бальна'),
               ),
+              DropdownMenuItem(
+                value: GradeScale.visual,
+                child: Text('Візуальна'),
+              ),
             ],
           ),
         );

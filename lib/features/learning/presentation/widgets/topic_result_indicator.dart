@@ -22,6 +22,7 @@ class TopicResultIndicator extends ConsumerWidget {
     }
 
     final gradeScaleAsync = ref.watch(gradeScaleControllerProvider);
+
     final displayAsync = ref.watch(topicResultDisplayControllerProvider);
 
     if (gradeScaleAsync.isLoading || displayAsync.isLoading) {
@@ -35,6 +36,24 @@ class TopicResultIndicator extends ConsumerWidget {
     final gradeScale = gradeScaleAsync.value!;
     final display = displayAsync.value!;
 
+    final resultContent = switch (gradeScale) {
+      GradeScale.visual => VisualGradeScaleWidget(
+        score: result!.currentScore,
+        size: 32,
+      ),
+
+      GradeScale.hundred ||
+      GradeScale.twelve => _buildTextResult(context, gradeScale, display),
+    };
+
+    return resultContent;
+  }
+
+  Widget _buildTextResult(
+    BuildContext context,
+    GradeScale gradeScale,
+    TopicResultDisplay display,
+  ) {
     final grade = gradeScale.formatScore(result!.currentScore);
 
     final duration = DurationFormatter.formatShort(
@@ -42,7 +61,7 @@ class TopicResultIndicator extends ConsumerWidget {
       result!.currentDuration,
     );
 
-    final resultContent = switch (display) {
+    return switch (display) {
       TopicResultDisplay.grade => Text(grade, style: AppTextStyles.body),
 
       TopicResultDisplay.duration => Text(duration, style: AppTextStyles.body),
@@ -56,16 +75,5 @@ class TopicResultIndicator extends ConsumerWidget {
         ],
       ),
     };
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        VisualGradeScaleWidget(score: result!.currentScore, size: 32),
-
-        const SizedBox(width: 8),
-
-        resultContent,
-      ],
-    );
   }
 }

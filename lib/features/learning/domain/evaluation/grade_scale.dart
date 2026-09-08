@@ -1,4 +1,4 @@
-enum GradeScale { hundred, twelve }
+enum GradeScale { hundred, twelve, visual }
 
 extension GradeScaleExtension on GradeScale {
   String formatScore(double score) {
@@ -10,6 +10,11 @@ extension GradeScaleExtension on GradeScale {
 
       case GradeScale.twelve:
         return '${toTwelveGrade(score)}';
+
+      case GradeScale.visual:
+        // У текстовому представленні візуальної шкали
+        // використовуємо відсоток.
+        return '${(normalizedScore * 100).round()}%';
     }
   }
 
