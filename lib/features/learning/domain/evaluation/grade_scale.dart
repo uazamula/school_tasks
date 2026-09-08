@@ -9,26 +9,11 @@ extension GradeScaleExtension on GradeScale {
         return '${(normalizedScore * 100).round()}%';
 
       case GradeScale.twelve:
-        return twelveGrade(normalizedScore).toString();
+        return '${toTwelveGrade(score)}';
     }
   }
 
-  /// Перетворює нормалізований результат 0..1
-  /// у 12-бальну оцінку відповідно до таблиці:
-  ///
-  /// 98–100% → 12
-  /// 93–97%  → 11
-  /// 90–92%  → 10
-  /// 85–89%  → 9
-  /// 78–84%  → 8
-  /// 72–77%  → 7
-  /// 65–71%  → 6
-  /// 57–64%  → 5
-  /// 50–56%  → 4
-  /// 35–49%  → 3
-  /// 15–34%  → 2
-  /// 0–14%   → 1
-  int twelveGrade(double score) {
+  int toTwelveGrade(double score) {
     final percentage = score.clamp(0.0, 1.0) * 100;
 
     if (percentage >= 98) return 12;
