@@ -216,4 +216,22 @@ class AppPreferences {
       },
     );
   }
+
+  Set<String> getExpandedLearningNodeIds() {
+    return _prefs
+            .getStringList(PreferenceKeys.expandedLearningNodeIds)
+            ?.toSet() ??
+        {};
+  }
+
+  bool hasExpandedLearningNodeIds() {
+    return _prefs.containsKey(PreferenceKeys.expandedLearningNodeIds);
+  }
+
+  Future<bool> setExpandedLearningNodeIds(Set<String> ids) {
+    return _prefs.setStringList(
+      PreferenceKeys.expandedLearningNodeIds,
+      ids.toList(),
+    );
+  }
 }

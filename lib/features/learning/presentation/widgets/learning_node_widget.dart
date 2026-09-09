@@ -7,13 +7,15 @@ import '../../domain/learning_node.dart';
 import '../../domain/learning_node_type.dart';
 import 'topic_result_indicator.dart';
 
-class LearningNodeWidget extends StatefulWidget {
+class LearningNodeWidget extends StatelessWidget {
   const LearningNodeWidget({
     super.key,
     required this.node,
     this.level = 0,
     this.onTopicPressed,
     this.getTopicResult,
+    this.isNodeExpanded,
+    this.onExpansionChanged,
   });
 
   final LearningNode node;
@@ -21,32 +23,32 @@ class LearningNodeWidget extends StatefulWidget {
   final ValueChanged<LearningNode>? onTopicPressed;
   final TopicResult? Function(String topicId)? getTopicResult;
 
-  @override
-  State<LearningNodeWidget> createState() => _LearningNodeWidgetState();
-}
-
-class _LearningNodeWidgetState extends State<LearningNodeWidget> {
-  bool _isExpanded = true;
+  final bool Function(String nodeId)? isNodeExpanded;
+  final ValueChanged<String>? onExpansionChanged;
 
   @override
   Widget build(BuildContext context) {
+    final expanded = isNodeExpanded?.call(node.id) ?? true;
+
     return Padding(
       padding: EdgeInsets.only(
-        left: widget.level * AppSpacing.lg,
+        left: level * AppSpacing.lg,
         bottom: AppSpacing.sm,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildNode(),
+          _buildNode(expanded),
 
-          if (widget.node.hasChildren && _isExpanded)
-            ...widget.node.children.map(
+          if (node.hasChildren && expanded)
+            ...node.children.map(
               (child) => LearningNodeWidget(
                 node: child,
-                level: widget.level + 1,
-                onTopicPressed: widget.onTopicPressed,
-                getTopicResult: widget.getTopicResult,
+                level: level + 1,
+                onTopicPressed: onTopicPressed,
+                getTopicResult: getTopicResult,
+                isNodeExpanded: isNodeExpanded,
+                onExpansionChanged: onExpansionChanged,
               ),
             ),
         ],
@@ -54,38 +56,34 @@ class _LearningNodeWidgetState extends State<LearningNodeWidget> {
     );
   }
 
-  Widget _buildNode() {
-    switch (widget.node.type) {
+  Widget _buildNode(bool expanded) {
+    switch (node.type) {
       case LearningNodeType.knowledgeLevel:
         return _buildExpandableNode(
-          child: Text(widget.node.titleKey, style: AppTextStyles.headline),
+          expanded: expanded,
+          child: Text(node.titleKey, style: AppTextStyles.headline),
         );
 
       case LearningNodeType.section:
         return _buildExpandableNode(
+          expanded: expanded,
           child: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.sm),
-            child: Text(widget.node.titleKey, style: AppTextStyles.title),
+            child: Text(node.titleKey, style: AppTextStyles.title),
           ),
         );
 
       case LearningNodeType.topic:
         return InkWell(
-          onTap: () => widget.onTopicPressed?.call(widget.node),
+          onTap: () => onTopicPressed?.call(node),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             child: Row(
               children: [
-                TopicResultIndicator(
-                  result: widget.getTopicResult?.call(widget.node.id),
-                ),
-
+                TopicResultIndicator(result: getTopicResult?.call(node.id)),
                 const SizedBox(width: AppSpacing.sm),
-
-                Expanded(
-                  child: Text(widget.node.titleKey, style: AppTextStyles.body),
-                ),
+                Expanded(child: Text(node.titleKey, style: AppTextStyles.body)),
               ],
             ),
           ),
@@ -93,29 +91,21 @@ class _LearningNodeWidgetState extends State<LearningNodeWidget> {
     }
   }
 
-  Widget _buildExpandableNode({required Widget child}) {
-    if (!widget.node.hasChildren) {
+  Widget _buildExpandableNode({required bool expanded, required Widget child}) {
+    if (!node.hasChildren) {
       return child;
     }
 
     return InkWell(
-      onTap: () {
-        setState(() {
-          _isExpanded = !_isExpanded;
-        });
-      },
+      onTap: () => onExpansionChanged?.call(node.id),
       borderRadius: BorderRadius.circular(8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            _isExpanded
-                ? Icons.keyboard_arrow_down
-                : Icons.keyboard_arrow_right,
+            expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
           ),
-
           const SizedBox(width: AppSpacing.xs),
-
           child,
         ],
       ),
