@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:school_tasks/core/formatters/duration_formatter.dart';
-import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
@@ -15,46 +14,29 @@ class TopicResultIndicator extends ConsumerWidget {
 
   final TopicResult? result;
 
+  static const double _gradeFontSize = 20;
+  static const double _durationFontSize = 14;
+  static const double _visualSize = 32;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (result == null) {
-      return const Text('-', style: AppTextStyles.body);
+      return const Text('-');
     }
 
     final gradeScaleAsync = ref.watch(gradeScaleControllerProvider);
-
     final displayAsync = ref.watch(topicResultDisplayControllerProvider);
 
     if (gradeScaleAsync.isLoading || displayAsync.isLoading) {
-      return const Text('-', style: AppTextStyles.body);
+      return const Text('-');
     }
 
     if (gradeScaleAsync.hasError || displayAsync.hasError) {
-      return const Text('-', style: AppTextStyles.body);
+      return const Text('-');
     }
 
     final gradeScale = gradeScaleAsync.value!;
     final display = displayAsync.value!;
-
-    final resultContent = switch (gradeScale) {
-      GradeScale.visual => VisualGradeScaleWidget(
-        score: result!.currentScore,
-        size: 32,
-      ),
-
-      GradeScale.hundred ||
-      GradeScale.twelve => _buildTextResult(context, gradeScale, display),
-    };
-
-    return resultContent;
-  }
-
-  Widget _buildTextResult(
-    BuildContext context,
-    GradeScale gradeScale,
-    TopicResultDisplay display,
-  ) {
-    final grade = gradeScale.formatScore(result!.currentScore);
 
     final duration = DurationFormatter.formatShort(
       context,
@@ -62,18 +44,42 @@ class TopicResultIndicator extends ConsumerWidget {
     );
 
     return switch (display) {
-      TopicResultDisplay.grade => Text(grade, style: AppTextStyles.body),
+      TopicResultDisplay.grade => _buildGrade(gradeScale, result!.currentScore),
 
-      TopicResultDisplay.duration => Text(duration, style: AppTextStyles.body),
+      TopicResultDisplay.duration => _buildDuration(duration),
 
       TopicResultDisplay.gradeAndDuration => Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(grade, style: AppTextStyles.body),
-          Text(duration, style: AppTextStyles.body),
+          _buildGrade(gradeScale, result!.currentScore),
+          _buildDuration(duration),
         ],
       ),
     };
+  }
+
+  Widget _buildGrade(GradeScale scale, double score) {
+    if (scale == GradeScale.visual) {
+      return VisualGradeScaleWidget(score: score, size: _visualSize);
+    }
+
+    return Text(
+      scale.formatScore(score),
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        fontSize: _gradeFontSize,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  Widget _buildDuration(String duration) {
+    return Text(
+      duration,
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontSize: _durationFontSize),
+    );
   }
 }
