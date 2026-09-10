@@ -15,8 +15,8 @@ class TopicResultIndicator extends ConsumerWidget {
   final TopicResult? result;
 
   static const double _gradeFontSize = 20;
-  static const double _durationFontSize = 14;
-  static const double _visualSize = 32;
+  static const double _durationFontSize = 12;
+  static const double _visualSize = 46;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -54,6 +54,7 @@ class TopicResultIndicator extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildGrade(gradeScale, result!.currentScore),
+          const SizedBox(height: 1),
           _buildDuration(duration),
         ],
       ),
@@ -62,7 +63,16 @@ class TopicResultIndicator extends ConsumerWidget {
 
   Widget _buildGrade(GradeScale scale, double score) {
     if (scale == GradeScale.visual) {
-      return VisualGradeScaleWidget(score: score, size: _visualSize);
+      return Center(
+        child: SizedBox(
+          width: _visualSize,
+          height: _visualSize,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: VisualGradeScaleWidget(score: score, size: _visualSize),
+          ),
+        ),
+      );
     }
 
     return Text(

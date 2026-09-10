@@ -26,6 +26,10 @@ class LearningNodeWidget extends StatelessWidget {
   final bool Function(String nodeId)? isNodeExpanded;
   final ValueChanged<String>? onExpansionChanged;
 
+  static const double _topicResultWidth = 56;
+  static const double _topicCardHeight = 64;
+  static const double _topicCardRadius = 8;
+
   @override
   Widget build(BuildContext context) {
     final expanded = isNodeExpanded?.call(node.id) ?? true;
@@ -38,7 +42,7 @@ class LearningNodeWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildNode(expanded),
+          _buildNode(context, expanded),
 
           if (node.hasChildren && expanded)
             ...node.children.map(
@@ -56,7 +60,7 @@ class LearningNodeWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildNode(bool expanded) {
+  Widget _buildNode(BuildContext context, bool expanded) {
     switch (node.type) {
       case LearningNodeType.knowledgeLevel:
         return _buildExpandableNode(
@@ -74,21 +78,51 @@ class LearningNodeWidget extends StatelessWidget {
         );
 
       case LearningNodeType.topic:
-        return InkWell(
-          onTap: () => onTopicPressed?.call(node),
-          borderRadius: BorderRadius.circular(8),
+        return _buildTopicCard(context);
+    }
+  }
+
+  Widget _buildTopicCard(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_topicCardRadius),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => onTopicPressed?.call(node),
+        child: SizedBox(
+          height: _topicCardHeight,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             child: Row(
               children: [
-                TopicResultIndicator(result: getTopicResult?.call(node.id)),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(child: Text(node.titleKey, style: AppTextStyles.body)),
+                SizedBox(
+                  width: _topicResultWidth,
+                  child: Center(
+                    child: TopicResultIndicator(
+                      result: getTopicResult?.call(node.id),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(child: _buildTopicTitle()),
               ],
             ),
           ),
-        );
-    }
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopicTitle() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Text(node.titleKey, style: AppTextStyles.body),
+    );
   }
 
   Widget _buildExpandableNode({required bool expanded, required Widget child}) {

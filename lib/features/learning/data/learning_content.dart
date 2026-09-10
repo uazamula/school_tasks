@@ -20,7 +20,8 @@ abstract final class LearningContent {
           children: [
             LearningNode(
               id: 'addition_digits',
-              titleKey: 'additionDigits',
+              titleKey:
+                  'additionDigits additionDigits additionDigits additionDigits',
               type: LearningNodeType.topic,
             ),
             LearningNode(
