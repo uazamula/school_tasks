@@ -35,10 +35,7 @@ class LearningNodeWidget extends StatelessWidget {
     final expanded = isNodeExpanded?.call(node.id) ?? true;
 
     return Padding(
-      padding: EdgeInsets.only(
-        left: level * AppSpacing.lg,
-        bottom: AppSpacing.sm,
-      ),
+      padding: EdgeInsets.only(left: _getLeftPadding(), bottom: AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -97,7 +94,7 @@ class LearningNodeWidget extends StatelessWidget {
         child: SizedBox(
           height: _topicCardHeight,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             child: Row(
               children: [
                 SizedBox(
@@ -108,7 +105,15 @@ class LearningNodeWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.sm),
+
+                Container(
+                  width: 2,
+                  height: 42,
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(child: _buildTopicTitle()),
               ],
             ),
@@ -144,5 +149,13 @@ class LearningNodeWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  double _getLeftPadding() {
+    if (node.type == LearningNodeType.topic) {
+      return (level - 1).clamp(0, double.infinity) * AppSpacing.lg;
+    }
+
+    return level * AppSpacing.lg;
   }
 }
