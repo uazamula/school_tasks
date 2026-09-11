@@ -22,11 +22,13 @@ class TaskWidget extends StatelessWidget {
     required this.task,
     required this.result,
     required this.onTaskAnswered,
+    required this.onProgressStep,
   });
 
   final LearningTask<dynamic, dynamic> task;
   final TaskResult<dynamic, dynamic>? result;
   final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;
+  final VoidCallback onProgressStep;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +61,7 @@ class TaskWidget extends StatelessWidget {
         task: task as MatchingTask,
         result: result as TaskResult<MatchingAnswer, List<MatchingPair>>?,
         onTaskAnswered: onTaskAnswered,
+        onProgressStep: onProgressStep,
       );
     }
 

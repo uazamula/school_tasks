@@ -18,13 +18,14 @@ class MatchingTaskWidget extends StatefulWidget {
     required this.task,
     required this.result,
     required this.onTaskAnswered,
+    required this.onProgressStep,
   });
 
   final MatchingTask task;
   final TaskResult<MatchingAnswer, List<MatchingPair>>? result;
-
   final ValueChanged<TaskResult<MatchingAnswer, List<MatchingPair>>>
   onTaskAnswered;
+  final VoidCallback onProgressStep;
 
   @override
   State<MatchingTaskWidget> createState() => _MatchingTaskWidgetState();
@@ -169,6 +170,8 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
 
     _registerCorrectAttempt(pairIndex);
     _completedPairIndices.add(pairIndex);
+
+    widget.onProgressStep();
 
     _clearSelection();
 
