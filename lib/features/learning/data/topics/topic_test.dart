@@ -12,6 +12,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
+import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 
 abstract final class Tests {
   static final Topic topic = Topic(
@@ -19,6 +20,8 @@ abstract final class Tests {
     taskTypeCounts: {
       LearningTaskType.matching: 2,
       LearningTaskType.positionSelection: 1,
+      LearningTaskType.numericInput: 1,
+      LearningTaskType.selection: 1,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
@@ -28,7 +31,7 @@ abstract final class Tests {
       ...positionSelectionTasks,
       //...FractionData.fractions,
       // ...AdditionTaskData.within10,
-      //   ...MultiplicationTaskData.multiplicationTable,
+      ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
     ]),
     help: 'Тестування різних типів завдань',
@@ -43,5 +46,6 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
+    layout: TopicLayout(promptFlex: 2, interactionFlex: 5),
   );
 }

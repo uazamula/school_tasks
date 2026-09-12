@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:school_tasks/features/learning/domain/grid_position.dart';
 
+import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
@@ -15,6 +15,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/matching_tas
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class TaskWidget extends StatelessWidget {
   const TaskWidget({
@@ -30,8 +31,11 @@ class TaskWidget extends StatelessWidget {
   final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;
   final VoidCallback onProgressStep;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget buildPrompt() {
+    return TaskPromptWidget(prompt: task.prompt);
+  }
+
+  Widget buildInteraction() {
     if (task is SelectionTask) {
       return SelectionTaskWidget<dynamic, dynamic, dynamic>(
         task: task as SelectionTask<dynamic, dynamic, dynamic>,
@@ -74,5 +78,13 @@ class TaskWidget extends StatelessWidget {
     }
 
     return const SizedBox.shrink();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [buildPrompt(), buildInteraction()],
+    );
   }
 }

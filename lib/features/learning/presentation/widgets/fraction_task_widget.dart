@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class FractionTaskWidget extends StatefulWidget {
   const FractionTaskWidget({
@@ -40,8 +39,6 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TaskPromptWidget(prompt: widget.task.prompt),
-        const SizedBox(height: AppSpacing.xl),
         _buildCake(),
         const SizedBox(height: AppSpacing.lg),
         FilledButton(

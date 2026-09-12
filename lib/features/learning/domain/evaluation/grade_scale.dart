@@ -21,17 +21,17 @@ extension GradeScaleExtension on GradeScale {
   int toTwelveGrade(double score) {
     final percentage = score.clamp(0.0, 1.0) * 100;
 
-    if (percentage >= 98) return 12;
-    if (percentage >= 93) return 11;
-    if (percentage >= 90) return 10;
-    if (percentage >= 85) return 9;
-    if (percentage >= 78) return 8;
-    if (percentage >= 72) return 7;
-    if (percentage >= 65) return 6;
-    if (percentage >= 57) return 5;
-    if (percentage >= 50) return 4;
-    if (percentage >= 35) return 3;
-    if (percentage >= 15) return 2;
+    if (percentage >= 95) return 12;
+    if (percentage >= 90) return 11;
+    if (percentage >= 85) return 10;
+    if (percentage >= 75) return 9;
+    if (percentage >= 65) return 8;
+    if (percentage >= 55) return 7;
+    if (percentage >= 45) return 6;
+    if (percentage >= 40) return 5;
+    if (percentage >= 34) return 4;
+    if (percentage >= 22) return 3;
+    if (percentage >= 10) return 2;
 
     return 1;
   }

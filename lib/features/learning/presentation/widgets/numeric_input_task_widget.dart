@@ -3,7 +3,6 @@ import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_keyboard.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class NumericInputTaskWidget extends StatefulWidget {
   const NumericInputTaskWidget({
@@ -74,10 +73,6 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TaskPromptWidget(prompt: widget.task.prompt),
-
-        const SizedBox(height: AppSpacing.xl),
-
         AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           width: 200,

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:school_tasks/core/theme/app_spacing.dart';
+
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
@@ -14,6 +14,7 @@ import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_progress_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
 
 class LearningPage extends StatefulWidget {
   const LearningPage({super.key, required this.topicId});
@@ -82,6 +83,13 @@ class _LearningPageState extends State<LearningPage> {
     final currentTask = _attempt.currentTask;
     final result = currentTask.result;
 
+    final taskWidget = TaskWidget(
+      task: currentTask.task,
+      result: result,
+      onTaskAnswered: _onTaskAnswered,
+      onProgressStep: _onProgressStep,
+    );
+
     return AppScaffold(
       child: SafeArea(
         child: Column(
@@ -92,19 +100,13 @@ class _LearningPageState extends State<LearningPage> {
               elapsed: _stopwatch.elapsed,
             ),
 
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: 16),
 
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                child: Center(
-                  child: TaskWidget(
-                    task: currentTask.task,
-                    result: result,
-                    onTaskAnswered: _onTaskAnswered,
-                    onProgressStep: _onProgressStep,
-                  ),
-                ),
+              child: TopicLayoutWidget(
+                layout: _topic.layout,
+                prompt: taskWidget.buildPrompt(),
+                interaction: taskWidget.buildInteraction(),
               ),
             ),
           ],
@@ -132,8 +134,6 @@ class _LearningPageState extends State<LearningPage> {
 
     _attempt.recordResult(result);
 
-    // Для звичайного завдання одна прийнята відповідь
-    // дорівнює одному кроку прогресу.
     if (currentTask.task is! MatchingTask) {
       _completedProgressSteps++;
     }

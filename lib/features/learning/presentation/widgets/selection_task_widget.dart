@@ -9,7 +9,6 @@ import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.da
 import 'package:school_tasks/features/learning/presentation/widgets/choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/image_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/multi_choice_answer_button.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
   const SelectionTaskWidget({
@@ -145,10 +144,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TaskPromptWidget(prompt: widget.task.prompt),
-
-        const SizedBox(height: AppSpacing.xl),
-
         _buildOptions(),
 
         if (_isMultiple) ...[

@@ -10,7 +10,6 @@ import 'package:school_tasks/features/learning/domain/tasks/content/matching_pai
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/matching/matching_column.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class MatchingTaskWidget extends StatefulWidget {
   const MatchingTaskWidget({
@@ -70,10 +69,6 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TaskPromptWidget(prompt: widget.task.prompt),
-
-            const SizedBox(height: AppSpacing.xl),
-
             SizedBox(
               width: availableWidth,
               child: Row(

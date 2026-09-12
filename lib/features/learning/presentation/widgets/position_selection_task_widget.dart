@@ -5,7 +5,6 @@ import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class PositionSelectionTaskWidget extends StatefulWidget {
   const PositionSelectionTaskWidget({
@@ -47,8 +46,6 @@ class _PositionSelectionTaskWidgetState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TaskPromptWidget(prompt: widget.task.prompt),
-        const SizedBox(height: AppSpacing.xl),
         _buildGrid(),
         const SizedBox(height: AppSpacing.lg),
         FilledButton(
