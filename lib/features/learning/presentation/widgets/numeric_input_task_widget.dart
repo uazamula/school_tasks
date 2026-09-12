@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
-import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_keyboard.dart';
@@ -70,31 +69,42 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         TaskPromptWidget(prompt: widget.task.prompt),
 
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.xl),
 
-        Container(
-          width: 180,
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 200,
+          constraints: const BoxConstraints(minHeight: 72),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md,
             vertical: AppSpacing.sm,
           ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.outline),
-            borderRadius: BorderRadius.circular(8),
+            color: colorScheme.surfaceContainerHighest,
+            border: Border.all(
+              color: _input.isEmpty ? colorScheme.outline : colorScheme.primary,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             _input.isEmpty ? '—' : _input,
-            style: AppTextStyles.headline,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontSize: 36,
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
+            ),
           ),
         ),
-
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.xl),
 
         NumericKeyboard(
           enabled: !_isAnswered,

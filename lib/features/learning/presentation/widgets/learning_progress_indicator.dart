@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:school_tasks/core/theme/app_spacing.dart';
 
 class LearningProgressIndicator extends StatelessWidget {
@@ -23,16 +22,17 @@ class LearningProgressIndicator extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: LinearProgressIndicator(
-            value: progressValue,
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(4),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(value: progressValue, minHeight: 12),
           ),
         ),
+
         const SizedBox(width: AppSpacing.md),
+
         Text(
           _formatDuration(elapsed),
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
       ],
     );

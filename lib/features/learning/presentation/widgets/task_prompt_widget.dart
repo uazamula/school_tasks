@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
-import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 
@@ -13,24 +12,31 @@ class TaskPromptWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final textStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      fontWeight: FontWeight.normal,
+      color: colorScheme.onSurfaceVariant,
+    );
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         for (final content in prompt.content) ...[
-          _buildContent(content),
+          _buildContent(context, content, textStyle),
           const SizedBox(height: AppSpacing.md),
         ],
       ],
     );
   }
 
-  Widget _buildContent(TaskContent content) {
+  Widget _buildContent(
+    BuildContext context,
+    TaskContent content,
+    TextStyle? textStyle,
+  ) {
     if (content is TextContent) {
-      return Text(
-        content.text,
-        style: AppTextStyles.headline,
-        textAlign: TextAlign.center,
-      );
+      return Text(content.text, style: textStyle, textAlign: TextAlign.center);
     }
 
     if (content is ImageContent) {
@@ -50,6 +56,7 @@ class TaskPromptWidget extends StatelessWidget {
         final screenSize = MediaQuery.sizeOf(context);
 
         final maxHeight = screenSize.height * 0.33;
+
         final maxWidth = constraints.hasBoundedWidth
             ? constraints.maxWidth
             : screenSize.width;
@@ -57,16 +64,17 @@ class TaskPromptWidget extends StatelessWidget {
         final spacing = AppSpacing.sm * 1.5;
 
         final horizontalSpacing = spacing * (content.columns - 1);
-
         final verticalSpacing = spacing * (content.rows - 1);
 
+        final availableWidth = maxWidth - horizontalSpacing;
+        final availableHeight = maxHeight - verticalSpacing;
+
         final cellSize = min(
-          (maxWidth - horizontalSpacing) / content.columns,
-          (maxHeight - verticalSpacing) / content.rows,
+          availableWidth / content.columns,
+          availableHeight / content.rows,
         );
 
         final width = cellSize * content.columns + horizontalSpacing;
-
         final height = cellSize * content.rows + verticalSpacing;
 
         return SizedBox(
@@ -86,7 +94,7 @@ class TaskPromptWidget extends StatelessWidget {
               return SizedBox(
                 width: cellSize,
                 height: cellSize,
-                child: _buildContent(content.item),
+                child: _buildContent(context, content.item, null),
               );
             },
           ),

@@ -83,29 +83,32 @@ class _LearningPageState extends State<LearningPage> {
     final result = currentTask.result;
 
     return AppScaffold(
-      child: Column(
-        children: [
-          LearningProgressIndicator(
-            progress: _completedProgressSteps,
-            totalSteps: _totalProgressSteps,
-            elapsed: _stopwatch.elapsed,
-          ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            LearningProgressIndicator(
+              progress: _completedProgressSteps,
+              totalSteps: _totalProgressSteps,
+              elapsed: _stopwatch.elapsed,
+            ),
 
-          const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
 
-          Expanded(
-            child: SingleChildScrollView(
-              child: Center(
-                child: TaskWidget(
-                  task: currentTask.task,
-                  result: result,
-                  onTaskAnswered: _onTaskAnswered,
-                  onProgressStep: _onProgressStep,
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                child: Center(
+                  child: TaskWidget(
+                    task: currentTask.task,
+                    result: result,
+                    onTaskAnswered: _onTaskAnswered,
+                    onProgressStep: _onProgressStep,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -129,7 +132,7 @@ class _LearningPageState extends State<LearningPage> {
 
     _attempt.recordResult(result);
 
-    // Для всіх звичайних завдань одна прийнята відповідь
+    // Для звичайного завдання одна прийнята відповідь
     // дорівнює одному кроку прогресу.
     if (currentTask.task is! MatchingTask) {
       _completedProgressSteps++;

@@ -35,13 +35,8 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   int? _selectedLeftIndex;
   int? _selectedRightIndex;
 
-  /// Індекси пар, які вже правильно з'єднані.
   final Set<int> _completedPairIndices = {};
-
-  /// Індекси пар, для яких уже була перша спроба.
   final Set<int> _attemptedPairIndices = {};
-
-  /// Індекси пар, які були правильно з'єднані з першої спроби.
   final Set<int> _firstAttemptCorrectPairIndices = {};
 
   final Random _random = Random();
@@ -64,23 +59,37 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TaskPromptWidget(prompt: widget.task.prompt),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.hasBoundedWidth
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
 
-        const SizedBox(height: AppSpacing.xl),
+        final double columnWidth = max(0, (availableWidth - AppSpacing.lg) / 2);
 
-        Row(
+        return Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLeftColumn(),
-            const SizedBox(width: AppSpacing.xl),
-            _buildRightColumn(),
+            TaskPromptWidget(prompt: widget.task.prompt),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            SizedBox(
+              width: availableWidth,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: columnWidth, child: _buildLeftColumn()),
+
+                  const SizedBox(width: AppSpacing.lg),
+
+                  SizedBox(width: columnWidth, child: _buildRightColumn()),
+                ],
+              ),
+            ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -92,6 +101,17 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
       selectedIndex: _selectedLeftIndex,
       isLeft: true,
       onItemTap: _selectLeft,
+    );
+  }
+
+  Widget _buildRightColumn() {
+    return MatchingColumn(
+      pairs: widget.task.pairs,
+      order: _rightOrder,
+      completedPairIndices: _completedPairIndices,
+      selectedIndex: _selectedRightIndex,
+      isLeft: false,
+      onItemTap: _selectRight,
     );
   }
 
@@ -109,17 +129,6 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
 
       _createRightOrder();
     }
-  }
-
-  Widget _buildRightColumn() {
-    return MatchingColumn(
-      pairs: widget.task.pairs,
-      order: _rightOrder,
-      completedPairIndices: _completedPairIndices,
-      selectedIndex: _selectedRightIndex,
-      isLeft: false,
-      onItemTap: _selectRight,
-    );
   }
 
   void _selectLeft(int index) {
@@ -171,6 +180,8 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     _registerCorrectAttempt(pairIndex);
     _completedPairIndices.add(pairIndex);
 
+    // Одна правильно складена пара = один крок прогресу.
+    // Правильність першої спроби на прогрес не впливає.
     widget.onProgressStep();
 
     _clearSelection();
