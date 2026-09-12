@@ -54,13 +54,13 @@ class TaskPromptWidget extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenSize = MediaQuery.sizeOf(context);
-
+        //todo automatically
         final maxHeight = screenSize.height * 0.33;
 
         final maxWidth = constraints.hasBoundedWidth
             ? constraints.maxWidth
             : screenSize.width;
-
+        //todo automatically
         final spacing = AppSpacing.sm * 1.5;
 
         final horizontalSpacing = spacing * (content.columns - 1);
