@@ -10,6 +10,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/evaluation_crit
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
+import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
@@ -18,18 +19,19 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 2,
+      LearningTaskType.matching: 1,
       LearningTaskType.positionSelection: 1,
       LearningTaskType.numericInput: 1,
-      LearningTaskType.selection: 1,
+      LearningTaskType.selection: 3,
+      LearningTaskType.fraction: 1,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
-      //...GeometryShapesData.shapes,
+      ...GeometryShapesData.shapes,
       ...matchingTasks,
       ...matchingTasks,
       ...positionSelectionTasks,
-      //...FractionData.fractions,
+      ...FractionData.fractions,
       // ...AdditionTaskData.within10,
       ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
@@ -46,6 +48,10 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
-    layout: TopicLayout(promptFlex: 2, interactionFlex: 5),
+    layout: TopicLayout(
+      promptFlex: 1,
+      interactionFlex: 3,
+      interaction: InteractionLayout(scrollable: true),
+    ),
   );
 }

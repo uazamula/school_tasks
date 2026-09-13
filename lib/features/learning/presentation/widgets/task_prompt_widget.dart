@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
@@ -15,6 +13,7 @@ class TaskPromptWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final textStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      fontSize: 24,
       fontWeight: FontWeight.normal,
       color: colorScheme.onSurfaceVariant,
     );
@@ -53,29 +52,25 @@ class TaskPromptWidget extends StatelessWidget {
   Widget _buildGrid(GridContent content) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final screenSize = MediaQuery.sizeOf(context);
-        //todo automatically
-        final maxHeight = screenSize.height * 0.33;
-
         final maxWidth = constraints.hasBoundedWidth
             ? constraints.maxWidth
-            : screenSize.width;
-        //todo automatically
-        final spacing = AppSpacing.sm * 1.5;
+            : MediaQuery.sizeOf(context).width;
+
+        const spacing = AppSpacing.md;
 
         final horizontalSpacing = spacing * (content.columns - 1);
-        final verticalSpacing = spacing * (content.rows - 1);
 
         final availableWidth = maxWidth - horizontalSpacing;
-        final availableHeight = maxHeight - verticalSpacing;
 
-        final cellSize = min(
-          availableWidth / content.columns,
-          availableHeight / content.rows,
-        );
+        if (availableWidth <= 0) {
+          return const SizedBox.shrink();
+        }
+
+        final cellSize = availableWidth / content.columns;
 
         final width = cellSize * content.columns + horizontalSpacing;
-        final height = cellSize * content.rows + verticalSpacing;
+
+        final height = cellSize * content.rows + spacing * (content.rows - 1);
 
         return SizedBox(
           width: width,

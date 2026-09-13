@@ -14,26 +14,54 @@ class TopicLayoutWidget extends StatelessWidget {
   final Widget prompt;
   final Widget interaction;
 
+  // Тимчасові налаштування.
+  // Пізніше вони будуть перенесені в TopicLayout.
+  static const bool scrollableInteraction = true;
+
   @override
   Widget build(BuildContext context) {
+    final bool scrollablePrompt = layout.prompt.scrollable;
+    final bool scrollableInteraction = layout.interaction.scrollable;
+
     return Column(
       children: [
         Expanded(
           flex: layout.promptFlex,
-          child: SingleChildScrollView(
+          child: _buildArea(
+            child: prompt,
+            scrollable: scrollablePrompt,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Center(child: prompt),
           ),
         ),
 
         Expanded(
           flex: layout.interactionFlex,
-          child: SingleChildScrollView(
+          child: _buildArea(
+            child: interaction,
+            scrollable: scrollableInteraction,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Center(child: interaction),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildArea({
+    required Widget child,
+    required bool scrollable,
+    required EdgeInsets padding,
+  }) {
+    if (scrollable) {
+      return Center(
+        child: SingleChildScrollView(padding: padding, child: child),
+      );
+    }
+
+    return Padding(
+      padding: padding,
+      child: Center(
+        child: FittedBox(fit: BoxFit.contain, child: child),
+      ),
     );
   }
 }

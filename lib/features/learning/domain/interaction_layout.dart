@@ -1,12 +1,13 @@
 class InteractionLayout {
-  const InteractionLayout({this.minScale = 0.75, this.spacing = 16});
+  const InteractionLayout({this.scrollable = false, this.spacing = 16});
 
-  /// Мінімальний допустимий масштаб елементів.
+  /// Якщо true — великий контент не масштабується,
+  /// а прокручується.
   ///
-  /// Якщо при цьому масштабі взаємодія все одно
-  /// не вміщується, використовується прокручування.
-  final double minScale;
+  /// Якщо false — великий контент масштабується,
+  /// щоб уміститися в область.
+  final bool scrollable;
 
-  /// Відстань між елементами взаємодії.
+  /// Відступ навколо контенту.
   final double spacing;
 }
