@@ -18,8 +18,8 @@ abstract final class MultiplicationTaskData {
         ],
       ),
       correctAnswers: ['12'],
-      wrongAnswers: ['13', '14', '17'],
-      wrongAnswerCount: 3,
+      wrongAnswers: ['13', '14', '15', '16', '17'],
+      wrongAnswerCount: 5,
     ),
 
     SelectionTaskData(
@@ -34,8 +34,8 @@ abstract final class MultiplicationTaskData {
         ],
       ),
       correctAnswers: ['20'],
-      wrongAnswers: ['13', '14', '17', '15'],
-      wrongAnswerCount: 3,
+      wrongAnswers: ['13', '14', '17', '15', '18', '19'],
+      wrongAnswerCount: 6,
     ),
 
     NumericInputTaskData(

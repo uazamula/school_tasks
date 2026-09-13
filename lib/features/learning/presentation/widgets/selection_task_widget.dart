@@ -38,6 +38,17 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
+  @override
+  void didUpdateWidget(covariant SelectionTaskWidget oldWidget) {
+    super.didUpdateWidget(
+      oldWidget as SelectionTaskWidget<TOption, TAnswer, TSolution>,
+    );
+
+    if (oldWidget.task != widget.task) {
+      _selectedOptions.clear();
+    }
+  }
+
   void _onOptionSelected(TOption option) {
     if (_isAnswered) {
       return;
@@ -185,7 +196,13 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         }
 
         // Зображення — по два в рядок.
-        final imageSize = (constraints.maxWidth - spacing) / 2;
+        // Захист від double.infinity: якщо B2 не передає чіткої ширини,
+        // беремо дефолтне значення (наприклад, 160.0 * 2 + spacing).
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : (160.0 * 2 + spacing);
+
+        final imageSize = (availableWidth - spacing) / 2;
 
         final rows = <Widget>[];
 

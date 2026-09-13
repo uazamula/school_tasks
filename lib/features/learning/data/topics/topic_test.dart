@@ -11,6 +11,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/passing_criteri
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
+import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
@@ -19,11 +20,11 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 1,
-      LearningTaskType.positionSelection: 1,
-      LearningTaskType.numericInput: 1,
+      // LearningTaskType.matching: 1,
+      // LearningTaskType.positionSelection: 1,
+      // LearningTaskType.numericInput: 1,
       LearningTaskType.selection: 3,
-      LearningTaskType.fraction: 1,
+      // LearningTaskType.fraction: 1,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
@@ -33,7 +34,7 @@ abstract final class Tests {
       ...positionSelectionTasks,
       ...FractionData.fractions,
       // ...AdditionTaskData.within10,
-      ...MultiplicationTaskData.multiplicationTable,
+      // ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
     ]),
     help: 'Тестування різних типів завдань',
@@ -49,8 +50,9 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
     layout: TopicLayout(
-      promptFlex: 1,
-      interactionFlex: 3,
+      promptFlex: 3,
+      interactionFlex: 1,
+      prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: true),
     ),
   );

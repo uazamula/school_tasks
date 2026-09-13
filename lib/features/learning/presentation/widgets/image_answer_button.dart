@@ -22,8 +22,8 @@ class ImageAnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 160,
-      height: 160,
+      width: size,
+      height: size,
       child: ElevatedButton(
         onPressed: onPressed,
         style: _buttonStyle(context),

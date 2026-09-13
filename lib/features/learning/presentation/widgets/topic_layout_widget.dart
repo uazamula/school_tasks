@@ -14,10 +14,6 @@ class TopicLayoutWidget extends StatelessWidget {
   final Widget prompt;
   final Widget interaction;
 
-  // Тимчасові налаштування.
-  // Пізніше вони будуть перенесені в TopicLayout.
-  static const bool scrollableInteraction = true;
-
   @override
   Widget build(BuildContext context) {
     final bool scrollablePrompt = layout.prompt.scrollable;

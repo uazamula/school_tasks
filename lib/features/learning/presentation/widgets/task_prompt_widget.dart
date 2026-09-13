@@ -18,14 +18,25 @@ class TaskPromptWidget extends StatelessWidget {
       color: colorScheme.onSurfaceVariant,
     );
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final content in prompt.content) ...[
-          _buildContent(context, content, textStyle),
-          const SizedBox(height: AppSpacing.md),
-        ],
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.hasBoundedWidth
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
+
+        return SizedBox(
+          width: maxWidth,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final content in prompt.content) ...[
+                _buildContent(context, content, textStyle),
+                const SizedBox(height: AppSpacing.md),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -35,11 +46,22 @@ class TaskPromptWidget extends StatelessWidget {
     TextStyle? textStyle,
   ) {
     if (content is TextContent) {
-      return Text(content.text, style: textStyle, textAlign: TextAlign.center);
+      return SizedBox(
+        width: double.infinity,
+        child: Text(
+          content.text,
+          style: textStyle,
+          textAlign: TextAlign.center,
+          softWrap: true,
+        ),
+      );
     }
 
     if (content is ImageContent) {
-      return Image.asset(content.imagePath, fit: BoxFit.contain);
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        child: Image.asset(content.imagePath, fit: BoxFit.contain),
+      );
     }
 
     if (content is GridContent) {
