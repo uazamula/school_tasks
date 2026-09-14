@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
+import 'package:school_tasks/features/learning/domain/task_navigation_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
@@ -13,6 +14,7 @@ class Topic {
     required this.evaluation,
     this.passingCriteria,
     this.layout = const TopicLayout.standard(),
+    this.navigationMode = TaskNavigationMode.automatic,
   });
 
   final String id;
@@ -22,6 +24,7 @@ class Topic {
   final EvaluationConfig evaluation;
   final PassingCriteria? passingCriteria;
   final TopicLayout layout;
+  final TaskNavigationMode navigationMode;
 
   int get totalTasks {
     return taskTypeCounts.values.fold(0, (sum, count) => sum + count);

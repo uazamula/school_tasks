@@ -9,6 +9,7 @@ import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dar
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_generator.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
+import 'package:school_tasks/features/learning/domain/task_navigation_mode.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
@@ -109,6 +110,17 @@ class _LearningPageState extends State<LearningPage> {
                 interaction: taskWidget.buildInteraction(),
               ),
             ),
+
+            if (_topic.navigationMode == TaskNavigationMode.manual)
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: FilledButton(
+                  onPressed: currentTask.isAnswered
+                      ? (_attempt.isFinished ? _finishAttempt : _moveToNextTask)
+                      : null,
+                  child: Text(_attempt.isFinished ? 'Завершити' : 'Далі'),
+                ),
+              ),
           ],
         ),
       ),
@@ -138,14 +150,17 @@ class _LearningPageState extends State<LearningPage> {
       _completedProgressSteps++;
     }
 
+    if (_topic.navigationMode == TaskNavigationMode.manual) {
+      setState(() {});
+      return;
+    }
+
     if (_attempt.isFinished) {
       _finishAttempt();
       return;
     }
 
-    setState(() {
-      _attempt.moveToNextTask();
-    });
+    _moveToNextTask();
   }
 
   void _finishAttempt() {
@@ -170,5 +185,15 @@ class _LearningPageState extends State<LearningPage> {
     );
 
     context.pop(evaluatedResult);
+  }
+
+  void _moveToNextTask() {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _attempt.moveToNextTask();
+    });
   }
 }
