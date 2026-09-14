@@ -1,1 +1,0 @@
-enum TaskNavigationMode { automatic, manual }

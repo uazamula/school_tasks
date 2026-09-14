@@ -1,9 +1,9 @@
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
-import 'package:school_tasks/features/learning/domain/task_navigation_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
+import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 
 class Topic {
   Topic({
@@ -14,7 +14,8 @@ class Topic {
     required this.evaluation,
     this.passingCriteria,
     this.layout = const TopicLayout.standard(),
-    this.navigationMode = TaskNavigationMode.automatic,
+    this.progressionMode = TopicProgressionMode.automatic,
+    this.feedbackDuration = const Duration(milliseconds: 500),
   });
 
   final String id;
@@ -24,7 +25,8 @@ class Topic {
   final EvaluationConfig evaluation;
   final PassingCriteria? passingCriteria;
   final TopicLayout layout;
-  final TaskNavigationMode navigationMode;
+  final TopicProgressionMode progressionMode;
+  final Duration feedbackDuration;
 
   int get totalTasks {
     return taskTypeCounts.values.fold(0, (sum, count) => sum + count);

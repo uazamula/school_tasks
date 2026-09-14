@@ -9,10 +9,10 @@ import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dar
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_generator.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
-import 'package:school_tasks/features/learning/domain/task_navigation_mode.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
+import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_progress_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
@@ -27,8 +27,6 @@ class LearningPage extends StatefulWidget {
 }
 
 class _LearningPageState extends State<LearningPage> {
-  static const _feedbackDuration = Duration(milliseconds: 500);
-
   late final TopicAttempt _attempt;
   late final Topic _topic;
 
@@ -62,9 +60,10 @@ class _LearningPageState extends State<LearningPage> {
 
   @override
   void dispose() {
-    _autoAdvanceTimer?.cancel();
     _timer?.cancel();
+    _autoAdvanceTimer?.cancel();
     _stopwatch.stop();
+
     super.dispose();
   }
 
@@ -90,7 +89,7 @@ class _LearningPageState extends State<LearningPage> {
     final result = currentTask.result;
 
     final isManualAnswered =
-        _topic.navigationMode == TaskNavigationMode.manual &&
+        _topic.progressionMode == TopicProgressionMode.manual &&
         currentTask.isAnswered;
 
     final taskWidget = TaskWidget(
@@ -158,24 +157,43 @@ class _LearningPageState extends State<LearningPage> {
       _completedProgressSteps++;
     }
 
-    if (_topic.navigationMode == TaskNavigationMode.manual) {
-      // У manual mode час зупиняється до натискання "Далі".
-      _stopwatch.stop();
+    switch (_topic.progressionMode) {
+      case TopicProgressionMode.automatic:
+        _moveAutomatically();
+        return;
 
-      setState(() {});
+      case TopicProgressionMode.automaticWithFeedback:
+        _showFeedbackAndAdvanceAutomatically();
+        return;
+
+      case TopicProgressionMode.manual:
+        _showFeedbackAndWaitForManualNext();
+        return;
+    }
+  }
+
+  void _moveAutomatically() {
+    if (_attempt.isFinished) {
+      _finishAttempt();
       return;
     }
 
-    // У automatic mode feedback-пауза не повинна входити
-    // у тривалість проходження.
+    _moveToNextTask();
+  }
+
+  void _showFeedbackAndAdvanceAutomatically() {
     _stopwatch.stop();
 
     setState(() {});
 
-    _autoAdvanceTimer = Timer(_feedbackDuration, () {
+    _autoAdvanceTimer?.cancel();
+
+    _autoAdvanceTimer = Timer(_topic.feedbackDuration, () {
       if (!mounted) {
         return;
       }
+
+      _autoAdvanceTimer = null;
 
       if (_attempt.isFinished) {
         _finishAttempt();
@@ -185,6 +203,12 @@ class _LearningPageState extends State<LearningPage> {
       _moveToNextTask();
       _stopwatch.start();
     });
+  }
+
+  void _showFeedbackAndWaitForManualNext() {
+    _stopwatch.stop();
+
+    setState(() {});
   }
 
   void _onManualNext() {
@@ -198,6 +222,8 @@ class _LearningPageState extends State<LearningPage> {
 
   void _finishAttempt() {
     _autoAdvanceTimer?.cancel();
+    _autoAdvanceTimer = null;
+
     _stopwatch.stop();
 
     final elapsedTime = _stopwatch.elapsed;

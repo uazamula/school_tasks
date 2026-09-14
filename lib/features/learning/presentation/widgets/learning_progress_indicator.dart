@@ -15,9 +15,16 @@ class LearningProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final progressValue = totalSteps == 0
         ? 0.0
         : (progress / totalSteps).clamp(0.0, 1.0);
+
+    final timeColor = theme.brightness == Brightness.light
+        ? colorScheme.onSurface
+        : colorScheme.onSurfaceVariant;
 
     return Row(
       children: [
@@ -27,12 +34,10 @@ class LearningProgressIndicator extends StatelessWidget {
             child: LinearProgressIndicator(value: progressValue, minHeight: 12),
           ),
         ),
-
         const SizedBox(width: AppSpacing.md),
-
         Text(
           _formatDuration(elapsed),
-          style: Theme.of(context).textTheme.titleMedium,
+          style: theme.textTheme.titleMedium?.copyWith(color: timeColor),
         ),
       ],
     );
