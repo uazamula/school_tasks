@@ -83,10 +83,10 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
           ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
+            color: _getInputBackgroundColor(colorScheme),
             border: Border.all(
               color: _getInputBorderColor(colorScheme),
-              width: 2,
+              width: _isAnswered && widget.result!.isCorrect ? 3 : 2,
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -117,5 +117,19 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
     }
 
     return widget.result!.isCorrect ? Colors.green : colorScheme.error;
+  }
+
+  Color _getInputBackgroundColor(ColorScheme colorScheme) {
+    if (!_isAnswered) {
+      return colorScheme.surfaceContainerHighest;
+    }
+
+    if (widget.result!.isCorrect) {
+      return colorScheme.brightness == Brightness.light
+          ? const Color(0xFFC8E6C9)
+          : const Color(0xFF356B3A);
+    }
+
+    return colorScheme.errorContainer;
   }
 }

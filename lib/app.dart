@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:school_tasks/core/services/emoji_preloader.dart';
 import 'package:school_tasks/l10n/app_localizations.dart';
 
 import 'core/localization/locale_controller.dart';
@@ -30,6 +31,9 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode.value ?? ThemeMode.system,
+      builder: (context, child) {
+        return EmojiPreloader(child: child ?? const SizedBox.shrink());
+      },
     );
   }
 }
