@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
@@ -29,26 +27,19 @@ class LearningPage extends StatefulWidget {
 class _LearningPageState extends State<LearningPage> {
   late final TopicAttempt _attempt;
   late final Topic _topic;
-
   final EvaluationCalculator _evaluationCalculator =
       const EvaluationCalculator();
-
   final TopicAttemptGenerator _attemptGenerator = TopicAttemptGenerator();
-
   late final Stopwatch _stopwatch;
   Timer? _timer;
-
   int _completedProgressSteps = 0;
 
   @override
   void initState() {
     super.initState();
-
     _topic = LearningContent.getTopic(widget.topicId);
     _attempt = _attemptGenerator.generate(_topic);
-
     _stopwatch = Stopwatch()..start();
-
     _timer = Timer.periodic(const Duration(milliseconds: 250), (_) {
       if (mounted) {
         setState(() {});
@@ -65,17 +56,14 @@ class _LearningPageState extends State<LearningPage> {
 
   int get _totalProgressSteps {
     var total = 0;
-
     for (final attemptTask in _attempt.tasks) {
       final task = attemptTask.task;
-
       if (task is MatchingTask) {
         total += task.pairs.length;
       } else {
         total += 1;
       }
     }
-
     return total;
   }
 
@@ -83,44 +71,44 @@ class _LearningPageState extends State<LearningPage> {
   Widget build(BuildContext context) {
     final currentTask = _attempt.currentTask;
     final result = currentTask.result;
-
+    final isManualAnswered =
+        _topic.navigationMode == TaskNavigationMode.manual &&
+        currentTask.isAnswered;
     final taskWidget = TaskWidget(
       task: currentTask.task,
       result: result,
       onTaskAnswered: _onTaskAnswered,
       onProgressStep: _onProgressStep,
     );
-
     return AppScaffold(
       child: SafeArea(
         child: Column(
           children: [
-            LearningProgressIndicator(
-              progress: _completedProgressSteps,
-              totalSteps: _totalProgressSteps,
-              elapsed: _stopwatch.elapsed,
+            Opacity(
+              opacity: isManualAnswered ? 0.15 : 1.0,
+              child: LearningProgressIndicator(
+                progress: _completedProgressSteps,
+                totalSteps: _totalProgressSteps,
+                elapsed: _stopwatch.elapsed,
+              ),
             ),
-
             const SizedBox(height: 16),
-
             Expanded(
               child: TopicLayoutWidget(
                 layout: _topic.layout,
                 prompt: taskWidget.buildPrompt(),
                 interaction: taskWidget.buildInteraction(),
+                dimmed: isManualAnswered,
+                promptOverlay: isManualAnswered
+                    ? FilledButton(
+                        onPressed: _attempt.isFinished
+                            ? _finishAttempt
+                            : _moveToNextTask,
+                        child: Text(_attempt.isFinished ? 'Завершити' : 'Далі'),
+                      )
+                    : null,
               ),
             ),
-
-            if (_topic.navigationMode == TaskNavigationMode.manual)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: FilledButton(
-                  onPressed: currentTask.isAnswered
-                      ? (_attempt.isFinished ? _finishAttempt : _moveToNextTask)
-                      : null,
-                  child: Text(_attempt.isFinished ? 'Завершити' : 'Далі'),
-                ),
-              ),
           ],
         ),
       ),
@@ -131,7 +119,6 @@ class _LearningPageState extends State<LearningPage> {
     if (!mounted) {
       return;
     }
-
     setState(() {
       _completedProgressSteps++;
     });
@@ -139,43 +126,33 @@ class _LearningPageState extends State<LearningPage> {
 
   void _onTaskAnswered(TaskResult<dynamic, dynamic> result) {
     final currentTask = _attempt.currentTask;
-
     if (currentTask.isAnswered) {
       return;
     }
-
     _attempt.recordResult(result);
-
     if (currentTask.task is! MatchingTask) {
       _completedProgressSteps++;
     }
-
     if (_topic.navigationMode == TaskNavigationMode.manual) {
       setState(() {});
       return;
     }
-
     if (_attempt.isFinished) {
       _finishAttempt();
       return;
     }
-
     _moveToNextTask();
   }
 
   void _finishAttempt() {
     _stopwatch.stop();
-
     final elapsedTime = _stopwatch.elapsed;
-
     final topicResult = _attempt.getResult(duration: elapsedTime);
-
     final evaluation = _evaluationCalculator.calculate(
       topic: _topic,
       result: topicResult,
       elapsedTime: elapsedTime,
     );
-
     final evaluatedResult = TopicAttemptResult(
       totalTasks: topicResult.totalTasks,
       completedTasks: topicResult.completedTasks,
@@ -183,7 +160,6 @@ class _LearningPageState extends State<LearningPage> {
       duration: topicResult.duration,
       evaluation: evaluation,
     );
-
     context.pop(evaluatedResult);
   }
 
@@ -191,7 +167,6 @@ class _LearningPageState extends State<LearningPage> {
     if (!mounted) {
       return;
     }
-
     setState(() {
       _attempt.moveToNextTask();
     });

@@ -85,7 +85,7 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest,
             border: Border.all(
-              color: _input.isEmpty ? colorScheme.outline : colorScheme.primary,
+              color: _getInputBorderColor(colorScheme),
               width: 2,
             ),
             borderRadius: BorderRadius.circular(12),
@@ -109,5 +109,13 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
         ),
       ],
     );
+  }
+
+  Color _getInputBorderColor(ColorScheme colorScheme) {
+    if (!_isAnswered) {
+      return _input.isEmpty ? colorScheme.outline : colorScheme.primary;
+    }
+
+    return widget.result!.isCorrect ? Colors.green : colorScheme.error;
   }
 }

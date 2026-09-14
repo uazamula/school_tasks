@@ -24,8 +24,8 @@ abstract final class FractionData {
       parts: 6,
     ),
     FractionTaskData(
-      prompt: TaskPrompt(content: [TextContent("З'їж 1/7 торта.")]),
-      numerator: 1,
+      prompt: TaskPrompt(content: [TextContent("З'їж 3/7 торта.")]),
+      numerator: 3,
       denominator: 7,
       parts: 7,
     ),

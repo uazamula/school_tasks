@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
 class FractionTaskWidget extends StatefulWidget {
   const FractionTaskWidget({
@@ -98,13 +99,19 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
 
   Widget _buildPart(int index, int rows, int columns) {
     final isSelected = _selectedParts.contains(index);
+    final state = _getPartState(index);
     final borderRadius = _getBorderRadius(index, rows, columns);
     final colors = Theme.of(context).colorScheme;
 
     return ClipRRect(
       borderRadius: borderRadius,
       child: Material(
-        color: isSelected ? colors.primary : const Color(0xFFFFE0B2),
+        color: switch (state) {
+          TaskAnswerState.correct => Colors.green,
+          TaskAnswerState.incorrect => Colors.red,
+          TaskAnswerState.neutral =>
+            isSelected ? colors.primary : const Color(0xFFFFE0B2),
+        },
         child: InkWell(
           onTap: _isAnswered
               ? null
@@ -172,6 +179,69 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
     }
 
     return _GridDimensions(rows: bestRows, columns: bestColumns);
+  }
+
+  TaskAnswerState _getPartState(int index) {
+    final result = widget.result;
+
+    if (result == null || !result.isAnswered) {
+      return TaskAnswerState.neutral;
+    }
+
+    final selectedParts = result.selectedAnswer ?? {};
+    final correctCount = widget.task.requiredSelectedParts;
+
+    // m == n
+    if (selectedParts.length == correctCount) {
+      return selectedParts.contains(index)
+          ? TaskAnswerState.correct
+          : TaskAnswerState.neutral;
+    }
+
+    // m < n
+    if (selectedParts.length < correctCount) {
+      if (selectedParts.contains(index)) {
+        return TaskAnswerState.correct;
+      }
+
+      final missingCount = correctCount - selectedParts.length;
+      var missingIndex = 0;
+
+      for (var i = 0; i < widget.task.parts; i++) {
+        if (selectedParts.contains(i)) {
+          continue;
+        }
+
+        if (i == index) {
+          return missingIndex < missingCount
+              ? TaskAnswerState.correct
+              : TaskAnswerState.neutral;
+        }
+
+        missingIndex++;
+      }
+
+      return TaskAnswerState.neutral;
+    }
+
+    // m > n
+    var selectedIndex = 0;
+
+    for (var i = 0; i < widget.task.parts; i++) {
+      if (!selectedParts.contains(i)) {
+        continue;
+      }
+
+      if (i == index) {
+        return selectedIndex < correctCount
+            ? TaskAnswerState.correct
+            : TaskAnswerState.incorrect;
+      }
+
+      selectedIndex++;
+    }
+
+    return TaskAnswerState.neutral;
   }
 }
 

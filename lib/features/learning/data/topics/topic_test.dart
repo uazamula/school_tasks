@@ -24,8 +24,8 @@ abstract final class Tests {
       LearningTaskType.matching: 1,
       LearningTaskType.positionSelection: 1,
       LearningTaskType.numericInput: 1,
-      LearningTaskType.selection: 3,
-      LearningTaskType.fraction: 1,
+      LearningTaskType.selection: 1,
+      LearningTaskType.fraction: 3,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
@@ -53,9 +53,9 @@ abstract final class Tests {
     layout: TopicLayout(
       promptFlex: 1,
       interactionFlex: 1,
-      prompt: PromptLayout(scrollable: false),
-      interaction: InteractionLayout(scrollable: false),
+      prompt: PromptLayout(scrollable: true),
+      interaction: InteractionLayout(scrollable: true),
     ),
-    navigationMode: TaskNavigationMode.manual,
+    navigationMode: TaskNavigationMode.automatic,
   );
 }

@@ -5,6 +5,7 @@ import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
 class PositionSelectionTaskWidget extends StatefulWidget {
   const PositionSelectionTaskWidget({
@@ -116,10 +117,17 @@ class _PositionSelectionTaskWidgetState
 
   Widget _buildCell(GridPosition position, TaskContent content) {
     final isSelected = _selectedPositions.contains(position);
+    final state = _getPositionState(position);
     final colors = Theme.of(context).colorScheme;
 
+    final backgroundColor = switch (state) {
+      TaskAnswerState.correct => Colors.green,
+      TaskAnswerState.incorrect => colors.error,
+      TaskAnswerState.neutral => isSelected ? colors.primary : colors.surface,
+    };
+
     return Material(
-      color: isSelected ? colors.primary : colors.surface,
+      color: backgroundColor,
       child: InkWell(
         onTap: _isAnswered
             ? null
@@ -171,5 +179,27 @@ class _PositionSelectionTaskWidgetState
     final result = widget.task.checkAnswer(answer);
 
     widget.onTaskAnswered(result);
+  }
+
+  TaskAnswerState _getPositionState(GridPosition position) {
+    final result = widget.result;
+
+    if (result == null) {
+      return TaskAnswerState.neutral;
+    }
+
+    final solution = result.solution?.value;
+
+    if (solution != null && solution.contains(position)) {
+      return TaskAnswerState.correct;
+    }
+
+    final selectedAnswer = result.selectedAnswer;
+
+    if (selectedAnswer != null && selectedAnswer.contains(position)) {
+      return TaskAnswerState.incorrect;
+    }
+
+    return TaskAnswerState.neutral;
   }
 }
