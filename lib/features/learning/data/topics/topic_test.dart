@@ -56,6 +56,6 @@ abstract final class Tests {
       prompt: PromptLayout(scrollable: true),
       interaction: InteractionLayout(scrollable: true),
     ),
-    navigationMode: TaskNavigationMode.automatic,
+    navigationMode: TaskNavigationMode.manual,
   );
 }
