@@ -21,30 +21,31 @@ class TopicLayoutWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool scrollablePrompt = layout.prompt.scrollable;
     final bool scrollableInteraction = layout.interaction.scrollable;
+
     return Stack(
       children: [
         Column(
           children: [
             Expanded(
               flex: layout.promptFlex,
-              child: _buildPromptArea(scrollable: scrollablePrompt),
+              child: Opacity(
+                opacity: dimmed ? 0.45 : 1.0,
+                child: _buildPromptArea(scrollable: scrollablePrompt),
+              ),
             ),
             Expanded(
               flex: layout.interactionFlex,
-              child: _buildArea(
-                child: interaction,
-                scrollable: scrollableInteraction,
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Opacity(
+                opacity: dimmed ? 0.45 : 1.0,
+                child: _buildArea(
+                  child: interaction,
+                  scrollable: scrollableInteraction,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                ),
               ),
             ),
           ],
         ),
-        if (dimmed)
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: ColoredBox(color: Color.fromRGBO(0, 0, 0, 0.30)),
-            ),
-          ),
         if (dimmed && promptOverlay != null) _buildPromptOverlay(),
       ],
     );
@@ -78,10 +79,18 @@ class TopicLayoutWidget extends StatelessWidget {
         child: SingleChildScrollView(padding: padding, child: child),
       );
     }
+
     return Padding(
       padding: padding,
-      child: Center(
-        child: FittedBox(fit: BoxFit.contain, child: child),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: SizedBox(width: constraints.maxWidth, child: child),
+            ),
+          );
+        },
       ),
     );
   }

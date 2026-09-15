@@ -3,21 +3,28 @@ import 'package:school_tasks/core/theme/app_colors.dart';
 
 class AppTheme {
   static ThemeData light() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: Brightness.light,
+    );
+
     return ThemeData(
       useMaterial3: true,
-      colorSchemeSeed: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.background,
-      //  appBarTheme: AppBarTheme(backgroundColor: Colors.green,)
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
     );
   }
 
   static ThemeData dark() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: Brightness.dark,
+    );
+
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.blue,
-        brightness: Brightness.dark,
-      ),
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
     );
   }
 }

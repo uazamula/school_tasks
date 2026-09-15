@@ -32,7 +32,10 @@ class MyApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: themeMode.value ?? ThemeMode.system,
       builder: (context, child) {
-        return EmojiPreloader(child: child ?? const SizedBox.shrink());
+        return ColoredBox(
+          color: Theme.of(context).colorScheme.surface,
+          child: EmojiPreloader(child: child ?? const SizedBox.shrink()),
+        );
       },
     );
   }
