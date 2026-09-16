@@ -44,6 +44,12 @@ class _LearningPageState extends State<LearningPage> {
 
   int _completedProgressSteps = 0;
 
+  /// Feedback доступний тільки для режимів,
+  /// у яких користувач має побачити результат відповіді.
+  bool get _feedbackEnabled {
+    return _topic.progressionMode != TopicProgressionMode.automatic;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -101,6 +107,7 @@ class _LearningPageState extends State<LearningPage> {
       onTaskAnswered: _onTaskAnswered,
       onProgressStep: _onProgressStep,
       onCorrectPair: _onCorrectPair,
+      feedbackEnabled: _feedbackEnabled,
     );
 
     return AppScaffold(
@@ -157,7 +164,9 @@ class _LearningPageState extends State<LearningPage> {
 
     _attempt.recordResult(result);
 
-    if (currentTask.task is! MatchingTask && result.isCorrect) {
+    if (_feedbackEnabled &&
+        currentTask.task is! MatchingTask &&
+        result.isCorrect) {
       _audioService.playSuccess();
     }
 
@@ -266,6 +275,10 @@ class _LearningPageState extends State<LearningPage> {
   }
 
   void _onCorrectPair() {
+    if (!_feedbackEnabled) {
+      return;
+    }
+
     _audioService.playSuccess();
   }
 }
