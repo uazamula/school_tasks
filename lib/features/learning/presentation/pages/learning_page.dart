@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/core/services/audio/audio_service.dart';
 
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
@@ -34,6 +35,7 @@ class _LearningPageState extends State<LearningPage> {
       const EvaluationCalculator();
 
   final TopicAttemptGenerator _attemptGenerator = TopicAttemptGenerator();
+  final AudioService _audioService = AudioService();
 
   late final Stopwatch _stopwatch;
 
@@ -63,6 +65,7 @@ class _LearningPageState extends State<LearningPage> {
     _timer?.cancel();
     _autoAdvanceTimer?.cancel();
     _stopwatch.stop();
+    _audioService.dispose();
 
     super.dispose();
   }
@@ -97,6 +100,7 @@ class _LearningPageState extends State<LearningPage> {
       result: result,
       onTaskAnswered: _onTaskAnswered,
       onProgressStep: _onProgressStep,
+      onCorrectPair: _onCorrectPair,
     );
 
     return AppScaffold(
@@ -152,6 +156,10 @@ class _LearningPageState extends State<LearningPage> {
     }
 
     _attempt.recordResult(result);
+
+    if (currentTask.task is! MatchingTask && result.isCorrect) {
+      _audioService.playSuccess();
+    }
 
     if (currentTask.task is! MatchingTask) {
       _completedProgressSteps++;
@@ -255,5 +263,9 @@ class _LearningPageState extends State<LearningPage> {
     setState(() {
       _attempt.moveToNextTask();
     });
+  }
+
+  void _onCorrectPair() {
+    _audioService.playSuccess();
   }
 }

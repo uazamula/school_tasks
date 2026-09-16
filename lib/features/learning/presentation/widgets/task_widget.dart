@@ -24,13 +24,14 @@ class TaskWidget extends StatelessWidget {
     required this.result,
     required this.onTaskAnswered,
     required this.onProgressStep,
+    required this.onCorrectPair,
   });
 
   final LearningTask<dynamic, dynamic> task;
   final TaskResult<dynamic, dynamic>? result;
   final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;
   final VoidCallback onProgressStep;
-
+  final VoidCallback onCorrectPair;
   Widget buildPrompt() {
     return TaskPromptWidget(prompt: task.prompt);
   }
@@ -66,9 +67,9 @@ class TaskWidget extends StatelessWidget {
         result: result as TaskResult<MatchingAnswer, List<MatchingPair>>?,
         onTaskAnswered: onTaskAnswered,
         onProgressStep: onProgressStep,
+        onCorrectPair: onCorrectPair,
       );
     }
-
     if (task is NumericInputTask) {
       return NumericInputTaskWidget(
         task: task as NumericInputTask,

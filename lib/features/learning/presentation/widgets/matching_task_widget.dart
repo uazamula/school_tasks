@@ -18,6 +18,7 @@ class MatchingTaskWidget extends StatefulWidget {
     required this.result,
     required this.onTaskAnswered,
     required this.onProgressStep,
+    required this.onCorrectPair,
   });
 
   final MatchingTask task;
@@ -25,6 +26,7 @@ class MatchingTaskWidget extends StatefulWidget {
   final ValueChanged<TaskResult<MatchingAnswer, List<MatchingPair>>>
   onTaskAnswered;
   final VoidCallback onProgressStep;
+  final VoidCallback onCorrectPair;
 
   @override
   State<MatchingTaskWidget> createState() => _MatchingTaskWidgetState();
@@ -177,6 +179,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
 
     // Одна правильно складена пара = один крок прогресу.
     // Правильність першої спроби на прогрес не впливає.
+    widget.onCorrectPair();
     widget.onProgressStep();
 
     _clearSelection();

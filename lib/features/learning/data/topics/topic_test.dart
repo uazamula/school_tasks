@@ -21,7 +21,7 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      // LearningTaskType.matching: 1,
+      LearningTaskType.matching: 1,
       // LearningTaskType.positionSelection: 1,
       LearningTaskType.numericInput: 1,
       LearningTaskType.selection: 2,
@@ -56,7 +56,7 @@ abstract final class Tests {
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
-    progressionMode: TopicProgressionMode.manual,
+    progressionMode: TopicProgressionMode.automatic,
     feedbackDuration: Duration(milliseconds: 500),
   );
 }
