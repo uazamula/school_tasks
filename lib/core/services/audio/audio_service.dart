@@ -11,6 +11,10 @@ class AudioService {
     await _player.play(AssetSource('audio/ding.mp3'));
   }
 
+  Future<void> playFailure() async {
+    await _player.play(AssetSource('audio/failure.mp3'));
+  }
+
   Future<void> dispose() async {
     await _player.dispose();
   }

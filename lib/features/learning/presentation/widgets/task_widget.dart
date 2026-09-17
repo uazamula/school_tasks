@@ -25,6 +25,7 @@ class TaskWidget extends StatelessWidget {
     required this.onTaskAnswered,
     required this.onProgressStep,
     required this.onCorrectPair,
+    required this.onIncorrectPair,
     required this.feedbackEnabled,
   });
 
@@ -33,6 +34,7 @@ class TaskWidget extends StatelessWidget {
   final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;
   final VoidCallback onProgressStep;
   final VoidCallback onCorrectPair;
+  final VoidCallback onIncorrectPair;
   final bool feedbackEnabled;
 
   Widget buildPrompt() {
@@ -71,6 +73,7 @@ class TaskWidget extends StatelessWidget {
         onTaskAnswered: onTaskAnswered,
         onProgressStep: onProgressStep,
         onCorrectPair: onCorrectPair,
+        onIncorrectPair: onIncorrectPair,
         feedbackEnabled: feedbackEnabled,
       );
     }

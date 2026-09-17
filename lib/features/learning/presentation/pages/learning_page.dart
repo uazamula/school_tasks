@@ -107,6 +107,7 @@ class _LearningPageState extends State<LearningPage> {
       onTaskAnswered: _onTaskAnswered,
       onProgressStep: _onProgressStep,
       onCorrectPair: _onCorrectPair,
+      onIncorrectPair: _onIncorrectPair,
       feedbackEnabled: _feedbackEnabled,
     );
 
@@ -164,10 +165,12 @@ class _LearningPageState extends State<LearningPage> {
 
     _attempt.recordResult(result);
 
-    if (_feedbackEnabled &&
-        currentTask.task is! MatchingTask &&
-        result.isCorrect) {
-      _audioService.playSuccess();
+    if (_feedbackEnabled && currentTask.task is! MatchingTask) {
+      if (result.isCorrect) {
+        _audioService.playSuccess();
+      } else {
+        _audioService.playFailure();
+      }
     }
 
     if (currentTask.task is! MatchingTask) {
@@ -280,5 +283,13 @@ class _LearningPageState extends State<LearningPage> {
     }
 
     _audioService.playSuccess();
+  }
+
+  void _onIncorrectPair() {
+    if (!_feedbackEnabled) {
+      return;
+    }
+
+    _audioService.playFailure();
   }
 }

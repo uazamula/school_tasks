@@ -20,6 +20,7 @@ class MatchingTaskWidget extends StatefulWidget {
     required this.onProgressStep,
     required this.onCorrectPair,
     required this.feedbackEnabled,
+    required this.onIncorrectPair,
   });
 
   final MatchingTask task;
@@ -29,6 +30,7 @@ class MatchingTaskWidget extends StatefulWidget {
   final VoidCallback onProgressStep;
   final VoidCallback onCorrectPair;
   final bool feedbackEnabled;
+  final VoidCallback onIncorrectPair;
 
   @override
   State<MatchingTaskWidget> createState() => _MatchingTaskWidgetState();
@@ -170,6 +172,10 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     final pairIndex = _findCorrectPair(answer);
 
     if (pairIndex == null) {
+      if (widget.feedbackEnabled) {
+        widget.onIncorrectPair();
+      }
+
       _registerIncorrectAttempt(leftIndex);
       _clearSelection();
       setState(() {});
