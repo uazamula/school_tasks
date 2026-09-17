@@ -234,4 +234,12 @@ class AppPreferences {
       ids.toList(),
     );
   }
+
+  bool getServiceSoundsEnabled() {
+    return _prefs.getBool(PreferenceKeys.serviceSoundsEnabled) ?? true;
+  }
+
+  Future<bool> setServiceSoundsEnabled(bool enabled) {
+    return _prefs.setBool(PreferenceKeys.serviceSoundsEnabled, enabled);
+  }
 }

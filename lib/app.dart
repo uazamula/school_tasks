@@ -7,6 +7,7 @@ import 'core/localization/locale_controller.dart';
 import 'core/statistics/usage_statistics_service_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
+import 'features/settings/providers/service_sounds_controller.dart';
 import 'routing/app_router.dart';
 
 class MyApp extends ConsumerWidget {
@@ -15,6 +16,8 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(usageStatisticsServiceProvider);
+    ref.watch(serviceSoundsControllerProvider);
+
     final themeMode = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
 

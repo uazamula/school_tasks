@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/services/audio/audio_service.dart';
 
@@ -18,16 +19,18 @@ import 'package:school_tasks/features/learning/presentation/widgets/learning_pro
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
 
-class LearningPage extends StatefulWidget {
+import '../../../../core/services/audio/audio_service_provider.dart';
+
+class LearningPage extends ConsumerStatefulWidget {
   const LearningPage({super.key, required this.topicId});
 
   final String topicId;
 
   @override
-  State<LearningPage> createState() => _LearningPageState();
+  ConsumerState<LearningPage> createState() => _LearningPageState();
 }
 
-class _LearningPageState extends State<LearningPage> {
+class _LearningPageState extends ConsumerState<LearningPage> {
   late final TopicAttempt _attempt;
   late final Topic _topic;
 
@@ -35,9 +38,10 @@ class _LearningPageState extends State<LearningPage> {
       const EvaluationCalculator();
 
   final TopicAttemptGenerator _attemptGenerator = TopicAttemptGenerator();
-  final AudioService _audioService = AudioService();
 
   late final Stopwatch _stopwatch;
+
+  AudioService get _audioService => ref.read(audioServiceProvider);
 
   Timer? _timer;
   Timer? _autoAdvanceTimer;
@@ -71,7 +75,6 @@ class _LearningPageState extends State<LearningPage> {
     _timer?.cancel();
     _autoAdvanceTimer?.cancel();
     _stopwatch.stop();
-    _audioService.dispose();
 
     super.dispose();
   }

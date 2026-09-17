@@ -20,4 +20,6 @@ abstract final class PreferenceKeys {
 
   // Стан розгортання рівнів і розділів дерева навчального матеріалу.
   static const expandedLearningNodeIds = 'expanded_learning_node_ids';
+  // Увімкнення службових звуків.
+  static const serviceSoundsEnabled = 'service_sounds_enabled';
 }
