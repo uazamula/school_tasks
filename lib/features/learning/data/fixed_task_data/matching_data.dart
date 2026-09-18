@@ -13,7 +13,7 @@ final matchingTasks = [
       MatchingPair(left: TextContent('3 × 2'), right: TextContent('6')),
       // MatchingPair(left: TextContent('4 × 2'), right: TextContent('8')),
       MatchingPair(
-        left: EmojiContent('🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎'),
+        left: ImageContent('assets/images/cheetah.png'),
         right: TextContent('5 × 2'),
       ),
       // MatchingPair(left: TextContent('3 × 3'), right: TextContent('9')),

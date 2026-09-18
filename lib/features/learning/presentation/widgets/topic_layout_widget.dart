@@ -91,10 +91,7 @@ class TopicLayoutWidget extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Center(
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: SizedBox(width: constraints.maxWidth, child: child),
-            ),
+            child: FittedBox(fit: BoxFit.contain, child: child),
           );
         },
       ),

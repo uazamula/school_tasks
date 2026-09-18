@@ -19,7 +19,7 @@ class TaskPromptWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final textStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
-      fontSize: 24,
+      fontSize: 18,
       fontWeight: FontWeight.normal,
       color: colorScheme.onSurfaceVariant,
     );
