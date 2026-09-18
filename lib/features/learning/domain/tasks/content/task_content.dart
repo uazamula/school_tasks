@@ -29,6 +29,20 @@ class ImageContent extends TaskContent {
   int get hashCode => imagePath.hashCode;
 }
 
+class AudioContent extends TaskContent {
+  const AudioContent(this.audioPath);
+
+  final String audioPath;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AudioContent && other.audioPath == audioPath;
+
+  @override
+  int get hashCode => audioPath.hashCode;
+}
+
 /// Concrete, already-generated grid.
 class GridContent extends TaskContent {
   const GridContent({

@@ -35,7 +35,26 @@ abstract final class AdditionTaskData {
       correctAnswer: 5,
     ),
   ];
-
+  static const List<TaskData> additionWithSound = [
+    SelectionTaskData(
+      prompt: TaskPrompt(
+        content: [
+          TextContent('Скільки буде 2 + 9?'),
+          AudioContent('assets/audio/test.mp3'),
+          GridContent(
+            rows: 3,
+            columns: 4,
+            item: ImageContent('assets/images/tasks/apple.png'),
+          ),
+          AudioContent('assets/audio/failure.mp3'),
+          ImageContent('assets/images/tasks/triangle.png'),
+        ],
+      ),
+      correctAnswers: ['11'],
+      wrongAnswers: ['13', '14', '17'],
+      wrongAnswerCount: 3,
+    ),
+  ];
   static const List<TaskData> additionDigits = [
     SelectionTaskData(
       prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 9?')]),

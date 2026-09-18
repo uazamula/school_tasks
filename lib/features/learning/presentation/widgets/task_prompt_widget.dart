@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
 class TaskPromptWidget extends StatelessWidget {
   const TaskPromptWidget({super.key, required this.prompt});
@@ -55,6 +56,10 @@ class TaskPromptWidget extends StatelessWidget {
           softWrap: true,
         ),
       );
+    }
+
+    if (content is AudioContent) {
+      return TaskAudioWidget(content: content);
     }
 
     if (content is ImageContent) {
