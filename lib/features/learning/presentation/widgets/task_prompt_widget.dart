@@ -5,9 +5,14 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
 class TaskPromptWidget extends StatelessWidget {
-  const TaskPromptWidget({super.key, required this.prompt});
+  const TaskPromptWidget({
+    super.key,
+    required this.prompt,
+    this.scrollable = false,
+  });
 
   final TaskPrompt prompt;
+  final bool scrollable;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +23,9 @@ class TaskPromptWidget extends StatelessWidget {
       fontWeight: FontWeight.normal,
       color: colorScheme.onSurfaceVariant,
     );
-
+    if (scrollable) {
+      return _buildScrollableContent(context, prompt.content, textStyle);
+    }
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.hasBoundedWidth
@@ -31,11 +38,7 @@ class TaskPromptWidget extends StatelessWidget {
         if (firstVisualIndex == -1) {
           return SizedBox(
             width: maxWidth,
-            child: _buildNonVisualContent(
-              context,
-              prompt.content,
-              textStyle,
-            ),
+            child: _buildNonVisualContent(context, prompt.content, textStyle),
           );
         }
 
@@ -47,11 +50,7 @@ class TaskPromptWidget extends StatelessWidget {
           child: Column(
             children: [
               if (nonVisualContent.isNotEmpty)
-                _buildNonVisualContent(
-                  context,
-                  nonVisualContent,
-                  textStyle,
-                ),
+                _buildNonVisualContent(context, nonVisualContent, textStyle),
 
               if (nonVisualContent.isNotEmpty)
                 const SizedBox(height: AppSpacing.md),
@@ -75,20 +74,15 @@ class TaskPromptWidget extends StatelessWidget {
   }
 
   Widget _buildNonVisualContent(
-      BuildContext context,
-      List<TaskContent> content,
-      TextStyle? textStyle,
-      ) {
+    BuildContext context,
+    List<TaskContent> content,
+    TextStyle? textStyle,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         for (final item in content) ...[
-          _buildContent(
-            context,
-            item,
-            textStyle,
-            fullWidthText: true,
-          ),
+          _buildContent(context, item, textStyle, fullWidthText: true),
           const SizedBox(height: AppSpacing.md),
         ],
       ],
@@ -96,10 +90,10 @@ class TaskPromptWidget extends StatelessWidget {
   }
 
   Widget _buildScalableContent(
-      BuildContext context,
-      List<TaskContent> content,
-      TextStyle? textStyle,
-      ) {
+    BuildContext context,
+    List<TaskContent> content,
+    TextStyle? textStyle,
+  ) {
     return Center(
       child: FittedBox(
         fit: BoxFit.contain,
@@ -107,12 +101,7 @@ class TaskPromptWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final item in content) ...[
-              _buildContent(
-                context,
-                item,
-                textStyle,
-                fullWidthText: false,
-              ),
+              _buildContent(context, item, textStyle, fullWidthText: false),
               const SizedBox(height: AppSpacing.md),
             ],
           ],
@@ -122,11 +111,11 @@ class TaskPromptWidget extends StatelessWidget {
   }
 
   Widget _buildContent(
-      BuildContext context,
-      TaskContent content,
-      TextStyle? textStyle, {
-        bool fullWidthText = false,
-      }) {
+    BuildContext context,
+    TaskContent content,
+    TextStyle? textStyle, {
+    bool fullWidthText = false,
+  }) {
     if (content is TextContent) {
       final text = Text(
         content.text,
@@ -136,10 +125,7 @@ class TaskPromptWidget extends StatelessWidget {
       );
 
       if (fullWidthText) {
-        return SizedBox(
-          width: double.infinity,
-          child: text,
-        );
+        return SizedBox(width: double.infinity, child: text);
       }
 
       return text;
@@ -152,10 +138,7 @@ class TaskPromptWidget extends StatelessWidget {
     if (content is ImageContent) {
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: double.infinity),
-        child: Image.asset(
-          content.imagePath,
-          fit: BoxFit.contain,
-        ),
+        child: Image.asset(content.imagePath, fit: BoxFit.contain),
       );
     }
 
@@ -187,9 +170,7 @@ class TaskPromptWidget extends StatelessWidget {
 
         final width = cellSize * content.columns + horizontalSpacing;
 
-        final height =
-            cellSize * content.rows +
-                spacing * (content.rows - 1);
+        final height = cellSize * content.rows + spacing * (content.rows - 1);
 
         return SizedBox(
           width: width,
@@ -208,16 +189,28 @@ class TaskPromptWidget extends StatelessWidget {
               return SizedBox(
                 width: cellSize,
                 height: cellSize,
-                child: _buildContent(
-                  context,
-                  content.item,
-                  null,
-                ),
+                child: _buildContent(context, content.item, null),
               );
             },
           ),
         );
       },
+    );
+  }
+
+  Widget _buildScrollableContent(
+    BuildContext context,
+    List<TaskContent> content,
+    TextStyle? textStyle,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final item in content) ...[
+          _buildContent(context, item, textStyle, fullWidthText: true),
+          const SizedBox(height: AppSpacing.md),
+        ],
+      ],
     );
   }
 }

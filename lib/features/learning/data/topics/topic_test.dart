@@ -52,10 +52,10 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
     layout: TopicLayout(
-      promptFlex: 2,
+      promptFlex: 5,
       interactionFlex: 2,
-      prompt: PromptLayout(scrollable: true),
-      interaction: InteractionLayout(scrollable: false),
+      prompt: PromptLayout(scrollable: false),
+      interaction: InteractionLayout(scrollable: true),
     ),
     progressionMode: TopicProgressionMode.automaticWithFeedback,
     feedbackDuration: Duration(milliseconds: 500),

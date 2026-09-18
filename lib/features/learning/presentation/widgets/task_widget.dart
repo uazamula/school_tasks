@@ -22,6 +22,7 @@ class TaskWidget extends StatelessWidget {
     super.key,
     required this.task,
     required this.result,
+    required this.promptScrollable,
     required this.onTaskAnswered,
     required this.onProgressStep,
     required this.onCorrectPair,
@@ -31,6 +32,7 @@ class TaskWidget extends StatelessWidget {
 
   final LearningTask<dynamic, dynamic> task;
   final TaskResult<dynamic, dynamic>? result;
+  final bool promptScrollable;
   final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;
   final VoidCallback onProgressStep;
   final VoidCallback onCorrectPair;
@@ -38,7 +40,7 @@ class TaskWidget extends StatelessWidget {
   final bool feedbackEnabled;
 
   Widget buildPrompt() {
-    return TaskPromptWidget(prompt: task.prompt);
+    return TaskPromptWidget(prompt: task.prompt, scrollable: promptScrollable);
   }
 
   Widget buildInteraction() {

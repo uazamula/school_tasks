@@ -106,6 +106,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     final taskWidget = TaskWidget(
       task: currentTask.task,
+      promptScrollable: _topic.layout.prompt.scrollable,
       result: result,
       onTaskAnswered: _onTaskAnswered,
       onProgressStep: _onProgressStep,
