@@ -52,9 +52,9 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
     layout: TopicLayout(
-      promptFlex: 1,
-      interactionFlex: 3,
-      prompt: PromptLayout(scrollable: false),
+      promptFlex: 2,
+      interactionFlex: 2,
+      prompt: PromptLayout(scrollable: true),
       interaction: InteractionLayout(scrollable: false),
     ),
     progressionMode: TopicProgressionMode.automaticWithFeedback,

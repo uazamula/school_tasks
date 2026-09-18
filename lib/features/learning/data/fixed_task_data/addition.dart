@@ -39,8 +39,6 @@ abstract final class AdditionTaskData {
     SelectionTaskData(
       prompt: TaskPrompt(
         content: [
-          TextContent('Скільки буде 2 + 9?'),
-          AudioContent('assets/audio/test.mp3'),
           GridContent(
             rows: 3,
             columns: 4,
@@ -48,6 +46,8 @@ abstract final class AdditionTaskData {
           ),
           AudioContent('assets/audio/failure.mp3'),
           ImageContent('assets/images/tasks/triangle.png'),
+          TextContent('Скільки буде 2 + 9?'),
+
         ],
       ),
       correctAnswers: ['11'],

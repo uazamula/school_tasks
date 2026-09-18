@@ -55,11 +55,17 @@ class TopicLayoutWidget extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        _buildArea(
-          child: prompt,
-          scrollable: scrollable,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
+        if (scrollable)
+          _buildArea(
+            child: prompt,
+            scrollable: true,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: prompt,
+          ),
         if (!dimmed && promptOverlay != null) promptOverlay!,
       ],
     );
