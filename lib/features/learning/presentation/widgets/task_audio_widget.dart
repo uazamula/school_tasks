@@ -8,19 +8,24 @@ class TaskAudioWidget extends StatefulWidget {
     required this.content,
     this.isActive = false,
     this.iconColor,
+    this.interactive = true,
   });
 
   final AudioContent content;
 
-  /// Використовується для AudioAnswerButton.
+  /// Використовується AudioAnswerButton.
   ///
-  /// true  → аудіо має відтворюватися.
-  /// false → аудіо має бути зупинене.
-  ///
-  /// Для звичайного аудіо в prompt залишається false.
+  /// true  → аудіо повинно відтворюватися.
+  /// false → аудіо повинно бути зупинене.
   final bool isActive;
 
   final Color? iconColor;
+
+  /// У prompt аудіо є самостійною кнопкою.
+  ///
+  /// В AudioAnswerButton false, тому що всю взаємодію
+  /// бере на себе сама AudioAnswerButton.
+  final bool interactive;
 
   @override
   State<TaskAudioWidget> createState() => _TaskAudioWidgetState();
@@ -88,10 +93,41 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     super.dispose();
   }
 
+  Future<void> _togglePlayback() async {
+    if (!widget.interactive) {
+      return;
+    }
+
+    final audioPath = _resolveAudioPath();
+
+    if (audioPath == null) {
+      return;
+    }
+
+    _currentAudioPath = audioPath;
+
+    switch (_playerState) {
+      case PlayerState.playing:
+        await _player.stop();
+
+      case PlayerState.paused:
+        await _player.resume();
+
+      case PlayerState.stopped:
+      case PlayerState.completed:
+        await _player.play(AssetSource(_assetPath(audioPath)));
+
+      case PlayerState.disposed:
+        return;
+    }
+  }
+
   Future<void> _play() async {
     final audioPath = _resolveAudioPath();
 
-    if (audioPath == null) return;
+    if (audioPath == null) {
+      return;
+    }
 
     _currentAudioPath = audioPath;
 
@@ -144,12 +180,23 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
   Widget build(BuildContext context) {
     final isPlaying = _playerState == PlayerState.playing;
 
-    final color = widget.iconColor ?? Theme.of(context).colorScheme.onSurface;
+    final iconColor =
+        widget.iconColor ?? Theme.of(context).colorScheme.onSurface;
 
-    return Icon(
+    final icon = Icon(
       isPlaying ? Icons.stop : Icons.play_arrow,
-      color: color,
+      color: iconColor,
       size: 32,
+    );
+
+    if (!widget.interactive) {
+      return icon;
+    }
+
+    return IconButton.filled(
+      onPressed: _resolveAudioPath() == null ? null : _togglePlayback,
+      icon: icon,
+      tooltip: isPlaying ? 'Зупинити' : 'Відтворити',
     );
   }
 }

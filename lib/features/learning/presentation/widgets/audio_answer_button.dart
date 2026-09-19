@@ -38,6 +38,7 @@ class AudioAnswerButton extends StatelessWidget {
                 content: answer,
                 isActive: isActive,
                 iconColor: _foregroundColor(context),
+                interactive: false,
               ),
             ),
           ),
