@@ -3,7 +3,7 @@ import 'package:school_tasks/features/learning/domain/task_data/position_selecti
 import 'package:school_tasks/features/learning/domain/tasks/content/emoji_grid.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
-import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_mode.dart';
 
 final positionSelectionTasks = <PositionSelectionTaskData>[
   PositionSelectionTaskData(
@@ -22,6 +22,7 @@ final positionSelectionTasks = <PositionSelectionTaskData>[
       GridPosition(row: 2, column: 4),
       GridPosition(row: 3, column: 4),
     ],
+    requiresConfirmation: true,
     selectionMode: SelectionMode.single,
   ),
 
@@ -40,5 +41,23 @@ final positionSelectionTasks = <PositionSelectionTaskData>[
       GridPosition(row: 3, column: 4),
     ],
     selectionMode: SelectionMode.multiple,
+  ),
+
+  PositionSelectionTaskData(
+    prompt: TaskPrompt(
+      content: [TextContent('Вибери будь-який банан першому рядку.')],
+    ),
+    grid: EmojiGrid([
+      '🍌🍎🍎🍌🍎',
+      '🍎🍎🍎🍎🍎',
+      '🍎🍎🍎🍎🍎',
+      '🍌🍌🍌🍌🍌',
+    ]).content,
+    correctPositions: [
+      GridPosition(row: 1, column: 1),
+      GridPosition(row: 1, column: 4),
+    ],
+    selectionMode: SelectionMode.single,
+    requiresConfirmation: false,
   ),
 ];

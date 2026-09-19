@@ -7,6 +7,7 @@ class SelectionTaskData<TOption> extends TaskData {
     required this.wrongAnswers,
     this.correctAnswerCount = 1,
     required this.wrongAnswerCount,
+    this.requiresConfirmation = false,
   });
 
   final List<TOption> correctAnswers;
@@ -14,4 +15,6 @@ class SelectionTaskData<TOption> extends TaskData {
 
   final int correctAnswerCount;
   final int wrongAnswerCount;
+
+  final bool requiresConfirmation;
 }

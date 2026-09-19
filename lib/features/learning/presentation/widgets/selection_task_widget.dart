@@ -36,6 +36,8 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
   bool get _isMultiple => _interaction.isMultiple;
 
+  bool get _requiresConfirmation => _interaction.requiresConfirmation;
+
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
   @override
@@ -54,7 +56,9 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       return;
     }
 
-    if (_interaction.isSingle) {
+    // Single choice без підтвердження:
+    // натискання одразу перевіряє відповідь.
+    if (!_isMultiple && !_requiresConfirmation) {
       final answer = option as TAnswer;
 
       widget.onTaskAnswered(widget.task.checkAnswer(answer));
@@ -62,6 +66,20 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       return;
     }
 
+    // Single choice з підтвердженням:
+    // можна вибрати тільки один варіант.
+    if (!_isMultiple) {
+      setState(() {
+        _selectedOptions
+          ..clear()
+          ..add(option);
+      });
+
+      return;
+    }
+
+    // Multiple choice:
+    // можна вибирати/скасовувати кілька варіантів.
     setState(() {
       if (_selectedOptions.contains(option)) {
         _selectedOptions.remove(option);
@@ -71,12 +89,14 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     });
   }
 
-  void _confirmMultiple() {
+  void _confirmSelection() {
     if (_isAnswered || _selectedOptions.isEmpty) {
       return;
     }
 
-    final answer = _selectedOptions.toList() as TAnswer;
+    final answer = _isMultiple
+        ? _selectedOptions.toList() as TAnswer
+        : _selectedOptions.first as TAnswer;
 
     widget.onTaskAnswered(widget.task.checkAnswer(answer));
   }
@@ -146,6 +166,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     return ChoiceAnswerButton(
       answer: answer,
       state: state,
+      isSelected: isSelected,
       onPressed: onPressed,
     );
   }
@@ -157,12 +178,12 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       children: [
         _buildOptions(),
 
-        if (_isMultiple) ...[
+        if (_requiresConfirmation) ...[
           const SizedBox(height: AppSpacing.lg),
           FilledButton(
             onPressed: _isAnswered || _selectedOptions.isEmpty
                 ? null
-                : _confirmMultiple,
+                : _confirmSelection,
             child: const Text('Підтвердити'),
           ),
         ],
@@ -196,8 +217,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         }
 
         // Зображення — по два в рядок.
-        // Захист від double.infinity: якщо B2 не передає чіткої ширини,
-        // беремо дефолтне значення (наприклад, 160.0 * 2 + spacing).
         final availableWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : (160.0 * 2 + spacing);

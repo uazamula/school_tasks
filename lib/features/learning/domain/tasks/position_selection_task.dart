@@ -2,6 +2,7 @@ import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/any_equals_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/set_equals_evaluator.dart';
@@ -14,10 +15,15 @@ class PositionSelectionTask
     required super.prompt,
     required this.grid,
     required List<GridPosition> correctPositions,
-    required SelectionMode mode,
+    required this.mode,
+    this.requiresConfirmation = false,
   }) : _correctPositions = correctPositions,
        super(
-         interaction: SelectionInteraction(mode: mode),
+         interaction: SelectionInteraction(
+           isMultiple: mode == SelectionMode.multiple,
+           requiresConfirmation:
+               mode == SelectionMode.multiple || requiresConfirmation,
+         ),
          solution: Solution<List<GridPosition>, List<GridPosition>>(
            value: correctPositions,
            evaluator: mode == SelectionMode.single
@@ -29,10 +35,11 @@ class PositionSelectionTask
   final List<List<TaskContent>> grid;
   final List<GridPosition> _correctPositions;
 
+  final SelectionMode mode;
+  final bool requiresConfirmation;
+
   List<GridPosition> get correctPositions =>
       List.unmodifiable(_correctPositions);
-
-  SelectionMode get mode => (interaction as SelectionInteraction).mode;
 
   @override
   TaskResult<List<GridPosition>, List<GridPosition>> checkAnswer(

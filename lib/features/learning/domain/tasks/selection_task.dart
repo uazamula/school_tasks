@@ -9,8 +9,14 @@ class SelectionTask<TOption, TAnswer, TSolution>
     required super.prompt,
     required super.solution,
     required this.options,
-    required SelectionMode mode,
-  }) : super(interaction: SelectionInteraction(mode: mode));
+    required bool isMultiple,
+    required bool requiresConfirmation,
+  }) : super(
+         interaction: SelectionInteraction(
+           isMultiple: isMultiple,
+           requiresConfirmation: isMultiple || requiresConfirmation,
+         ),
+       );
 
   final List<TOption> options;
 

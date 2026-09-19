@@ -16,6 +16,7 @@ class ArithmeticGeneratorConfig {
     this.wrongAnswerDivisibility,
     this.wrongAnswerCount = 3,
     this.wrongAnswerStrategy = WrongAnswerStrategy.randomInRange,
+    this.requiresConfirmation = false,
   });
 
   final int minA;
@@ -36,6 +37,7 @@ class ArithmeticGeneratorConfig {
 
   final int wrongAnswerCount;
   final WrongAnswerStrategy wrongAnswerStrategy;
+  final bool requiresConfirmation;
 
   int get effectiveWrongAnswerMinimumResult =>
       wrongAnswerMinimumResult ?? minimumResult;

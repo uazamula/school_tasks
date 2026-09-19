@@ -29,9 +29,14 @@ class _PositionSelectionTaskWidgetState
     extends State<PositionSelectionTaskWidget> {
   final List<GridPosition> _selectedPositions = [];
 
-  bool get _isAnswered => widget.result?.isAnswered ?? false;
+  SelectionInteraction get _interaction =>
+      widget.task.interaction as SelectionInteraction;
 
-  SelectionMode get _selectionMode => widget.task.mode;
+  bool get _isMultiple => _interaction.isMultiple;
+
+  bool get _requiresConfirmation => _interaction.requiresConfirmation;
+
+  bool get _isAnswered => widget.result?.isAnswered ?? false;
 
   @override
   void didUpdateWidget(covariant PositionSelectionTaskWidget oldWidget) {
@@ -48,13 +53,15 @@ class _PositionSelectionTaskWidgetState
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildGrid(),
-        const SizedBox(height: AppSpacing.lg),
-        FilledButton(
-          onPressed: _isAnswered || _selectedPositions.isEmpty
-              ? null
-              : _confirmAnswer,
-          child: const Text('Підтвердити'),
-        ),
+        if (_requiresConfirmation) ...[
+          const SizedBox(height: AppSpacing.lg),
+          FilledButton(
+            onPressed: _isAnswered || _selectedPositions.isEmpty
+                ? null
+                : _confirmAnswer,
+            child: const Text('Підтвердити'),
+          ),
+        ],
       ],
     );
   }
@@ -131,19 +138,7 @@ class _PositionSelectionTaskWidgetState
       child: InkWell(
         onTap: _isAnswered
             ? null
-            : () {
-                setState(() {
-                  if (_selectionMode == SelectionMode.single) {
-                    _selectedPositions
-                      ..clear()
-                      ..add(position);
-                  } else if (isSelected) {
-                    _selectedPositions.remove(position);
-                  } else {
-                    _selectedPositions.add(position);
-                  }
-                });
-              },
+            : () => _onPositionSelected(position, isSelected),
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: colors.outline, width: 1),
@@ -152,6 +147,36 @@ class _PositionSelectionTaskWidgetState
         ),
       ),
     );
+  }
+
+  void _onPositionSelected(GridPosition position, bool isSelected) {
+    if (_isAnswered) return;
+
+    // Single selection without confirmation:
+    // answer immediately.
+    if (!_isMultiple && !_requiresConfirmation) {
+      widget.onTaskAnswered(widget.task.checkAnswer([position]));
+      return;
+    }
+
+    setState(() {
+      // Single selection with confirmation:
+      // only one position can be selected.
+      if (!_isMultiple) {
+        _selectedPositions
+          ..clear()
+          ..add(position);
+        return;
+      }
+
+      // Multiple selection:
+      // toggle the selected position.
+      if (isSelected) {
+        _selectedPositions.remove(position);
+      } else {
+        _selectedPositions.add(position);
+      }
+    });
   }
 
   Widget _buildContent(TaskContent content) {
@@ -176,9 +201,7 @@ class _PositionSelectionTaskWidgetState
   void _confirmAnswer() {
     final answer = List<GridPosition>.from(_selectedPositions);
 
-    final result = widget.task.checkAnswer(answer);
-
-    widget.onTaskAnswered(result);
+    widget.onTaskAnswered(widget.task.checkAnswer(answer));
   }
 
   TaskAnswerState _getPositionState(GridPosition position) {
@@ -188,13 +211,27 @@ class _PositionSelectionTaskWidgetState
       return TaskAnswerState.neutral;
     }
 
+    final selectedAnswer = result.selectedAnswer;
+
+    // Single selection:
+    // only the actually selected position gets
+    // the final result color.
+    if (!_isMultiple) {
+      if (selectedAnswer != null && selectedAnswer.contains(position)) {
+        return result.state;
+      }
+
+      return TaskAnswerState.neutral;
+    }
+
+    // Multiple selection:
+    // all correct positions are green,
+    // selected incorrect positions are red.
     final solution = result.solution?.value;
 
     if (solution != null && solution.contains(position)) {
       return TaskAnswerState.correct;
     }
-
-    final selectedAnswer = result.selectedAnswer;
 
     if (selectedAnswer != null && selectedAnswer.contains(position)) {
       return TaskAnswerState.incorrect;

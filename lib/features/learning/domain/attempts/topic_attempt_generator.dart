@@ -13,7 +13,6 @@ import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
-import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
@@ -112,7 +111,9 @@ class TopicAttemptGenerator {
 
     final options = [...correctAnswers, ...wrongAnswers]..shuffle(_random);
 
-    if (data.correctAnswerCount == 1) {
+    final isMultiple = data.correctAnswerCount > 1;
+
+    if (!isMultiple) {
       return AttemptTask<dynamic, dynamic>(
         task: SelectionTask<dynamic, dynamic, dynamic>(
           prompt: data.prompt,
@@ -121,7 +122,8 @@ class TopicAttemptGenerator {
             value: correctAnswers.single,
             evaluator: const EqualsEvaluator<dynamic>(),
           ),
-          mode: SelectionMode.single,
+          isMultiple: false,
+          requiresConfirmation: data.requiresConfirmation,
         ),
       );
     }
@@ -134,7 +136,8 @@ class TopicAttemptGenerator {
           value: correctAnswers,
           evaluator: const SetEqualsEvaluator<dynamic>(),
         ),
-        mode: SelectionMode.multiple,
+        isMultiple: true,
+        requiresConfirmation: false,
       ),
     );
   }
@@ -168,6 +171,7 @@ class TopicAttemptGenerator {
         grid: data.grid,
         correctPositions: data.correctPositions,
         mode: data.selectionMode,
+        requiresConfirmation: data.requiresConfirmation,
       ),
     );
   }

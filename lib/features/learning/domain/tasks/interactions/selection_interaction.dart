@@ -1,13 +1,13 @@
 import 'package:school_tasks/features/learning/domain/tasks/interactions/task_interaction.dart';
 
-enum SelectionMode { single, multiple }
-
 class SelectionInteraction extends TaskInteraction {
-  const SelectionInteraction({required this.mode});
+  const SelectionInteraction({
+    required this.requiresConfirmation,
+    required this.isMultiple,
+  });
 
-  final SelectionMode mode;
+  final bool requiresConfirmation;
+  final bool isMultiple;
 
-  bool get isSingle => mode == SelectionMode.single;
-
-  bool get isMultiple => mode == SelectionMode.multiple;
+  bool get isSingle => !isMultiple;
 }

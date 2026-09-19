@@ -8,11 +8,13 @@ class ChoiceAnswerButton extends StatelessWidget {
     required this.answer,
     required this.state,
     required this.onPressed,
+    required this.isSelected,
   });
 
   final String answer;
   final TaskAnswerState state;
   final VoidCallback? onPressed;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,17 @@ class ChoiceAnswerButton extends StatelessWidget {
   }
 
   ButtonStyle _buttonStyle(BuildContext context) {
+    if (isSelected) {
+      final colors = Theme.of(context).colorScheme;
+
+      return FilledButton.styleFrom(
+        backgroundColor: colors.primaryContainer,
+        foregroundColor: colors.onPrimaryContainer,
+        side: BorderSide(color: colors.primary, width: 3),
+        elevation: 6,
+      );
+    }
+
     switch (state) {
       case TaskAnswerState.neutral:
         return FilledButton.styleFrom();
