@@ -49,7 +49,10 @@ class MatchingItemWidget extends StatelessWidget {
             child: Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: MatchingContentWidget(content: content),
+                child: MatchingContentWidget(
+                  content: content,
+                  isActive: isSelected,
+                ),
               ),
             ),
           ),

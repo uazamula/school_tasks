@@ -22,17 +22,17 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      // LearningTaskType.matching: 1,
+      LearningTaskType.matching: 1,
       LearningTaskType.positionSelection: 0,
       // LearningTaskType.numericInput: 1,
-      LearningTaskType.selection: 2,
+      LearningTaskType.selection: 0,
       // LearningTaskType.fraction: 1,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
       // ...GeometryShapesData.shapes,
-      // ...matchingTasks,
-      ...additionWithSound,
+      ...matchingTasks,
+      // ...additionWithSound,
       // ...matchingTasks,
       // ...positionSelectionTasks,
       // ...FractionData.fractions,
@@ -54,7 +54,7 @@ abstract final class Tests {
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
     layout: TopicLayout(
       promptFlex: 2,
-      interactionFlex: 1,
+      interactionFlex: 3,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),

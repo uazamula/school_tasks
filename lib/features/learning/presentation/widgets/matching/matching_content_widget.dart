@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
 class MatchingContentWidget extends StatelessWidget {
-  const MatchingContentWidget({super.key, required this.content});
-
+  const MatchingContentWidget({
+    super.key,
+    required this.content,
+    this.isActive = false,
+  });
   final TaskContent content;
+  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +38,14 @@ class MatchingContentWidget extends StatelessWidget {
           (content as ImageContent).imagePath,
           fit: BoxFit.contain,
         ),
+      );
+    }
+
+    if (content is AudioContent) {
+      return TaskAudioWidget(
+        content: content as AudioContent,
+        isActive: isActive,
+        interactive: false,
       );
     }
 
