@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
@@ -45,13 +46,24 @@ abstract final class AdditionTaskData {
             columns: 4,
             item: ImageContent('assets/images/tasks/apple.png'),
           ),
-          AudioContent('assets/audio/failure.mp3'),
+          AudioContent.fixed('assets/audio/failure.mp3'),
           ImageContent('assets/images/tasks/triangle.png'),
         ],
       ),
       correctAnswers: ['11'],
       wrongAnswers: ['13', '14', '17'],
       wrongAnswerCount: 3,
+    ),
+    SelectionTaskData(
+      prompt: TaskPrompt(content: [TextContent('Скільки буде 2 +1?')]),
+      correctAnswers: [AudioContent.fixed('assets/audio/failure.mp3')],
+      wrongAnswers: [
+        AudioContent.localized({'uk': 'assets/audio/ding.mp3'}),
+        AudioContent.localized({'uk': 'assets/audio/ding.mp3'}),
+        AudioContent.localized({'uk': 'assets/audio/ding.mp3'}),
+      ],
+      wrongAnswerCount: 2,
+      requiresConfirmation: true,
     ),
   ];
   static const List<TaskData> additionDigits = [

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/audio_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/image_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/multi_choice_answer_button.dart';
@@ -30,6 +32,7 @@ class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
 class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     extends State<SelectionTaskWidget<TOption, TAnswer, TSolution>> {
   final Set<TOption> _selectedOptions = {};
+  AudioContent? _activeAudioOption;
 
   SelectionInteraction get _interaction =>
       widget.task.interaction as SelectionInteraction;
@@ -41,13 +44,14 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
   @override
-  void didUpdateWidget(covariant SelectionTaskWidget oldWidget) {
-    super.didUpdateWidget(
-      oldWidget as SelectionTaskWidget<TOption, TAnswer, TSolution>,
-    );
+  void didUpdateWidget(
+    covariant SelectionTaskWidget<TOption, TAnswer, TSolution> oldWidget,
+  ) {
+    super.didUpdateWidget(oldWidget);
 
     if (oldWidget.task != widget.task) {
       _selectedOptions.clear();
+      _activeAudioOption = null;
     }
   }
 
@@ -56,8 +60,11 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       return;
     }
 
-    // Single choice без підтвердження:
-    // натискання одразу перевіряє відповідь.
+    if (option is AudioContent) {
+      _onAudioOptionSelected(option);
+      return;
+    }
+
     if (!_isMultiple && !_requiresConfirmation) {
       final answer = option as TAnswer;
 
@@ -66,8 +73,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       return;
     }
 
-    // Single choice з підтвердженням:
-    // можна вибрати тільки один варіант.
     if (!_isMultiple) {
       setState(() {
         _selectedOptions
@@ -78,8 +83,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       return;
     }
 
-    // Multiple choice:
-    // можна вибирати/скасовувати кілька варіантів.
     setState(() {
       if (_selectedOptions.contains(option)) {
         _selectedOptions.remove(option);
@@ -149,6 +152,16 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         isSelected: isSelected,
         onPressed: onPressed,
         size: imageSize ?? 160,
+      );
+    }
+
+    if (option is AudioContent) {
+      return AudioAnswerButton(
+        answer: option,
+        state: state,
+        isSelected: isSelected,
+        isActive: _activeAudioOption == option,
+        onPressed: onPressed,
       );
     }
 
@@ -254,5 +267,23 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         return Column(mainAxisSize: MainAxisSize.min, children: rows);
       },
     );
+  }
+
+  void _onAudioOptionSelected(AudioContent option) {
+    final typedOption = option as TOption;
+
+    setState(() {
+      if (_activeAudioOption == option) {
+        _activeAudioOption = null;
+        _selectedOptions.remove(typedOption);
+        return;
+      }
+
+      _activeAudioOption = option;
+
+      _selectedOptions
+        ..clear()
+        ..add(typedOption);
+    });
   }
 }

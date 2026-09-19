@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
