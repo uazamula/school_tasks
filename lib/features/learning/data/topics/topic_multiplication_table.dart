@@ -48,8 +48,8 @@ abstract final class MultiplicationTable {
         EvaluationCriterionType.time: 3,
       },
       time: TimeEvaluationConfig(
-        targetTime: Duration(seconds: 20),
-        maximumTime: Duration(seconds: 40),
+        targetTime: Duration(seconds: 30),
+        maximumTime: Duration(seconds: 60),
       ),
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.0),

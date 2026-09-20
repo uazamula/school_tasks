@@ -21,7 +21,7 @@ abstract final class MultiplicationTaskData {
       wrongAnswers: ['13', '14', '15', '16', '17'],
       correctAnswerCount: 2,
       wrongAnswerCount: 5,
-      // requiresConfirmation: true,
+      requiresConfirmation: true,
     ),
 
     SelectionTaskData(
@@ -38,7 +38,7 @@ abstract final class MultiplicationTaskData {
       correctAnswers: ['20'],
       wrongAnswers: ['13', '14', '17', '15', '18', '19'],
       wrongAnswerCount: 6,
-      // requiresConfirmation: true,
+      requiresConfirmation: true,
     ),
 
     NumericInputTaskData(

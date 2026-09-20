@@ -29,34 +29,48 @@ class ChoiceAnswerButton extends StatelessWidget {
   }
 
   ButtonStyle _buttonStyle(BuildContext context) {
-    if (isSelected) {
-      final colors = Theme.of(context).colorScheme;
-
-      return FilledButton.styleFrom(
-        backgroundColor: colors.primaryContainer,
-        foregroundColor: colors.onPrimaryContainer,
-        side: BorderSide(color: colors.primary, width: 3),
-        elevation: 6,
-      );
-    }
-
     switch (state) {
-      case TaskAnswerState.neutral:
-        return FilledButton.styleFrom();
       case TaskAnswerState.correct:
         return FilledButton.styleFrom(
           backgroundColor: Colors.green,
           disabledBackgroundColor: Colors.green,
           foregroundColor: Colors.white,
           disabledForegroundColor: Colors.white,
+          side: isSelected
+              ? BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 3,
+                )
+              : null,
         );
+
       case TaskAnswerState.incorrect:
         return FilledButton.styleFrom(
           backgroundColor: Colors.red,
           disabledBackgroundColor: Colors.red,
           foregroundColor: Colors.white,
           disabledForegroundColor: Colors.white,
+          side: isSelected
+              ? BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 3,
+                )
+              : null,
         );
+
+      case TaskAnswerState.neutral:
+        if (isSelected) {
+          final colors = Theme.of(context).colorScheme;
+
+          return FilledButton.styleFrom(
+            backgroundColor: colors.primaryContainer,
+            foregroundColor: colors.onPrimaryContainer,
+            side: BorderSide(color: colors.primary, width: 3),
+            elevation: 6,
+          );
+        }
+
+        return FilledButton.styleFrom();
     }
   }
 }
