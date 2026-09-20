@@ -15,6 +15,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/matching_tas
 import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -28,11 +29,13 @@ class TaskWidget extends StatelessWidget {
     required this.onCorrectPair,
     required this.onIncorrectPair,
     required this.feedbackEnabled,
+    this.interactionScrollable = false,
   });
 
   final LearningTask<dynamic, dynamic> task;
   final TaskResult<dynamic, dynamic>? result;
   final bool promptScrollable;
+  final bool interactionScrollable;
   final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;
   final VoidCallback onProgressStep;
   final VoidCallback onCorrectPair;
@@ -45,26 +48,35 @@ class TaskWidget extends StatelessWidget {
 
   Widget buildInteraction() {
     if (task is SelectionTask) {
-      return SelectionTaskWidget<dynamic, dynamic, dynamic>(
-        task: task as SelectionTask<dynamic, dynamic, dynamic>,
-        result: result,
-        onTaskAnswered: onTaskAnswered,
+      return TaskInteractionScalingBoundary(
+        child: SelectionTaskWidget<dynamic, dynamic, dynamic>(
+          task: task as SelectionTask<dynamic, dynamic, dynamic>,
+          result: result,
+          interactionScrollable: interactionScrollable,
+          onTaskAnswered: onTaskAnswered,
+        ),
       );
     }
 
     if (task is FractionTask) {
-      return FractionTaskWidget(
-        task: task as FractionTask,
-        result: result as TaskResult<Set<int>, int>?,
-        onTaskAnswered: onTaskAnswered,
+      return TaskInteractionScalingBoundary(
+        child: FractionTaskWidget(
+          task: task as FractionTask,
+          result: result as TaskResult<Set<int>, int>?,
+          interactionScrollable: interactionScrollable,
+          onTaskAnswered: onTaskAnswered,
+        ),
       );
     }
 
     if (task is PositionSelectionTask) {
-      return PositionSelectionTaskWidget(
-        task: task as PositionSelectionTask,
-        result: result as TaskResult<List<GridPosition>, List<GridPosition>>?,
-        onTaskAnswered: onTaskAnswered,
+      return TaskInteractionScalingBoundary(
+        child: PositionSelectionTaskWidget(
+          task: task as PositionSelectionTask,
+          result: result as TaskResult<List<GridPosition>, List<GridPosition>>?,
+          interactionScrollable: interactionScrollable,
+          onTaskAnswered: onTaskAnswered,
+        ),
       );
     }
 
@@ -79,6 +91,7 @@ class TaskWidget extends StatelessWidget {
         feedbackEnabled: feedbackEnabled,
       );
     }
+
     if (task is NumericInputTask) {
       return NumericInputTaskWidget(
         task: task as NumericInputTask,

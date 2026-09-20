@@ -113,6 +113,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       onCorrectPair: _onCorrectPair,
       onIncorrectPair: _onIncorrectPair,
       feedbackEnabled: _feedbackEnabled,
+      interactionScrollable: _topic.layout.interaction.scrollable,
     );
 
     return AppScaffold(

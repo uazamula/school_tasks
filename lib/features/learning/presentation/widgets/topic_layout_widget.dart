@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 
+import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
+
 class TopicLayoutWidget extends StatelessWidget {
   const TopicLayoutWidget({
     super.key,
@@ -22,6 +24,9 @@ class TopicLayoutWidget extends StatelessWidget {
     final bool scrollablePrompt = layout.prompt.scrollable;
     final bool scrollableInteraction = layout.interaction.scrollable;
 
+    final bool interactionHandlesScaling =
+        interaction is TaskInteractionScalingBoundary;
+
     return Stack(
       children: [
         Column(
@@ -41,6 +46,7 @@ class TopicLayoutWidget extends StatelessWidget {
                   child: interaction,
                   scrollable: scrollableInteraction,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  scaleWhenNotScrollable: !interactionHandlesScaling,
                 ),
               ),
             ),
@@ -60,6 +66,7 @@ class TopicLayoutWidget extends StatelessWidget {
             child: prompt,
             scrollable: true,
             padding: const EdgeInsets.symmetric(horizontal: 16),
+            scaleWhenNotScrollable: true,
           )
         else
           Padding(
@@ -79,6 +86,7 @@ class TopicLayoutWidget extends StatelessWidget {
     required Widget child,
     required bool scrollable,
     required EdgeInsets padding,
+    required bool scaleWhenNotScrollable,
   }) {
     if (scrollable) {
       return Center(
@@ -90,6 +98,10 @@ class TopicLayoutWidget extends StatelessWidget {
       padding: padding,
       child: LayoutBuilder(
         builder: (context, constraints) {
+          if (!scaleWhenNotScrollable) {
+            return Center(child: child);
+          }
+
           return Center(
             child: FittedBox(fit: BoxFit.contain, child: child),
           );

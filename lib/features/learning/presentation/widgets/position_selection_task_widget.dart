@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:school_tasks/core/theme/app_spacing.dart';
+
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
 class PositionSelectionTaskWidget extends StatefulWidget {
   const PositionSelectionTaskWidget({
@@ -13,12 +14,14 @@ class PositionSelectionTaskWidget extends StatefulWidget {
     required this.task,
     required this.result,
     required this.onTaskAnswered,
+    this.interactionScrollable = false,
   });
 
   final PositionSelectionTask task;
   final TaskResult<List<GridPosition>, List<GridPosition>>? result;
   final ValueChanged<TaskResult<List<GridPosition>, List<GridPosition>>>
   onTaskAnswered;
+  final bool interactionScrollable;
 
   @override
   State<PositionSelectionTaskWidget> createState() =>
@@ -49,20 +52,17 @@ class _PositionSelectionTaskWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildGrid(),
-        if (_requiresConfirmation) ...[
-          const SizedBox(height: AppSpacing.lg),
-          FilledButton(
-            onPressed: _isAnswered || _selectedPositions.isEmpty
-                ? null
-                : _confirmAnswer,
-            child: const Text('Підтвердити'),
-          ),
-        ],
-      ],
+    return TaskInteractionLayout(
+      scrollable: widget.interactionScrollable,
+      content: _buildGrid(),
+      confirmation: _requiresConfirmation
+          ? FilledButton(
+              onPressed: _isAnswered || _selectedPositions.isEmpty
+                  ? null
+                  : _confirmAnswer,
+              child: const Text('Підтвердити'),
+            )
+          : null,
     );
   }
 
@@ -75,6 +75,7 @@ class _PositionSelectionTaskWidgetState
         final screenSize = MediaQuery.sizeOf(context);
 
         final maxHeight = screenSize.height * 0.45;
+
         final maxWidth = constraints.hasBoundedWidth
             ? constraints.maxWidth
             : screenSize.width;
@@ -82,6 +83,7 @@ class _PositionSelectionTaskWidgetState
         const spacing = 1.0;
 
         final horizontalSpacing = spacing * (columns - 1);
+
         final verticalSpacing = spacing * (rows - 1);
 
         final cellSize = (
@@ -92,6 +94,7 @@ class _PositionSelectionTaskWidgetState
         final size = cellSize.$1 < cellSize.$2 ? cellSize.$1 : cellSize.$2;
 
         final width = size * columns + horizontalSpacing;
+
         final height = size * rows + verticalSpacing;
 
         return SizedBox(
@@ -124,7 +127,9 @@ class _PositionSelectionTaskWidgetState
 
   Widget _buildCell(GridPosition position, TaskContent content) {
     final isSelected = _selectedPositions.contains(position);
+
     final state = _getPositionState(position);
+
     final colors = Theme.of(context).colorScheme;
 
     final backgroundColor = switch (state) {
@@ -149,36 +154,6 @@ class _PositionSelectionTaskWidgetState
     );
   }
 
-  void _onPositionSelected(GridPosition position, bool isSelected) {
-    if (_isAnswered) return;
-
-    // Single selection without confirmation:
-    // answer immediately.
-    if (!_isMultiple && !_requiresConfirmation) {
-      widget.onTaskAnswered(widget.task.checkAnswer([position]));
-      return;
-    }
-
-    setState(() {
-      // Single selection with confirmation:
-      // only one position can be selected.
-      if (!_isMultiple) {
-        _selectedPositions
-          ..clear()
-          ..add(position);
-        return;
-      }
-
-      // Multiple selection:
-      // toggle the selected position.
-      if (isSelected) {
-        _selectedPositions.remove(position);
-      } else {
-        _selectedPositions.add(position);
-      }
-    });
-  }
-
   Widget _buildContent(TaskContent content) {
     if (content is EmojiContent) {
       return Text(content.emoji, style: const TextStyle(fontSize: 40));
@@ -198,6 +173,30 @@ class _PositionSelectionTaskWidgetState
     return const SizedBox.shrink();
   }
 
+  void _onPositionSelected(GridPosition position, bool isSelected) {
+    if (_isAnswered) return;
+
+    if (!_isMultiple && !_requiresConfirmation) {
+      widget.onTaskAnswered(widget.task.checkAnswer([position]));
+      return;
+    }
+
+    setState(() {
+      if (!_isMultiple) {
+        _selectedPositions
+          ..clear()
+          ..add(position);
+        return;
+      }
+
+      if (isSelected) {
+        _selectedPositions.remove(position);
+      } else {
+        _selectedPositions.add(position);
+      }
+    });
+  }
+
   void _confirmAnswer() {
     final answer = List<GridPosition>.from(_selectedPositions);
 
@@ -213,9 +212,6 @@ class _PositionSelectionTaskWidgetState
 
     final selectedAnswer = result.selectedAnswer;
 
-    // Single selection:
-    // only the actually selected position gets
-    // the final result color.
     if (!_isMultiple) {
       if (selectedAnswer != null && selectedAnswer.contains(position)) {
         return result.state;
@@ -224,9 +220,6 @@ class _PositionSelectionTaskWidgetState
       return TaskAnswerState.neutral;
     }
 
-    // Multiple selection:
-    // all correct positions are green,
-    // selected incorrect positions are red.
     final solution = result.solution?.value;
 
     if (solution != null && solution.contains(position)) {

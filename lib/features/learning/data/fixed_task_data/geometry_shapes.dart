@@ -52,6 +52,7 @@ abstract final class GeometryShapesData {
         ImageContent('assets/images/tasks/square.png'),
       ],
       wrongAnswerCount: 2,
+      requiresConfirmation: true,
     ),
     SelectionTaskData<ImageContent>(
       prompt: TaskPrompt(content: [TextContent('Вибери багатокутники.')]),

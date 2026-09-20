@@ -1,9 +1,11 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:school_tasks/core/theme/app_spacing.dart';
+
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
 class FractionTaskWidget extends StatefulWidget {
   const FractionTaskWidget({
@@ -11,11 +13,13 @@ class FractionTaskWidget extends StatefulWidget {
     required this.task,
     required this.result,
     required this.onTaskAnswered,
+    this.interactionScrollable = false,
   });
 
   final FractionTask task;
   final TaskResult<Set<int>, int>? result;
   final ValueChanged<TaskResult<Set<int>, int>> onTaskAnswered;
+  final bool interactionScrollable;
 
   @override
   State<FractionTaskWidget> createState() => _FractionTaskWidgetState();
@@ -37,18 +41,15 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildCake(),
-        const SizedBox(height: AppSpacing.lg),
-        FilledButton(
-          onPressed: _isAnswered || _selectedParts.isEmpty
-              ? null
-              : _confirmAnswer,
-          child: const Text('Підтвердити'),
-        ),
-      ],
+    return TaskInteractionLayout(
+      scrollable: widget.interactionScrollable,
+      content: _buildCake(),
+      confirmation: FilledButton(
+        onPressed: _isAnswered || _selectedParts.isEmpty
+            ? null
+            : _confirmAnswer,
+        child: const Text('Підтвердити'),
+      ),
     );
   }
 
@@ -99,8 +100,11 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
 
   Widget _buildPart(int index, int rows, int columns) {
     final isSelected = _selectedParts.contains(index);
+
     final state = _getPartState(index);
+
     final borderRadius = _getBorderRadius(index, rows, columns);
+
     final colors = Theme.of(context).colorScheme;
 
     return ClipRRect(
@@ -162,14 +166,12 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
     var bestColumns = 1;
 
     for (var rows = 1; rows <= sqrt(parts); rows++) {
-      if (parts % rows != 0) {
-        continue;
-      }
+      if (parts % rows != 0) continue;
 
       final columns = parts ~/ rows;
 
-      // Rows must be >= columns.
       final candidateRows = max(rows, columns);
+
       final candidateColumns = min(rows, columns);
 
       if (candidateRows / candidateColumns < bestRows / bestColumns) {
@@ -189,22 +191,22 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
     }
 
     final selectedParts = result.selectedAnswer ?? {};
+
     final correctCount = widget.task.requiredSelectedParts;
 
-    // m == n
     if (selectedParts.length == correctCount) {
       return selectedParts.contains(index)
           ? TaskAnswerState.correct
           : TaskAnswerState.neutral;
     }
 
-    // m < n
     if (selectedParts.length < correctCount) {
       if (selectedParts.contains(index)) {
         return TaskAnswerState.correct;
       }
 
       final missingCount = correctCount - selectedParts.length;
+
       var missingIndex = 0;
 
       for (var i = 0; i < widget.task.parts; i++) {
@@ -224,7 +226,6 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
       return TaskAnswerState.neutral;
     }
 
-    // m > n
     var selectedIndex = 0;
 
     for (var i = 0; i < widget.task.parts; i++) {

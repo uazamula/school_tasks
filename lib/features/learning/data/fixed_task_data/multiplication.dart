@@ -11,15 +11,17 @@ abstract final class MultiplicationTaskData {
         content: [
           TextContent('Скільки яблук на малюнку?'),
           GridContent(
-            rows: 3,
+            rows: 6,
             columns: 4,
             item: ImageContent('assets/images/tasks/apple.png'),
           ),
         ],
       ),
-      correctAnswers: ['12'],
+      correctAnswers: ['24', 'двадцять чотири'],
       wrongAnswers: ['13', '14', '15', '16', '17'],
+      correctAnswerCount: 2,
       wrongAnswerCount: 5,
+      // requiresConfirmation: true,
     ),
 
     SelectionTaskData(
@@ -36,6 +38,7 @@ abstract final class MultiplicationTaskData {
       correctAnswers: ['20'],
       wrongAnswers: ['13', '14', '17', '15', '18', '19'],
       wrongAnswerCount: 6,
+      // requiresConfirmation: true,
     ),
 
     NumericInputTaskData(

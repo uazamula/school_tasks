@@ -11,6 +11,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/audio_answer
 import 'package:school_tasks/features/learning/presentation/widgets/choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/image_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/multi_choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
 class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
   const SelectionTaskWidget({
@@ -18,11 +19,13 @@ class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
     required this.task,
     required this.result,
     required this.onTaskAnswered,
+    this.interactionScrollable = false,
   });
 
   final SelectionTask<TOption, TAnswer, TSolution> task;
   final TaskResult<TAnswer, TSolution>? result;
   final ValueChanged<TaskResult<TAnswer, TSolution>> onTaskAnswered;
+  final bool interactionScrollable;
 
   @override
   State<SelectionTaskWidget<TOption, TAnswer, TSolution>> createState() =>
@@ -56,9 +59,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
   }
 
   void _onOptionSelected(TOption option) {
-    if (_isAnswered) {
-      return;
-    }
+    if (_isAnswered) return;
 
     if (option is AudioContent) {
       _onAudioOptionSelected(option);
@@ -67,9 +68,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
     if (!_isMultiple && !_requiresConfirmation) {
       final answer = option as TAnswer;
-
       widget.onTaskAnswered(widget.task.checkAnswer(answer));
-
       return;
     }
 
@@ -79,7 +78,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
           ..clear()
           ..add(option);
       });
-
       return;
     }
 
@@ -93,9 +91,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
   }
 
   void _confirmSelection() {
-    if (_isAnswered || _selectedOptions.isEmpty) {
-      return;
-    }
+    if (_isAnswered || _selectedOptions.isEmpty) return;
 
     final answer = _isMultiple
         ? _selectedOptions.toList() as TAnswer
@@ -186,21 +182,17 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildOptions(),
-
-        if (_requiresConfirmation) ...[
-          const SizedBox(height: AppSpacing.lg),
-          FilledButton(
-            onPressed: _isAnswered || _selectedOptions.isEmpty
-                ? null
-                : _confirmSelection,
-            child: const Text('Підтвердити'),
-          ),
-        ],
-      ],
+    return TaskInteractionLayout(
+      scrollable: widget.interactionScrollable,
+      content: _buildOptions(),
+      confirmation: _requiresConfirmation
+          ? FilledButton(
+              onPressed: _isAnswered || _selectedOptions.isEmpty
+                  ? null
+                  : _confirmSelection,
+              child: const Text('Підтвердити'),
+            )
+          : null,
     );
   }
 
@@ -211,7 +203,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       builder: (context, constraints) {
         const spacing = AppSpacing.md;
 
-        // Текстові відповіді — одна кнопка в рядок.
         if (options.isNotEmpty && options.first is! ImageContent) {
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -229,7 +220,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
           );
         }
 
-        // Зображення — по два в рядок.
         final availableWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : (160.0 * 2 + spacing);

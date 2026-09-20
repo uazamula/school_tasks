@@ -22,6 +22,7 @@ const List<TaskData> additionWithSound = [
     correctAnswers: ['11'],
     wrongAnswers: ['13', '14', '17'],
     wrongAnswerCount: 3,
+    requiresConfirmation: true,
   ),
   SelectionTaskData(
     prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 5?')]),

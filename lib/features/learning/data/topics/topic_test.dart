@@ -22,11 +22,11 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 1,
+      LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 0,
-      // LearningTaskType.numericInput: 1,
-      LearningTaskType.selection: 0,
-      // LearningTaskType.fraction: 1,
+      LearningTaskType.numericInput: 0,
+      LearningTaskType.selection: 2,
+      LearningTaskType.fraction: 0,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
@@ -34,10 +34,10 @@ abstract final class Tests {
       ...matchingTasks,
       // ...additionWithSound,
       // ...matchingTasks,
-      // ...positionSelectionTasks,
-      // ...FractionData.fractions,
+      ...positionSelectionTasks,
+      ...FractionData.fractions,
       // ...AdditionTaskData.within10,
-      // ...MultiplicationTaskData.multiplicationTable,
+      ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
     ]),
     help: 'Тестування різних типів завдань',
@@ -53,12 +53,12 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
     layout: TopicLayout(
-      promptFlex: 2,
-      interactionFlex: 3,
+      promptFlex: 1,
+      interactionFlex: 2,
       prompt: PromptLayout(scrollable: false),
-      interaction: InteractionLayout(scrollable: false),
+      interaction: InteractionLayout(scrollable: true),
     ),
-    progressionMode: TopicProgressionMode.automaticWithFeedback,
+    progressionMode: TopicProgressionMode.manual,
     feedbackDuration: Duration(milliseconds: 500),
   );
 }
