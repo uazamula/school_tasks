@@ -50,7 +50,7 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
     layout: TopicLayout(
-      promptFlex: 3,
+      promptFlex: 1,
       interactionFlex: 1,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),

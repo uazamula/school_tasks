@@ -108,6 +108,7 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
           mode: widget.task.inputMode,
           enabled: !_isAnswered,
           onInputPressed: _onInputPressed,
+          onCyclePressed: _onCyclePressed,
           onBackspacePressed: _onBackspacePressed,
         ),
       ],
@@ -145,5 +146,25 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
     }
 
     return colorScheme.errorContainer;
+  }
+
+  void _onCyclePressed(List<String> values) {
+    if (_isAnswered || values.isEmpty || _input.isEmpty) {
+      return;
+    }
+
+    final lastCharacter = _input.substring(_input.length - 1);
+    final currentIndex = values.indexOf(lastCharacter);
+
+    setState(() {
+      if (currentIndex == -1) {
+        _input += values.first;
+        return;
+      }
+
+      final nextIndex = (currentIndex + 1) % values.length;
+
+      _input = _input.substring(0, _input.length - 1) + values[nextIndex];
+    });
   }
 }

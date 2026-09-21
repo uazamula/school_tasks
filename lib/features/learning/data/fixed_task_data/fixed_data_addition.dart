@@ -30,7 +30,7 @@ abstract final class AdditionTaskData {
     InputTaskData(
       prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 6?')]),
       correctAnswer: 8,
-      inputMode: InputMode.integer,
+      inputMode: InputMode.decimal,
     ),
 
     InputTaskData(

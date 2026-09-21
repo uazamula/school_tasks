@@ -1,1 +1,1 @@
-enum InputMode { integer }
+enum InputMode { integer, decimal }
