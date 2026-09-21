@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_addition.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_matching.dart';
@@ -20,8 +21,8 @@ abstract final class Tests {
     taskTypeCounts: {
       LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 0,
-      LearningTaskType.input: 0,
-      LearningTaskType.selection: 2,
+      LearningTaskType.input: 1,
+      LearningTaskType.selection: 0,
       LearningTaskType.fraction: 0,
     },
     dataSource: FixedTaskDataSource([
@@ -32,7 +33,7 @@ abstract final class Tests {
       // ...matchingTasks,
       ...positionSelectionTasks,
       ...FractionData.fractions,
-      // ...AdditionTaskData.within10,
+      ...AdditionTaskData.within10,
       // ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
     ]),
@@ -49,10 +50,10 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
     layout: TopicLayout(
-      promptFlex: 1,
-      interactionFlex: 2,
+      promptFlex: 3,
+      interactionFlex: 1,
       prompt: PromptLayout(scrollable: false),
-      interaction: InteractionLayout(scrollable: true),
+      interaction: InteractionLayout(scrollable: false),
     ),
     progressionMode: TopicProgressionMode.manual,
     feedbackDuration: Duration(milliseconds: 500),

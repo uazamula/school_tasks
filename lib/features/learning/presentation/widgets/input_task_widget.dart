@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
+
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
-import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/numeric_keyboard.dart';
+import 'package:school_tasks/features/learning/domain/tasks/input_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/input_keyboard.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
-class NumericInputTaskWidget extends StatefulWidget {
-  const NumericInputTaskWidget({
+class InputTaskWidget extends StatefulWidget {
+  const InputTaskWidget({
     super.key,
     required this.task,
     required this.result,
+    required this.interactionScrollable,
     required this.onTaskAnswered,
   });
 
-  final NumericInputTask task;
+  final InputTask task;
   final TaskResult<int, int>? result;
+  final bool interactionScrollable;
   final ValueChanged<TaskResult<int, int>> onTaskAnswered;
 
   @override
-  State<NumericInputTaskWidget> createState() => _NumericInputTaskWidgetState();
+  State<InputTaskWidget> createState() => _InputTaskWidgetState();
 }
 
-class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
+class _InputTaskWidgetState extends State<InputTaskWidget> {
   String _input = '';
 
   bool get _isAnswered => widget.result != null;
 
   @override
-  void didUpdateWidget(covariant NumericInputTaskWidget oldWidget) {
+  void didUpdateWidget(covariant InputTaskWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.task != widget.task) {
@@ -36,13 +40,13 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
     }
   }
 
-  void _onDigitPressed(int digit) {
+  void _onInputPressed(String value) {
     if (_isAnswered) {
       return;
     }
 
     setState(() {
-      _input += digit.toString();
+      _input += value;
     });
   }
 
@@ -70,7 +74,7 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Column(
+    final content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         AnimatedContainer(
@@ -100,14 +104,24 @@ class _NumericInputTaskWidgetState extends State<NumericInputTaskWidget> {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-
-        NumericKeyboard(
+        InputKeyboard(
+          mode: widget.task.inputMode,
           enabled: !_isAnswered,
-          onDigitPressed: _onDigitPressed,
+          onInputPressed: _onInputPressed,
           onBackspacePressed: _onBackspacePressed,
-          onConfirmPressed: _onConfirmPressed,
         ),
       ],
+    );
+
+    final confirmation = FilledButton(
+      onPressed: !_isAnswered && _input.isNotEmpty ? _onConfirmPressed : null,
+      child: const Text('Підтвердити'),
+    );
+
+    return TaskInteractionLayout(
+      scrollable: widget.interactionScrollable,
+      content: content,
+      confirmation: confirmation,
     );
   }
 

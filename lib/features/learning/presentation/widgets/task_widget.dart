@@ -5,14 +5,14 @@ import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
-import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/fraction_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/matching_task_widget.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/numeric_input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
@@ -92,11 +92,14 @@ class TaskWidget extends StatelessWidget {
       );
     }
 
-    if (task is NumericInputTask) {
-      return NumericInputTaskWidget(
-        task: task as NumericInputTask,
-        result: result as TaskResult<int, int>?,
-        onTaskAnswered: onTaskAnswered,
+    if (task is InputTask) {
+      return TaskInteractionScalingBoundary(
+        child: InputTaskWidget(
+          task: task as InputTask,
+          result: result as TaskResult<int, int>?,
+          interactionScrollable: interactionScrollable,
+          onTaskAnswered: onTaskAnswered,
+        ),
       );
     }
 
