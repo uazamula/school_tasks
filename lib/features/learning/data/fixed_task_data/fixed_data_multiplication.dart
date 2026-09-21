@@ -1,8 +1,9 @@
-import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
+import 'package:school_tasks/features/learning/domain/tasks/input_mode.dart';
 
 abstract final class MultiplicationTaskData {
   static List<TaskData> multiplicationTable = [
@@ -41,7 +42,7 @@ abstract final class MultiplicationTaskData {
       requiresConfirmation: true,
     ),
 
-    NumericInputTaskData(
+    InputTaskData(
       prompt: TaskPrompt(
         content: [
           TextContent('Скільки квадратів на малюнку?'),
@@ -53,6 +54,7 @@ abstract final class MultiplicationTaskData {
         ],
       ),
       correctAnswer: 16,
+      inputMode: InputMode.integer,
     ),
   ];
 }

@@ -2,11 +2,12 @@ import 'dart:math';
 
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
-import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
+import 'package:school_tasks/features/learning/domain/tasks/input_mode.dart';
 
 import 'arithmetic_generator_config.dart';
 import 'arithmetic_operation.dart';
@@ -16,7 +17,7 @@ class ArithmeticTaskDataGenerator extends TaskDataGenerator {
     required this.config,
     required this.operation,
     this.imageForGrid,
-    this.useNumericInput = false,
+    this.inputMode,
     WrongAnswerGenerator? wrongAnswerGenerator,
     Random? random,
   }) : _wrongAnswerGenerator =
@@ -26,7 +27,7 @@ class ArithmeticTaskDataGenerator extends TaskDataGenerator {
   final ArithmeticGeneratorConfig config;
   final ArithmeticOperation operation;
   final String? imageForGrid;
-  final bool useNumericInput;
+  final InputMode? inputMode;
 
   final WrongAnswerGenerator _wrongAnswerGenerator;
   final Random _random;
@@ -63,9 +64,13 @@ class ArithmeticTaskDataGenerator extends TaskDataGenerator {
 
         final prompt = _createPrompt(a, b);
 
-        if (useNumericInput) {
+        if (inputMode != null) {
           result.add(
-            NumericInputTaskData(prompt: prompt, correctAnswer: correctAnswer),
+            InputTaskData(
+              prompt: prompt,
+              correctAnswer: correctAnswer,
+              inputMode: inputMode!,
+            ),
           );
           continue;
         }
@@ -101,7 +106,6 @@ class ArithmeticTaskDataGenerator extends TaskDataGenerator {
     switch (operation) {
       case ArithmeticOperation.addition:
         return a + b;
-
       case ArithmeticOperation.multiplication:
         return a * b;
     }

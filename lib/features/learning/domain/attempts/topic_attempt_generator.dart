@@ -5,17 +5,17 @@ import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
-import 'package:school_tasks/features/learning/domain/task_data/numeric_input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/position_selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
-import 'package:school_tasks/features/learning/domain/tasks/numeric_input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/equals_evaluator.dart';
@@ -49,8 +49,8 @@ class TopicAttemptGenerator {
       random: _random,
     );
 
-    final numericInputDataPool = TaskDataPool<NumericInputTaskData>(
-      items: data.whereType<NumericInputTaskData>().toList(),
+    final inputDataPool = TaskDataPool<InputTaskData>(
+      items: data.whereType<InputTaskData>().toList(),
       random: _random,
     );
 
@@ -74,10 +74,11 @@ class TopicAttemptGenerator {
         case LearningTaskType.selection:
           return _createSelectionTask(selectionDataPool.takeRandom());
 
-        case LearningTaskType.numericInput:
+        case LearningTaskType.input:
           return AttemptTask<int, int>(
-            task: _createNumericInputTask(numericInputDataPool.takeRandom()),
+            task: _createInputTask(inputDataPool.takeRandom()),
           );
+
         case LearningTaskType.fraction:
           return _createFractionTask(fractionDataPool.takeRandom());
 
@@ -142,13 +143,14 @@ class TopicAttemptGenerator {
     );
   }
 
-  NumericInputTask _createNumericInputTask(NumericInputTaskData data) {
-    return NumericInputTask(
+  InputTask _createInputTask(InputTaskData data) {
+    return InputTask(
       prompt: data.prompt,
       solution: Solution<int, int>(
         value: data.correctAnswer,
         evaluator: const EqualsEvaluator<int>(),
       ),
+      inputMode: data.inputMode,
     );
   }
 

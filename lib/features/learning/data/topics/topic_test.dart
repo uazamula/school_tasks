@@ -1,11 +1,7 @@
-import 'package:school_tasks/features/learning/data/fixed_task_data/addition.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/algebraic_operations.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/audio_data.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fraction_data.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/geometry_shapes.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/matching_data.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/multiplication.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/position_selection.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_matching.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_position_selection.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
@@ -24,7 +20,7 @@ abstract final class Tests {
     taskTypeCounts: {
       LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 0,
-      LearningTaskType.numericInput: 0,
+      LearningTaskType.input: 0,
       LearningTaskType.selection: 2,
       LearningTaskType.fraction: 0,
     },

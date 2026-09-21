@@ -1,4 +1,3 @@
-import 'package:school_tasks/features/learning/data/fixed_task_data/multiplication.dart';
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_generator_config.dart';
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_operation.dart';
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_task_data_generator.dart';
@@ -8,7 +7,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/evaluation_conf
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
-import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
+import 'package:school_tasks/features/learning/domain/tasks/input_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
@@ -17,13 +16,13 @@ abstract final class MultiplicationTable {
     id: 'multiplication_table',
     taskTypeCounts: {
       // LearningTaskType.selection: 5,
-      LearningTaskType.numericInput: 10,
+      LearningTaskType.input: 10,
     },
     dataSource: GeneratedTaskDataSource([
       ArithmeticTaskDataGenerator(
         operation: ArithmeticOperation.multiplication,
         imageForGrid: 'assets/images/tasks/apple.png',
-        useNumericInput: true,
+        inputMode: InputMode.integer,
         config: ArithmeticGeneratorConfig(
           minA: 2,
           maxA: 6,
