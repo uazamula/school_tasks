@@ -3,6 +3,7 @@ import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_f
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_matching.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_position_selection.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_rational.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
@@ -21,7 +22,7 @@ abstract final class Tests {
     taskTypeCounts: {
       LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 0,
-      LearningTaskType.input: 1,
+      LearningTaskType.input: 4,
       LearningTaskType.selection: 0,
       LearningTaskType.fraction: 0,
     },
@@ -33,7 +34,8 @@ abstract final class Tests {
       // ...matchingTasks,
       ...positionSelectionTasks,
       ...FractionData.fractions,
-      ...AdditionTaskData.within10,
+      // ...AdditionTaskData.within10,
+      ...rational,
       // ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
     ]),

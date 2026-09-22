@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/rational.dart';
 import 'package:school_tasks/features/learning/domain/task_data/input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
@@ -6,8 +7,8 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.
 import 'package:school_tasks/features/learning/domain/tasks/input_mode.dart';
 
 abstract final class AdditionTaskData {
-  static const List<TaskData> within10 = [
-    SelectionTaskData(
+  static final List<TaskData> within10 = [
+    const SelectionTaskData(
       prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 2?')]),
       correctAnswers: ['4'],
       wrongAnswers: ['1', '3', '7'],
@@ -15,12 +16,12 @@ abstract final class AdditionTaskData {
     ),
 
     InputTaskData(
-      prompt: TaskPrompt(content: [TextContent('Скільки буде 3 + 4?')]),
-      correctAnswer: 7,
+      prompt: const TaskPrompt(content: [TextContent('Скільки буде 3 + 4?')]),
+      correctAnswer: Rational(7),
       inputMode: InputMode.integer,
     ),
 
-    SelectionTaskData(
+    const SelectionTaskData(
       prompt: TaskPrompt(content: [TextContent('Скільки буде 1 + 5?')]),
       correctAnswers: ['6'],
       wrongAnswers: ['4', '5', '8'],
@@ -29,13 +30,13 @@ abstract final class AdditionTaskData {
 
     InputTaskData(
       prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 6?')]),
-      correctAnswer: 8,
+      correctAnswer: Rational(8),
       inputMode: InputMode.decimal,
     ),
 
     InputTaskData(
       prompt: TaskPrompt(content: [TextContent('Скільки буде 3 + 2?')]),
-      correctAnswer: 5,
+      correctAnswer: Rational(5),
       inputMode: InputMode.integer,
     ),
   ];

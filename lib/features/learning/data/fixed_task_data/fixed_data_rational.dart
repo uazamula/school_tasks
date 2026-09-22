@@ -6,17 +6,38 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_content
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/tasks/input_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/approximate_equals_evaluator.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/tolerance_config.dart';
 
-const List<TaskData> rational = [
+final List<TaskData> rational = [
   InputTaskData(
     prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 6?')]),
-    correctAnswer: 8,
+    correctAnswer: Rational(8),
+    inputMode: InputMode.decimal,
+    tolerance: ApproximateToleranceConfig(
+      relativeTolerance: Rational(1, 1000),
+      absoluteTolerance: Rational(1, 10000),
+    ),
+  ),
+
+  InputTaskData(
+    prompt: TaskPrompt(content: [TextContent('Введіть значення 2/4')]),
+    correctAnswer: Rational(1, 2),
     inputMode: InputMode.decimal,
   ),
 
   InputTaskData(
-    prompt: TaskPrompt(content: [TextContent('Скільки буде 3 + 2?')]),
-    correctAnswer: 5,
+    prompt: TaskPrompt(content: [TextContent('Введіть значення 1/3')]),
+    correctAnswer: Rational(1, 3),
+    inputMode: InputMode.decimal,
+    tolerance: ApproximateToleranceConfig(
+      relativeTolerance: Rational(1, 1000),
+      absoluteTolerance: Rational(1, 10000),
+    ),
+  ),
+
+  InputTaskData(
+    prompt: TaskPrompt(content: [TextContent('Скільки буде 3 - 3?')]),
+    correctAnswer: Rational(0),
     inputMode: InputMode.integer,
   ),
 ];

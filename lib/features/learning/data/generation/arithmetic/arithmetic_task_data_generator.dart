@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
+import 'package:school_tasks/features/learning/domain/rational.dart';
 import 'package:school_tasks/features/learning/domain/task_data/input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
@@ -68,7 +69,7 @@ class ArithmeticTaskDataGenerator extends TaskDataGenerator {
           result.add(
             InputTaskData(
               prompt: prompt,
-              correctAnswer: correctAnswer,
+              correctAnswer: Rational(correctAnswer),
               inputMode: inputMode!,
             ),
           );

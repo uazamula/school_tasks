@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
+import 'package:school_tasks/features/learning/domain/rational.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
@@ -96,7 +97,7 @@ class TaskWidget extends StatelessWidget {
       return TaskInteractionScalingBoundary(
         child: InputTaskWidget(
           task: task as InputTask,
-          result: result as TaskResult<int, int>?,
+          result: result as TaskResult<Rational, Rational>?,
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
         ),

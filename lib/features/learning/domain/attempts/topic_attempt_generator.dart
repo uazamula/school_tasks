@@ -4,6 +4,7 @@ import 'package:school_tasks/features/learning/data/generation/predefined_answer
 import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
+import 'package:school_tasks/features/learning/domain/rational.dart';
 import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
@@ -18,9 +19,12 @@ import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.d
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/approximate_equals_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/equals_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/set_equals_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/solution_evaluator.dart';
+import 'package:school_tasks/features/learning/domain/tasks/solutions/tolerance_config.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 class TopicAttemptGenerator {
@@ -75,7 +79,7 @@ class TopicAttemptGenerator {
           return _createSelectionTask(selectionDataPool.takeRandom());
 
         case LearningTaskType.input:
-          return AttemptTask<int, int>(
+          return AttemptTask<Rational, Rational>(
             task: _createInputTask(inputDataPool.takeRandom()),
           );
 
@@ -144,11 +148,13 @@ class TopicAttemptGenerator {
   }
 
   InputTask _createInputTask(InputTaskData data) {
+    final evaluator = _createInputEvaluator(data.tolerance);
+
     return InputTask(
       prompt: data.prompt,
-      solution: Solution<int, int>(
+      solution: Solution<Rational, Rational>(
         value: data.correctAnswer,
-        evaluator: const EqualsEvaluator<int>(),
+        evaluator: evaluator,
       ),
       inputMode: data.inputMode,
     );
@@ -190,5 +196,24 @@ class TopicAttemptGenerator {
     return AttemptTask<MatchingAnswer, List<MatchingPair>>(
       task: MatchingTask(prompt: data.prompt, pairs: pairs),
     );
+  }
+
+  SolutionEvaluator<Rational, Rational> _createInputEvaluator(
+    ToleranceConfig tolerance,
+  ) {
+    switch (tolerance) {
+      case ExactToleranceConfig():
+        return const EqualsEvaluator<Rational>();
+
+      case ApproximateToleranceConfig(
+        :final relativeTolerance,
+        :final absoluteTolerance,
+      ):
+        return ApproximateEqualsEvaluator(
+          relativeTolerance: relativeTolerance,
+          absoluteTolerance: absoluteTolerance,
+        );
+    }
+    throw StateError('Unsupported ToleranceConfig: ${tolerance.runtimeType}');
   }
 }

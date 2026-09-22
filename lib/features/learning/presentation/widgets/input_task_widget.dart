@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/input_parser.dart';
+import 'package:school_tasks/features/learning/domain/rational.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/input_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/input_keyboard.dart';
@@ -16,9 +18,9 @@ class InputTaskWidget extends StatefulWidget {
   });
 
   final InputTask task;
-  final TaskResult<int, int>? result;
+  final TaskResult<Rational, Rational>? result;
   final bool interactionScrollable;
-  final ValueChanged<TaskResult<int, int>> onTaskAnswered;
+  final ValueChanged<TaskResult<Rational, Rational>> onTaskAnswered;
 
   @override
   State<InputTaskWidget> createState() => _InputTaskWidgetState();
@@ -61,11 +63,9 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
   }
 
   void _onConfirmPressed() {
-    if (_isAnswered || _input.isEmpty) {
-      return;
-    }
+    if (_isAnswered || _input.isEmpty) return;
 
-    final answer = int.parse(_input);
+    final answer = InputParser.parse(_input, widget.task.inputMode);
 
     widget.onTaskAnswered(widget.task.checkAnswer(answer));
   }

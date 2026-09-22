@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/rational.dart';
 import 'package:school_tasks/features/learning/domain/task_data/input_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
@@ -53,7 +54,7 @@ abstract final class MultiplicationTaskData {
           ),
         ],
       ),
-      correctAnswer: 16,
+      correctAnswer: Rational(16),
       inputMode: InputMode.integer,
     ),
   ];
