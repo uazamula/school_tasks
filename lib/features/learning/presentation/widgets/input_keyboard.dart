@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/tasks/input_mode.dart';
 
-enum InputKeyboardKeyType { input, cycle, backspace, empty }
+enum InputKeyboardKeyType { input, cycle, decimalSeparator, backspace, empty }
 
 class InputKeyboardKey {
   const InputKeyboardKey.input(this.value)
@@ -13,6 +14,11 @@ class InputKeyboardKey {
   const InputKeyboardKey.cycle(this.values)
     : type = InputKeyboardKeyType.cycle,
       value = null;
+
+  const InputKeyboardKey.decimalSeparator()
+    : type = InputKeyboardKeyType.decimalSeparator,
+      value = null,
+      values = null;
 
   const InputKeyboardKey.backspace()
     : type = InputKeyboardKeyType.backspace,
@@ -34,15 +40,20 @@ class InputKeyboard extends StatelessWidget {
     super.key,
     required this.mode,
     required this.enabled,
+    required this.decimalSeparator,
     required this.onInputPressed,
     required this.onCyclePressed,
+    required this.onDecimalSeparatorPressed,
     required this.onBackspacePressed,
   });
 
   final InputMode mode;
   final bool enabled;
+  final String decimalSeparator;
+
   final ValueChanged<String> onInputPressed;
   final ValueChanged<List<String>> onCyclePressed;
+  final VoidCallback onDecimalSeparatorPressed;
   final VoidCallback onBackspacePressed;
 
   List<List<InputKeyboardKey>> _getLayout() {
@@ -91,7 +102,7 @@ class InputKeyboard extends StatelessWidget {
           [
             const InputKeyboardKey.backspace(),
             const InputKeyboardKey.input('0'),
-            const InputKeyboardKey.cycle(['.']),
+            const InputKeyboardKey.decimalSeparator(),
           ],
         ];
     }
@@ -133,11 +144,19 @@ class InputKeyboard extends StatelessWidget {
           enabled: enabled,
           onPressed: onInputPressed,
         );
+
       case InputKeyboardKeyType.cycle:
         return _CycleButton(
           values: key.values!,
           enabled: enabled,
           onPressed: () => onCyclePressed(key.values!),
+        );
+
+      case InputKeyboardKeyType.decimalSeparator:
+        return _InputButton(
+          value: decimalSeparator,
+          enabled: enabled,
+          onPressed: (_) => onDecimalSeparatorPressed(),
         );
 
       case InputKeyboardKeyType.backspace:

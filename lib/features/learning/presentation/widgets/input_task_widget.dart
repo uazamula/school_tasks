@@ -62,17 +62,43 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
     });
   }
 
+  void _onDecimalSeparatorPressed() {
+    if (_isAnswered || _input.contains('.')) {
+      return;
+    }
+
+    setState(() {
+      _input += _input.isEmpty ? '0.' : '.';
+    });
+  }
+
   void _onConfirmPressed() {
-    if (_isAnswered || _input.isEmpty) return;
+    if (_isAnswered || _input.isEmpty) {
+      return;
+    }
 
     final answer = InputParser.parse(_input, widget.task.inputMode);
 
     widget.onTaskAnswered(widget.task.checkAnswer(answer));
   }
 
+  String _getDecimalSeparator(Locale locale) {
+    switch (locale.languageCode) {
+      case 'uk':
+      case 'tr':
+        return ',';
+
+      case 'en':
+      default:
+        return '.';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final locale = Localizations.localeOf(context);
+    final decimalSeparator = _getDecimalSeparator(locale);
 
     final content = Column(
       mainAxisSize: MainAxisSize.min,
@@ -95,7 +121,7 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
-            _input.isEmpty ? '—' : _input,
+            _input.isEmpty ? '—' : _input.replaceAll('.', decimalSeparator),
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontSize: 36,
               fontWeight: FontWeight.w600,
@@ -107,8 +133,10 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
         InputKeyboard(
           mode: widget.task.inputMode,
           enabled: !_isAnswered,
+          decimalSeparator: decimalSeparator,
           onInputPressed: _onInputPressed,
           onCyclePressed: _onCyclePressed,
+          onDecimalSeparatorPressed: _onDecimalSeparatorPressed,
           onBackspacePressed: _onBackspacePressed,
         ),
       ],
