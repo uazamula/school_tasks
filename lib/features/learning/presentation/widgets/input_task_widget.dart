@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/input_parser.dart';
 import 'package:school_tasks/features/learning/domain/rational.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/input_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/input_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/input_keyboard.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
@@ -82,6 +84,69 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
     widget.onTaskAnswered(widget.task.checkAnswer(answer));
   }
 
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
+    if (_isAnswered || event is! KeyDownEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    final key = event.logicalKey;
+
+    final digit = _getDigit(key);
+
+    if (digit != null) {
+      _onInputPressed(digit);
+      return KeyEventResult.handled;
+    }
+
+    if (key == LogicalKeyboardKey.backspace) {
+      _onBackspacePressed();
+      return KeyEventResult.handled;
+    }
+
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter) {
+      _onConfirmPressed();
+      return KeyEventResult.handled;
+    }
+
+    if (widget.task.inputMode == InputMode.decimal &&
+        (key == LogicalKeyboardKey.period ||
+            key == LogicalKeyboardKey.comma ||
+            key == LogicalKeyboardKey.numpadDecimal)) {
+      _onDecimalSeparatorPressed();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  String? _getDigit(LogicalKeyboardKey key) {
+    final digits = <LogicalKeyboardKey, String>{
+      LogicalKeyboardKey.digit0: '0',
+      LogicalKeyboardKey.digit1: '1',
+      LogicalKeyboardKey.digit2: '2',
+      LogicalKeyboardKey.digit3: '3',
+      LogicalKeyboardKey.digit4: '4',
+      LogicalKeyboardKey.digit5: '5',
+      LogicalKeyboardKey.digit6: '6',
+      LogicalKeyboardKey.digit7: '7',
+      LogicalKeyboardKey.digit8: '8',
+      LogicalKeyboardKey.digit9: '9',
+      LogicalKeyboardKey.numpad0: '0',
+      LogicalKeyboardKey.numpad1: '1',
+      LogicalKeyboardKey.numpad2: '2',
+      LogicalKeyboardKey.numpad3: '3',
+      LogicalKeyboardKey.numpad4: '4',
+      LogicalKeyboardKey.numpad5: '5',
+      LogicalKeyboardKey.numpad6: '6',
+      LogicalKeyboardKey.numpad7: '7',
+      LogicalKeyboardKey.numpad8: '8',
+      LogicalKeyboardKey.numpad9: '9',
+    };
+
+    return digits[key];
+  }
+
   String _getDecimalSeparator(Locale locale) {
     switch (locale.languageCode) {
       case 'uk':
@@ -147,11 +212,13 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
       child: const Text('Підтвердити'),
     );
 
-    return TaskInteractionLayout(
+    final interaction = TaskInteractionLayout(
       scrollable: widget.interactionScrollable,
       content: content,
       confirmation: confirmation,
     );
+
+    return Focus(autofocus: true, onKeyEvent: _onKeyEvent, child: interaction);
   }
 
   Color _getInputBorderColor(ColorScheme colorScheme) {
