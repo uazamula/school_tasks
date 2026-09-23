@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +22,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/task_widget.
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
 import 'package:school_tasks/features/learning/providers/learning_results_controller.dart';
 import 'package:school_tasks/routing/app_router.dart';
+import 'package:school_tasks/routing/app_routes.dart';
 
 import '../../../../core/services/audio/audio_service_provider.dart';
 
@@ -299,9 +301,15 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         .read(learningResultsControllerProvider.notifier)
         .setResult(_topic.id, updatedResult);
 
+    // Нормальне завершення теми — це дозволений вихід,
+    // тому confirmation через onExit показувати не потрібно.
     widget.exitGuard.allowExit = true;
 
-    context.pop();
+    if (kIsWeb) {
+      Router.neglect(context, () => context.go(AppRoutes.home));
+    } else {
+      context.pop();
+    }
   }
 
   void _moveToNextTask() {

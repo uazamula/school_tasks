@@ -31,27 +31,6 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: AppRoutes.home,
               builder: (context, state) => const HomePage(),
-              routes: [
-                GoRoute(
-                  path: 'learning/:topicId',
-                  onExit: (context, state) async {
-                    if (_learningExitGuard.allowExit) {
-                      _learningExitGuard.allowExit = false;
-                      return true;
-                    }
-
-                    return _confirmLearningExit(context);
-                  },
-                  builder: (context, state) {
-                    final topicId = state.pathParameters['topicId']!;
-
-                    return LearningPage(
-                      topicId: topicId,
-                      exitGuard: _learningExitGuard,
-                    );
-                  },
-                ),
-              ],
             ),
           ],
         ),
@@ -74,6 +53,23 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/learning/:topicId',
+      parentNavigatorKey: rootNavigatorKey,
+      onExit: (context, state) async {
+        if (_learningExitGuard.allowExit) {
+          _learningExitGuard.allowExit = false;
+          return true;
+        }
+
+        return _confirmLearningExit(context);
+      },
+      builder: (context, state) {
+        final topicId = state.pathParameters['topicId']!;
+
+        return LearningPage(topicId: topicId, exitGuard: _learningExitGuard);
+      },
     ),
   ],
 );

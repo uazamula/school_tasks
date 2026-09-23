@@ -57,7 +57,7 @@ abstract final class Tests {
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
-    progressionMode: TopicProgressionMode.manual,
+    progressionMode: TopicProgressionMode.automatic,
     feedbackDuration: Duration(milliseconds: 500),
   );
 }
