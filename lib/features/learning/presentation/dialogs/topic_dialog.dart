@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
-import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
-import 'package:school_tasks/routing/app_routes.dart';
 
 import 'topic_result_dialog.dart';
 
@@ -32,14 +30,8 @@ class TopicDialog extends StatelessWidget {
       actionsAlignment: MainAxisAlignment.center,
       actions: [
         FilledButton(
-          onPressed: () async {
-            final attemptResult = await context.push<TopicAttemptResult>(
-              AppRoutes.learningFor(topicNode.id),
-            );
-
-            if (context.mounted) {
-              Navigator.pop(context, attemptResult);
-            }
+          onPressed: () {
+            Navigator.pop(context, true);
           },
           child: const Text('Почати'),
         ),

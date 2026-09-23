@@ -12,41 +12,140 @@ class LearningProgressIndicator extends StatelessWidget {
   final int progress;
   final int totalSteps;
   final Duration elapsed;
+  static const _animationDuration = Duration(milliseconds: 400);
+  static const _progressHeight = 12.0;
+  static const _borderRadius = 8.0;
+  static const _indicatorPadding = 8.0;
+  static const _indicatorDiameter = 16.0;
+  static const _indicatorBorderWidth = 2.0;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     final progressValue = totalSteps == 0
         ? 0.0
         : (progress / totalSteps).clamp(0.0, 1.0);
-
     final timeColor = theme.brightness == Brightness.light
         ? colorScheme.onSurface
         : colorScheme.onSurfaceVariant;
-
-    return Row(
-      children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(value: progressValue, minHeight: 12),
+    return Container(
+      padding: const EdgeInsets.all(_indicatorPadding),
+      decoration: BoxDecoration(
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(_borderRadius),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _AnimatedProgressBar(
+              value: progressValue,
+              progressColor: colorScheme.primary,
+              indicatorColor: colorScheme.primaryContainer,
+              indicatorBorderColor: colorScheme.primary,
+              backgroundColor: colorScheme.surfaceContainerHighest,
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Text(
-          _formatDuration(elapsed),
-          style: theme.textTheme.titleMedium?.copyWith(color: timeColor),
-        ),
-      ],
+          const SizedBox(width: AppSpacing.md),
+          Text(
+            _formatDuration(elapsed),
+            style: theme.textTheme.titleMedium?.copyWith(color: timeColor),
+          ),
+        ],
+      ),
     );
   }
 
   String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds % 60;
-
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+}
+
+class _AnimatedProgressBar extends StatelessWidget {
+  const _AnimatedProgressBar({
+    required this.value,
+    required this.progressColor,
+    required this.indicatorColor,
+    required this.indicatorBorderColor,
+    required this.backgroundColor,
+  });
+
+  final double value;
+  final Color progressColor;
+  final Color indicatorColor;
+  final Color indicatorBorderColor;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final diameter = LearningProgressIndicator._indicatorDiameter;
+
+        return SizedBox(
+          height: diameter,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(
+              LearningProgressIndicator._borderRadius,
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 2,
+                  height: LearningProgressIndicator._progressHeight,
+                  child: ColoredBox(color: backgroundColor),
+                ),
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: value),
+                  duration: LearningProgressIndicator._animationDuration,
+                  curve: Curves.easeOut,
+                  builder: (context, animatedValue, child) {
+                    final progressWidth = width * animatedValue;
+                    final indicatorRadius = diameter / 2;
+                    final indicatorCenter =
+                        indicatorRadius + (width - diameter) * animatedValue;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          left: 0,
+                          top: 2,
+                          width: progressWidth,
+                          height: LearningProgressIndicator._progressHeight,
+                          child: ColoredBox(color: progressColor),
+                        ),
+                        Positioned(
+                          left: indicatorCenter - indicatorRadius,
+                          top: 0,
+                          child: Container(
+                            width: diameter,
+                            height: diameter,
+                            decoration: BoxDecoration(
+                              color: indicatorColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: indicatorBorderColor,
+                                width: LearningProgressIndicator
+                                    ._indicatorBorderWidth,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

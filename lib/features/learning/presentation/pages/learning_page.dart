@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/core/preferences/preferences_provider.dart';
 import 'package:school_tasks/core/services/audio/audio_service.dart';
-
 import 'package:school_tasks/core/widgets/app_scaffold.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
@@ -15,16 +15,24 @@ import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_progress_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
+import 'package:school_tasks/features/learning/providers/learning_results_controller.dart';
+import 'package:school_tasks/routing/app_router.dart';
 
 import '../../../../core/services/audio/audio_service_provider.dart';
 
 class LearningPage extends ConsumerStatefulWidget {
-  const LearningPage({super.key, required this.topicId});
+  const LearningPage({
+    super.key,
+    required this.topicId,
+    required this.exitGuard,
+  });
 
   final String topicId;
+  final LearningExitGuard exitGuard;
 
   @override
   ConsumerState<LearningPage> createState() => _LearningPageState();
@@ -39,6 +47,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   final TopicAttemptGenerator _attemptGenerator = TopicAttemptGenerator();
 
+  final TopicResultUpdater _topicResultUpdater = const TopicResultUpdater();
+
   late final Stopwatch _stopwatch;
 
   AudioService get _audioService => ref.read(audioServiceProvider);
@@ -48,8 +58,6 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   int _completedProgressSteps = 0;
 
-  /// Feedback доступний тільки для режимів,
-  /// у яких користувач має побачити результат відповіді.
   bool get _feedbackEnabled {
     return _topic.progressionMode != TopicProgressionMode.automatic;
   }
@@ -245,7 +253,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     _stopwatch.start();
   }
 
-  void _finishAttempt() {
+  Future<void> _finishAttempt() async {
     _autoAdvanceTimer?.cancel();
     _autoAdvanceTimer = null;
 
@@ -269,7 +277,31 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       evaluation: evaluation,
     );
 
-    context.pop(evaluatedResult);
+    final previousResult = ref.read(
+      learningResultsControllerProvider,
+    )[_topic.id];
+
+    final updatedResult = _topicResultUpdater.update(
+      attempt: evaluatedResult,
+      currentAt: DateTime.now(),
+      previous: previousResult,
+    );
+
+    final preferences = await ref.read(appPreferencesProvider.future);
+
+    await preferences.setTopicResult(_topic.id, updatedResult);
+
+    if (!mounted) {
+      return;
+    }
+
+    ref
+        .read(learningResultsControllerProvider.notifier)
+        .setResult(_topic.id, updatedResult);
+
+    widget.exitGuard.allowExit = true;
+
+    context.pop();
   }
 
   void _moveToNextTask() {
