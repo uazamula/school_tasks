@@ -63,12 +63,34 @@ final GoRouter appRouter = GoRouter(
           return true;
         }
 
-        return _confirmLearningExit(context);
+        final shouldExit = await _confirmLearningExit(context);
+
+        if (!shouldExit) {
+          return false;
+        }
+
+        // Не дозволяємо поточному Back завершити маршрут.
+        // Замість цього нижче виконаємо такий самий перехід,
+        // як при нормальному завершенні теми.
+        _learningExitGuard.allowExit = true;
+
+        Future.microtask(() {
+          if (!context.mounted) {
+            return;
+          }
+
+          Router.neglect(context, () => context.go(AppRoutes.home));
+        });
+
+        return false;
       },
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final topicId = state.pathParameters['topicId']!;
 
-        return LearningPage(topicId: topicId, exitGuard: _learningExitGuard);
+        return NoTransitionPage(
+          key: state.pageKey,
+          child: LearningPage(topicId: topicId, exitGuard: _learningExitGuard),
+        );
       },
     ),
   ],

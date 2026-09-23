@@ -44,6 +44,7 @@ dependencies:
   url_launcher: ^6.3.2
   emoji_picker_flutter: ^4.4.0
   audioplayers: ^6.7.1
+  web: ^1.1.1
 
 
   # The following adds the Cupertino Icons font to your application.
