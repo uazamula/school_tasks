@@ -7,11 +7,14 @@ class LearningProgressIndicator extends StatelessWidget {
     required this.progress,
     required this.totalSteps,
     required this.elapsed,
+    this.maximumTime,
   });
 
   final int progress;
   final int totalSteps;
   final Duration elapsed;
+  final Duration? maximumTime;
+
   static const animationDuration = Duration(milliseconds: 400);
   static const _progressHeight = 12.0;
   static const _borderRadius = 8.0;
@@ -23,12 +26,17 @@ class LearningProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
     final progressValue = totalSteps == 0
         ? 0.0
         : (progress / totalSteps).clamp(0.0, 1.0);
+
     final timeColor = theme.brightness == Brightness.light
         ? colorScheme.onSurface
         : colorScheme.onSurfaceVariant;
+
+    final displayedTime = _displayedTime;
+
     return Container(
       padding: const EdgeInsets.all(_indicatorPadding),
       decoration: BoxDecoration(
@@ -48,7 +56,7 @@ class LearningProgressIndicator extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.md),
           Text(
-            _formatDuration(elapsed),
+            _formatDuration(displayedTime),
             style: theme.textTheme.titleMedium?.copyWith(color: timeColor),
           ),
         ],
@@ -56,9 +64,26 @@ class LearningProgressIndicator extends StatelessWidget {
     );
   }
 
+  Duration get _displayedTime {
+    final maximum = maximumTime;
+
+    if (maximum == null) {
+      return elapsed;
+    }
+
+    final remaining = maximum - elapsed;
+
+    if (remaining.isNegative) {
+      return Duration.zero;
+    }
+
+    return remaining;
+  }
+
   String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds % 60;
+
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 }
@@ -110,6 +135,7 @@ class _AnimatedProgressBar extends StatelessWidget {
                     final indicatorRadius = diameter / 2;
                     final indicatorCenter =
                         indicatorRadius + (width - diameter) * animatedValue;
+
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [

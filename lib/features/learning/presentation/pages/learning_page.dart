@@ -150,6 +150,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                       progress: _completedProgressSteps,
                       totalSteps: _totalProgressSteps,
                       elapsed: _stopwatch.elapsed,
+                      maximumTime: _topic.passingCriteria?.maximumTime,
                     ),
                   ),
                 ),

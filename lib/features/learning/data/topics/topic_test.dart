@@ -52,7 +52,7 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(
       minimumAccuracy: 0.8,
-      maximumTime: Duration(seconds: 20),
+      // maximumTime: Duration(seconds: 20),
     ),
     layout: TopicLayout(
       promptFlex: 1,
