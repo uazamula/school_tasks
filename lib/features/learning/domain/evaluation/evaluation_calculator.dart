@@ -57,7 +57,11 @@ class EvaluationCalculator {
       return EvaluationResult(
         criterionResults: const {},
         finalScore: 0,
-        isPassed: _isPassed(topic: topic, result: result),
+        isPassed: _isPassed(
+          topic: topic,
+          result: result,
+          elapsedTime: elapsedTime,
+        ),
       );
     }
     final normalizedResults =
@@ -82,7 +86,11 @@ class EvaluationCalculator {
       finalScore += weightedScore;
     }
 
-    final isPassed = _isPassed(topic: topic, result: result);
+    final isPassed = _isPassed(
+      topic: topic,
+      result: result,
+      elapsedTime: elapsedTime,
+    );
 
     return EvaluationResult(
       criterionResults: Map.unmodifiable(normalizedResults),
@@ -112,7 +120,11 @@ class EvaluationCalculator {
     );
   }
 
-  bool _isPassed({required Topic topic, required TopicAttemptResult result}) {
+  bool _isPassed({
+    required Topic topic,
+    required TopicAttemptResult result,
+    Duration? elapsedTime,
+  }) {
     final criteria = topic.passingCriteria;
 
     if (criteria == null) {
@@ -122,6 +134,14 @@ class EvaluationCalculator {
     final minimumAccuracy = criteria.minimumAccuracy;
 
     if (minimumAccuracy != null && result.score < minimumAccuracy) {
+      return false;
+    }
+
+    final maximumTime = criteria.maximumTime;
+
+    if (maximumTime != null &&
+        elapsedTime != null &&
+        elapsedTime > maximumTime) {
       return false;
     }
 

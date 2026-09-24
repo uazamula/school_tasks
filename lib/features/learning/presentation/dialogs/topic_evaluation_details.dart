@@ -114,6 +114,22 @@ class TopicEvaluationDetails extends StatelessWidget {
       );
     }
 
+    final maximumPassingTime = topic.passingCriteria?.maximumTime;
+
+    if (maximumPassingTime != null) {
+      if (children.isNotEmpty) {
+        children.add(const SizedBox(height: AppSpacing.sm));
+      }
+
+      children.add(
+        Text(
+          'Максимальний час для зарахування: '
+          '${DurationFormatter.formatDetailed(context, maximumPassingTime)} '
+          '${context.l10n.secondsShort}',
+        ),
+      );
+    }
+
     if (result != null) {
       if (children.isNotEmpty) {
         children.add(const SizedBox(height: AppSpacing.md));

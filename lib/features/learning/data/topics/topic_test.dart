@@ -43,14 +43,17 @@ abstract final class Tests {
     evaluation: EvaluationConfig(
       weights: {
         EvaluationCriterionType.accuracy: 1,
-        EvaluationCriterionType.time: 0,
+        EvaluationCriterionType.time: 1,
       },
       time: TimeEvaluationConfig(
-        targetTime: Duration(seconds: 30),
-        maximumTime: Duration(seconds: 90),
+        targetTime: Duration(seconds: 15),
+        maximumTime: Duration(seconds: 30),
       ),
     ),
-    passingCriteria: PassingCriteria(minimumAccuracy: 0.2),
+    passingCriteria: PassingCriteria(
+      minimumAccuracy: 0.8,
+      maximumTime: Duration(seconds: 20),
+    ),
     layout: TopicLayout(
       promptFlex: 1,
       interactionFlex: 1,
