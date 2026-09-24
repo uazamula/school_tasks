@@ -52,7 +52,7 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(
       minimumAccuracy: 0.8,
-      // maximumTime: Duration(seconds: 20),
+      maximumTime: Duration(seconds: 20),
     ),
     layout: TopicLayout(
       promptFlex: 1,
@@ -60,7 +60,7 @@ abstract final class Tests {
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
-    progressionMode: TopicProgressionMode.manual,
-    feedbackDuration: Duration(milliseconds: 500),
+    progressionMode: TopicProgressionMode.automaticWithFeedback,
+    feedbackDuration: Duration(milliseconds: 3000),
   );
 }

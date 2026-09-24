@@ -59,6 +59,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   Timer? _autoAdvanceTimer;
 
   int _completedProgressSteps = 0;
+  bool _isFinishing = false;
 
   bool get _feedbackEnabled {
     return _topic.progressionMode != TopicProgressionMode.automatic;
@@ -74,9 +75,18 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     _stopwatch = Stopwatch()..start();
 
     _timer = Timer.periodic(const Duration(milliseconds: 250), (_) {
-      if (mounted) {
-        setState(() {});
+      if (!mounted || _isFinishing) {
+        return;
       }
+
+      final maximumTime = _topic.passingCriteria?.maximumTime;
+
+      if (maximumTime != null && _stopwatch.elapsed >= maximumTime) {
+        _handleTimeExpired();
+        return;
+      }
+
+      setState(() {});
     });
   }
 
@@ -284,6 +294,51 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     _moveToNextTask();
     _stopwatch.start();
+  }
+
+  Future<void> _handleTimeExpired() async {
+    if (_isFinishing) {
+      return;
+    }
+
+    _isFinishing = true;
+
+    _timer?.cancel();
+    _timer = null;
+
+    _autoAdvanceTimer?.cancel();
+    _autoAdvanceTimer = null;
+
+    _stopwatch.stop();
+
+    if (!mounted) {
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Час вичерпано'),
+          content: const Text('Час на проходження теми завершено.'),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    await _finishAttempt();
   }
 
   Future<void> _finishAttempt() async {
