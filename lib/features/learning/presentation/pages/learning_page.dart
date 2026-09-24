@@ -130,13 +130,30 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       child: SafeArea(
         child: Column(
           children: [
-            Opacity(
-              opacity: isManualAnswered ? 0.15 : 1.0,
-              child: LearningProgressIndicator(
-                progress: _completedProgressSteps,
-                totalSteps: _totalProgressSteps,
-                elapsed: _stopwatch.elapsed,
-              ),
+            Row(
+              children: [
+                Transform.translate(
+                  offset: const Offset(-8, 0),
+                  child: IconButton(
+                    onPressed: () {
+                      rootNavigatorKey.currentState?.maybePop();
+                    },
+                    tooltip: 'Вийти',
+                    icon: const Icon(Icons.arrow_back),
+                  ),
+                ),
+                const SizedBox(width: 0),
+                Expanded(
+                  child: Opacity(
+                    opacity: isManualAnswered ? 0.15 : 1.0,
+                    child: LearningProgressIndicator(
+                      progress: _completedProgressSteps,
+                      totalSteps: _totalProgressSteps,
+                      elapsed: _stopwatch.elapsed,
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Expanded(
