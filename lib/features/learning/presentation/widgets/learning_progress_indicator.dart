@@ -12,7 +12,7 @@ class LearningProgressIndicator extends StatelessWidget {
   final int progress;
   final int totalSteps;
   final Duration elapsed;
-  static const _animationDuration = Duration(milliseconds: 400);
+  static const animationDuration = Duration(milliseconds: 400);
   static const _progressHeight = 12.0;
   static const _borderRadius = 8.0;
   static const _indicatorPadding = 8.0;
@@ -103,7 +103,7 @@ class _AnimatedProgressBar extends StatelessWidget {
                 ),
                 TweenAnimationBuilder<double>(
                   tween: Tween(begin: 0, end: value),
-                  duration: LearningProgressIndicator._animationDuration,
+                  duration: LearningProgressIndicator.animationDuration,
                   curve: Curves.easeOut,
                   builder: (context, animatedValue, child) {
                     final progressWidth = width * animatedValue;
