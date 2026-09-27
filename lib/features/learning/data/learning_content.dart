@@ -3,6 +3,7 @@ import 'package:school_tasks/features/learning/data/topics/topic_addition_within
 import 'package:school_tasks/features/learning/data/topics/topic_fractions.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_mult_sel.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_multiplication_table.dart';
+import 'package:school_tasks/features/learning/data/topics/topic_percents.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_test.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
@@ -72,11 +73,11 @@ abstract final class LearningContent {
               titleKey: 'Дроби',
               type: LearningNodeType.topic,
             ),
-            // LearningNode(
-            //   id: 'percents',
-            //   titleKey: 'Відсотки',
-            //   type: LearningNodeType.topic,
-            // ),
+            LearningNode(
+              id: 'percents',
+              titleKey: 'Відсотки',
+              type: LearningNodeType.topic,
+            ),
           ],
         ),
       ],
@@ -90,6 +91,7 @@ abstract final class LearningContent {
     'multiplication_table': MultiplicationTable.topic,
     'multiplication_table_selected': MultiplicationTableSelected.topic,
     'fractions': Fractions.topic,
+    'percents': Percents.topic,
   };
 
   static Topic getTopic(String topicId) {

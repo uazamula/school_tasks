@@ -4,6 +4,7 @@ import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_g
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_matching.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_position_selection.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_rational.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_roots.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
@@ -22,7 +23,7 @@ abstract final class Tests {
     taskTypeCounts: {
       LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 0,
-      LearningTaskType.input: 4,
+      LearningTaskType.input: 7,
       LearningTaskType.selection: 0,
       LearningTaskType.fraction: 0,
     },
@@ -34,8 +35,9 @@ abstract final class Tests {
       // ...matchingTasks,
       ...positionSelectionTasks,
       ...FractionData.fractions,
+      ...roots,
       // ...AdditionTaskData.within10,
-      ...rational,
+      // ...rational,
       // ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
     ]),
@@ -51,16 +53,16 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(
-      minimumAccuracy: 0.8,
-      maximumTime: Duration(seconds: 20),
+      minimumAccuracy: 0.5,
+      maximumTime: Duration(seconds: 60),
     ),
     layout: TopicLayout(
       promptFlex: 1,
-      interactionFlex: 1,
+      interactionFlex: 2,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
     progressionMode: TopicProgressionMode.automaticWithFeedback,
-    feedbackDuration: Duration(milliseconds: 3000),
+    feedbackDuration: Duration(milliseconds: 500),
   );
 }

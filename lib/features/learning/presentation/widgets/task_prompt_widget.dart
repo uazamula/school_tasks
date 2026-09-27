@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/math_content_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
 class TaskPromptWidget extends StatelessWidget {
@@ -140,6 +142,13 @@ class TaskPromptWidget extends StatelessWidget {
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: double.infinity),
         child: Image.asset(content.imagePath, fit: BoxFit.contain),
+      );
+    }
+
+    if (content is MathContent) {
+      return MathContentWidget(
+        expression: content.expression,
+        style: textStyle,
       );
     }
 
