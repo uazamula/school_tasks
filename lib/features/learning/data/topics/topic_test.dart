@@ -25,14 +25,14 @@ abstract final class Tests {
       LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 0,
       LearningTaskType.input: 0,
-      LearningTaskType.selection: 7,
+      LearningTaskType.selection: 4,
       LearningTaskType.fraction: 0,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
-      // ...GeometryShapesData.shapes,
+      ...GeometryShapesData.shapes,
       // ...CodingTasks.codingForTest,
-      ...CodingTasks.codingTasksSel,
+      // ...CodingTasks.codingTasksSel,
       ...matchingTasks,
       // ...additionWithSound,
       // ...matchingTasks,
@@ -65,7 +65,7 @@ abstract final class Tests {
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
-    progressionMode: TopicProgressionMode.manual,
+    progressionMode: TopicProgressionMode.automaticWithFeedback,
     feedbackDuration: Duration(milliseconds: 1500),
   );
 }

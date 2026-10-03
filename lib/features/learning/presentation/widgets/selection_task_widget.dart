@@ -9,8 +9,8 @@ import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart'
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/audio_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection/choice_answer_button.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/selection/image_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection/multi_choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/selection/visual_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
 class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
@@ -148,12 +148,22 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     double? imageSize,
   }) {
     if (option is ImageContent) {
-      return ImageAnswerButton(
-        answer: option,
+      return VisualAnswerButton(
         state: state,
         isSelected: isSelected,
         onPressed: onPressed,
         size: imageSize ?? 160,
+        child: Image.asset(option.imagePath, fit: BoxFit.contain),
+      );
+    }
+
+    if (option is EmojiContent) {
+      return VisualAnswerButton(
+        state: state,
+        isSelected: isSelected,
+        onPressed: onPressed,
+        size: imageSize ?? 160,
+        child: Text(option.emoji, style: const TextStyle(fontSize: 300)),
       );
     }
 
@@ -210,8 +220,11 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     return LayoutBuilder(
       builder: (context, constraints) {
         const spacing = AppSpacing.md;
+        final isVisualOptions =
+            options.isNotEmpty &&
+            (options.first is ImageContent || options.first is EmojiContent);
 
-        if (options.isNotEmpty && options.first is! ImageContent) {
+        if (!isVisualOptions) {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [

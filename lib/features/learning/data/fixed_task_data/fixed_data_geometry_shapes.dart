@@ -67,5 +67,21 @@ abstract final class GeometryShapesData {
       correctAnswerCount: 2,
       wrongAnswerCount: 2,
     ),
+
+    SelectionTaskData<EmojiContent>(
+      prompt: TaskPrompt(
+        content: [TextContent('На якій картинці зображено коло?')],
+      ),
+      correctAnswers: [EmojiContent('🟡')],
+      wrongAnswers: [
+        EmojiContent('🟨'),
+        EmojiContent('🔺'),
+        EmojiContent('🦌'),
+        EmojiContent('😀'),
+        EmojiContent('🍎'),
+        EmojiContent('👍'),
+      ],
+      wrongAnswerCount: 6,
+    ),
   ];
 }

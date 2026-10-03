@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 
-import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
-class ImageAnswerButton extends StatelessWidget {
-  const ImageAnswerButton({
+class VisualAnswerButton extends StatelessWidget {
+  const VisualAnswerButton({
     super.key,
-    required this.answer,
     required this.state,
     required this.isSelected,
     required this.onPressed,
+    required this.child,
     this.size = 160,
   });
 
-  final ImageContent answer;
   final TaskAnswerState state;
   final bool isSelected;
   final VoidCallback? onPressed;
+  final Widget child;
   final double size;
 
   @override
@@ -29,7 +28,7 @@ class ImageAnswerButton extends StatelessWidget {
         style: _buttonStyle(context),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Image.asset(answer.imagePath, fit: BoxFit.contain),
+          child: FittedBox(fit: BoxFit.contain, child: child),
         ),
       ),
     );
