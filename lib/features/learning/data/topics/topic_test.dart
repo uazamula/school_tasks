@@ -5,6 +5,7 @@ import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_m
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_position_selection.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_rational.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_roots.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/inf/coding/coding.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
@@ -23,19 +24,21 @@ abstract final class Tests {
     taskTypeCounts: {
       LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 0,
-      LearningTaskType.input: 7,
-      LearningTaskType.selection: 0,
+      LearningTaskType.input: 0,
+      LearningTaskType.selection: 5,
       LearningTaskType.fraction: 0,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
-      ...GeometryShapesData.shapes,
+      // ...GeometryShapesData.shapes,
+      ...CodingTasks.codingTasksSel,
+      // ...CodingTasks.codingTasksInput,
       ...matchingTasks,
       // ...additionWithSound,
       // ...matchingTasks,
       ...positionSelectionTasks,
       ...FractionData.fractions,
-      ...roots,
+      // ...roots,
       // ...AdditionTaskData.within10,
       // ...rational,
       // ...MultiplicationTaskData.multiplicationTable,
@@ -54,7 +57,7 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(
       minimumAccuracy: 0.5,
-      maximumTime: Duration(seconds: 60),
+      maximumTime: Duration(seconds: 300),
     ),
     layout: TopicLayout(
       promptFlex: 1,
@@ -62,7 +65,7 @@ abstract final class Tests {
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
-    progressionMode: TopicProgressionMode.automaticWithFeedback,
+    progressionMode: TopicProgressionMode.automatic,
     feedbackDuration: Duration(milliseconds: 500),
   );
 }

@@ -36,12 +36,12 @@ abstract final class LearningContent {
         ),
         LearningNode(
           id: 'geometry',
-          titleKey: 'geometry',
+          titleKey: 'Tests',
           type: LearningNodeType.section,
           children: [
             LearningNode(
               id: 'shapes',
-              titleKey: 'shape',
+              titleKey: 'tests',
               type: LearningNodeType.topic,
             ),
           ],

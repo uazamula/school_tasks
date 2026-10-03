@@ -14,7 +14,7 @@ final matchingTasks = [
         left: AudioContent.fixed('assets/audio/dva.mp3'),
         right: TextContent('2'),
       ),
-      MatchingPair(left: TextContent('3 × 2'), right: TextContent('6')),
+      MatchingPair(left: EmojiContent('🦌'), right: TextContent('1')),
       MatchingPair(left: TextContent('2 × 3'), right: TextContent('6')),
       MatchingPair(
         left: ImageContent('assets/images/cheetah.png'),
@@ -25,8 +25,8 @@ final matchingTasks = [
         right: TextContent('9'),
       ),
       MatchingPair(
-        left: EmojiContent('🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎'),
-        right: TextContent('2 × 5'),
+        left: TextContent('🍎🍎🍎🍎🍎\n🍎🍎🍎🍎🍎'),
+        right: TextContent('10'),
       ),
     ],
     pairCount: 6,

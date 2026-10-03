@@ -26,13 +26,13 @@ class MatchingContentWidget extends StatelessWidget {
     if (content is EmojiContent) {
       return Text(
         (content as EmojiContent).emoji,
-        style: const TextStyle(fontSize: 40),
+        style: const TextStyle(fontSize: 50),
       );
     }
 
     if (content is ImageContent) {
       return SizedBox(
-        width: 80,
+        width: 120,
         height: 80,
         child: Image.asset(
           (content as ImageContent).imagePath,

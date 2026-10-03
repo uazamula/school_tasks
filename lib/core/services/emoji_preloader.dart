@@ -23,7 +23,8 @@ class _EmojiPreloaderState extends State<EmojiPreloader> {
       '🐸 🐵 🐙 🦋 🐝 🐞 🐳 🐬 🦈 🐊 🦄 '
       '⚽ 🏀 🏈 🎾 🏆 ⭐ 🌟 ❤️ 💙 💚 💛 💜 🧡 '
       '👍 👎 👏 🙌 👋 ✋ 💪 👀 🎉 🔥 💡 ✅ ❌'
-      '🐌 🐢 🦔 🐇 🐕 🦌';
+      '🐌 🐢 🦔 🐇 🐕 🦌'
+      '🔴🟡🟢🔵🟣';
 
   @override
   void initState() {
