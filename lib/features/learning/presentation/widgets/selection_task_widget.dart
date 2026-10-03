@@ -8,9 +8,9 @@ import 'package:school_tasks/features/learning/domain/tasks/interactions/selecti
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/audio_answer_button.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/choice_answer_button.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/image_answer_button.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/multi_choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/selection/choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/selection/image_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/selection/multi_choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
 class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
@@ -20,12 +20,14 @@ class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
     required this.result,
     required this.onTaskAnswered,
     this.interactionScrollable = false,
+    required this.feedbackEnabled,
   });
 
   final SelectionTask<TOption, TAnswer, TSolution> task;
   final TaskResult<TAnswer, TSolution>? result;
   final ValueChanged<TaskResult<TAnswer, TSolution>> onTaskAnswered;
   final bool interactionScrollable;
+  final bool feedbackEnabled;
 
   @override
   State<SelectionTaskWidget<TOption, TAnswer, TSolution>> createState() =>
@@ -101,6 +103,10 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
   }
 
   TaskAnswerState _getAnswerState(TOption option) {
+    if (!widget.feedbackEnabled) {
+      return TaskAnswerState.neutral;
+    }
+
     final result = widget.result;
 
     if (result == null) {
@@ -169,6 +175,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         state: state,
         isSelected: isSelected,
         onPressed: onPressed,
+        buttonConfig: widget.task.buttonConfig,
       );
     }
 
@@ -177,6 +184,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       state: state,
       isSelected: isSelected,
       onPressed: onPressed,
+      buttonConfig: widget.task.buttonConfig,
     );
   }
 

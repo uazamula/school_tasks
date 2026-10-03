@@ -55,6 +55,7 @@ class TaskWidget extends StatelessWidget {
           result: result,
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
+          feedbackEnabled: feedbackEnabled,
         ),
       );
     }

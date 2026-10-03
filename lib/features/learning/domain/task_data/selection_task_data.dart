@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 
 class SelectionTaskData<TOption> extends TaskData {
@@ -8,6 +9,7 @@ class SelectionTaskData<TOption> extends TaskData {
     this.correctAnswerCount = 1,
     required this.wrongAnswerCount,
     this.requiresConfirmation = false,
+    this.buttonConfig,
   });
 
   final List<TOption> correctAnswers;
@@ -17,4 +19,6 @@ class SelectionTaskData<TOption> extends TaskData {
   final int wrongAnswerCount;
 
   final bool requiresConfirmation;
+
+  final SelectionButtonConfig? buttonConfig;
 }

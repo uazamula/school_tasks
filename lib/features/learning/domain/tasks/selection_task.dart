@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
@@ -11,6 +12,7 @@ class SelectionTask<TOption, TAnswer, TSolution>
     required this.options,
     required bool isMultiple,
     required bool requiresConfirmation,
+    this.buttonConfig,
   }) : super(
          interaction: SelectionInteraction(
            isMultiple: isMultiple,
@@ -19,6 +21,7 @@ class SelectionTask<TOption, TAnswer, TSolution>
        );
 
   final List<TOption> options;
+  final SelectionButtonConfig? buttonConfig;
 
   @override
   TaskResult<TAnswer, TSolution> checkAnswer(TAnswer answer) {

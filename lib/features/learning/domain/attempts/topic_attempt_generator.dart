@@ -129,6 +129,7 @@ class TopicAttemptGenerator {
           ),
           isMultiple: false,
           requiresConfirmation: data.requiresConfirmation,
+          buttonConfig: data.buttonConfig,
         ),
       );
     }
@@ -143,6 +144,7 @@ class TopicAttemptGenerator {
         ),
         isMultiple: true,
         requiresConfirmation: false,
+        buttonConfig: data.buttonConfig,
       ),
     );
   }
