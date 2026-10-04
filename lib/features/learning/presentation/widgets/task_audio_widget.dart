@@ -11,9 +11,11 @@ class TaskAudioWidget extends StatefulWidget {
     this.interactive = true,
     this.child,
     this.showIcon = true,
+    this.onCompleted,
   });
 
   final AudioContent content;
+  final VoidCallback? onCompleted;
 
   /// Керує відтворенням ззовні.
   ///
@@ -65,6 +67,10 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
       setState(() {
         _playerState = state;
       });
+
+      if (state == PlayerState.completed) {
+        widget.onCompleted?.call();
+      }
     });
   }
 

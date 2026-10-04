@@ -64,11 +64,38 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
   void _onOptionSelected(TOption option) {
     if (_isAnswered) return;
+
     if (option is AudioLinkedContent) {
       setState(() {
+        if (_activeAudioOption == option) {
+          _activeAudioOption = null;
+          _selectedOptions.remove(option);
+          return;
+        }
+
         _activeAudioOption = option;
+
+        if (!_isMultiple) {
+          _selectedOptions
+            ..clear()
+            ..add(option);
+        } else if (_selectedOptions.contains(option)) {
+          _selectedOptions.remove(option);
+        } else {
+          _selectedOptions.add(option);
+        }
       });
-    } else if (_activeAudioOption != null) {
+
+      // Для single choice без підтвердження
+      // відповідь перевіряємо після завершення аудіо.
+      if (!_isMultiple && !_requiresConfirmation) {
+        return;
+      }
+
+      return;
+    }
+
+    if (_activeAudioOption != null) {
       setState(() {
         _activeAudioOption = null;
       });
@@ -101,6 +128,20 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         _selectedOptions.add(option);
       }
     });
+  }
+
+  void _onLinkedAudioCompleted(AudioLinkedContent option) {
+    if (_isAnswered) return;
+
+    if (_activeAudioOption != option) return;
+
+    setState(() {
+      _activeAudioOption = null;
+    });
+
+    final answer = option as TAnswer;
+
+    widget.onTaskAnswered(widget.task.checkAnswer(answer));
   }
 
   void _confirmSelection() {
@@ -209,6 +250,9 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         isActive: _activeAudioOption == option,
         interactive: false,
         showIcon: false,
+        onCompleted: !_isMultiple && !_requiresConfirmation
+            ? () => _onLinkedAudioCompleted(option)
+            : null,
         child: answerButton,
       );
     }
@@ -280,15 +324,28 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     );
   }
 
+  bool _isVisualOption(TOption option) {
+    if (option is ImageContent || option is EmojiContent) {
+      return true;
+    }
+
+    if (option is AudioLinkedContent) {
+      return option.content is ImageContent || option.content is EmojiContent;
+    }
+
+    return false;
+  }
+
   Widget _buildOptions() {
     final options = widget.task.options;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         const spacing = AppSpacing.md;
+
         final isVisualOptions =
             options.isNotEmpty &&
-            (options.first is ImageContent || options.first is EmojiContent);
+            options.every((option) => _isVisualOption(option));
 
         if (!isVisualOptions) {
           return Column(
