@@ -9,11 +9,13 @@ class TaskAudioWidget extends StatefulWidget {
     this.isActive = false,
     this.iconColor,
     this.interactive = true,
+    this.child,
+    this.showIcon = true,
   });
 
   final AudioContent content;
 
-  /// Використовується AudioAnswerButton.
+  /// Керує відтворенням ззовні.
   ///
   /// true  → аудіо повинно відтворюватися.
   /// false → аудіо повинно бути зупинене.
@@ -21,11 +23,25 @@ class TaskAudioWidget extends StatefulWidget {
 
   final Color? iconColor;
 
-  /// У prompt аудіо є самостійною кнопкою.
-  ///
-  /// В AudioAnswerButton false, тому що всю взаємодію
-  /// бере на себе сама AudioAnswerButton.
+  /// true  → TaskAudioWidget сам реагує на натискання.
+  /// false → відтворення контролюється через [isActive].
   final bool interactive;
+
+  /// Необов'язковий вміст, який потрібно зробити аудіо-активним.
+  ///
+  /// Наприклад:
+  /// Text(...)
+  /// Image.asset(...)
+  /// ChoiceAnswerButton(...)
+  ///
+  /// Якщо [child] не заданий, відображається стандартна кнопка
+  /// з іконкою відтворення/зупинки.
+  final Widget? child;
+
+  /// Чи показувати стандартну аудіо-іконку.
+  ///
+  /// Для AudioLinkedContent буде false.
+  final bool showIcon;
 
   @override
   State<TaskAudioWidget> createState() => _TaskAudioWidgetState();
@@ -108,10 +124,8 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
 
     switch (_playerState) {
       case PlayerState.playing:
-        await _player.stop();
-
       case PlayerState.paused:
-        await _player.resume();
+        await _player.stop();
 
       case PlayerState.stopped:
       case PlayerState.completed:
@@ -179,6 +193,33 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
   @override
   Widget build(BuildContext context) {
     final isPlaying = _playerState == PlayerState.playing;
+
+    if (widget.child != null) {
+      final child = widget.child!;
+
+      if (!widget.interactive) {
+        return child;
+      }
+
+      final colorScheme = Theme.of(context).colorScheme;
+
+      return GestureDetector(
+        onTap: _resolveAudioPath() == null ? null : _togglePlayback,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: isPlaying ? colorScheme.primaryContainer : null,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: child,
+        ),
+      );
+    }
+
+    if (!widget.showIcon) {
+      return const SizedBox.shrink();
+    }
 
     final iconColor =
         widget.iconColor ?? Theme.of(context).colorScheme.onSurface;

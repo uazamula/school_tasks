@@ -18,6 +18,8 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 
+import '../fixed_task_data/fixed_data_audio.dart';
+
 abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
@@ -30,7 +32,7 @@ abstract final class Tests {
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
-      ...GeometryShapesData.shapes,
+      // ...GeometryShapesData.shapes,
       // ...CodingTasks.codingForTest,
       // ...CodingTasks.codingTasksSel,
       ...matchingTasks,
@@ -38,7 +40,9 @@ abstract final class Tests {
       // ...matchingTasks,
       ...positionSelectionTasks,
       ...FractionData.fractions,
+      ...audioLinkedSelectionDemo,
       // ...roots,
+      // ...audioLinkedPromptDemo,
       // ...AdditionTaskData.within10,
       // ...rational,
       // ...MultiplicationTaskData.multiplicationTable,
@@ -61,11 +65,11 @@ abstract final class Tests {
     ),
     layout: TopicLayout(
       promptFlex: 1,
-      interactionFlex: 2,
-      prompt: PromptLayout(scrollable: false),
+      interactionFlex: 1,
+      prompt: PromptLayout(scrollable: true),
       interaction: InteractionLayout(scrollable: false),
     ),
     progressionMode: TopicProgressionMode.automaticWithFeedback,
-    feedbackDuration: Duration(milliseconds: 1500),
+    feedbackDuration: Duration(milliseconds: 300),
   );
 }

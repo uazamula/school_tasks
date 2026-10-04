@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
@@ -11,6 +12,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/audio_answer
 import 'package:school_tasks/features/learning/presentation/widgets/selection/choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection/multi_choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection/visual_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
 class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
@@ -37,7 +39,7 @@ class SelectionTaskWidget<TOption, TAnswer, TSolution> extends StatefulWidget {
 class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     extends State<SelectionTaskWidget<TOption, TAnswer, TSolution>> {
   final Set<TOption> _selectedOptions = {};
-  AudioContent? _activeAudioOption;
+  TaskContent? _activeAudioOption;
 
   SelectionInteraction get _interaction =>
       widget.task.interaction as SelectionInteraction;
@@ -62,9 +64,18 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
 
   void _onOptionSelected(TOption option) {
     if (_isAnswered) return;
+    if (option is AudioLinkedContent) {
+      setState(() {
+        _activeAudioOption = option;
+      });
+    } else if (_activeAudioOption != null) {
+      setState(() {
+        _activeAudioOption = null;
+      });
+    }
 
     if (option is AudioContent) {
-      _onAudioOptionSelected(option);
+      _onAudioOptionSelected(option as TaskContent);
       return;
     }
 
@@ -147,6 +158,61 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     VoidCallback? onPressed, {
     double? imageSize,
   }) {
+    if (option is AudioLinkedContent) {
+      final linkedContent = option.content;
+
+      Widget answerButton;
+
+      if (linkedContent is ImageContent) {
+        answerButton = VisualAnswerButton(
+          state: state,
+          isSelected: isSelected,
+          onPressed: onPressed,
+          size: imageSize ?? 160,
+          child: Image.asset(linkedContent.imagePath, fit: BoxFit.contain),
+        );
+      } else if (linkedContent is EmojiContent) {
+        answerButton = VisualAnswerButton(
+          state: state,
+          isSelected: isSelected,
+          onPressed: onPressed,
+          size: imageSize ?? 160,
+          child: Text(
+            linkedContent.emoji,
+            style: const TextStyle(fontSize: 300),
+          ),
+        );
+      } else {
+        final answer = linkedContent.toString();
+
+        if (_isMultiple) {
+          answerButton = MultiChoiceAnswerButton(
+            answer: answer,
+            state: state,
+            isSelected: isSelected,
+            onPressed: onPressed,
+            buttonConfig: widget.task.buttonConfig,
+          );
+        } else {
+          answerButton = ChoiceAnswerButton(
+            answer: answer,
+            state: state,
+            isSelected: isSelected,
+            onPressed: onPressed,
+            buttonConfig: widget.task.buttonConfig,
+          );
+        }
+      }
+
+      return TaskAudioWidget(
+        content: option.audio,
+        isActive: _activeAudioOption == option,
+        interactive: false,
+        showIcon: false,
+        child: answerButton,
+      );
+    }
+
     if (option is ImageContent) {
       return VisualAnswerButton(
         state: state,
@@ -280,7 +346,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     );
   }
 
-  void _onAudioOptionSelected(AudioContent option) {
+  void _onAudioOptionSelected(TaskContent option) {
     final typedOption = option as TOption;
 
     setState(() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
@@ -73,7 +74,17 @@ class TaskPromptWidget extends StatelessWidget {
   }
 
   bool _isVisual(TaskContent content) {
-    return content is ImageContent || content is GridContent;
+    if (content is ImageContent ||
+        content is GridContent ||
+        content is EmojiContent) {
+      return true;
+    }
+
+    if (content is AudioLinkedContent) {
+      return _isVisual(content.content);
+    }
+
+    return false;
   }
 
   Widget _buildNonVisualContent(
@@ -138,6 +149,20 @@ class TaskPromptWidget extends StatelessWidget {
       return TaskAudioWidget(content: content);
     }
 
+    if (content is AudioLinkedContent) {
+      return TaskAudioWidget(
+        content: content.audio,
+        interactive: true,
+        showIcon: false,
+        child: _buildContent(
+          context,
+          content.content,
+          textStyle,
+          fullWidthText: fullWidthText,
+        ),
+      );
+    }
+
     if (content is ImageContent) {
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: double.infinity),
@@ -154,6 +179,14 @@ class TaskPromptWidget extends StatelessWidget {
 
     if (content is GridContent) {
       return _buildGrid(content);
+    }
+
+    if (content is EmojiContent) {
+      return Text(
+        content.emoji,
+        textAlign: TextAlign.center,
+        style: textStyle?.copyWith(fontSize: 64),
+      );
     }
 
     return const SizedBox.shrink();
