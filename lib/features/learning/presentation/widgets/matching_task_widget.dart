@@ -102,6 +102,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
       selectedIndex: _selectedLeftIndex,
       isLeft: true,
       onItemTap: _selectLeft,
+      buttonConfig: widget.task.buttonConfig,
     );
   }
 
@@ -113,6 +114,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
       selectedIndex: _selectedRightIndex,
       isLeft: false,
       onItemTap: _selectRight,
+      buttonConfig: widget.task.buttonConfig,
     );
   }
 

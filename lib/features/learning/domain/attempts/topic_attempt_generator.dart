@@ -196,7 +196,11 @@ class TopicAttemptGenerator {
     );
 
     return AttemptTask<MatchingAnswer, List<MatchingPair>>(
-      task: MatchingTask(prompt: data.prompt, pairs: pairs),
+      task: MatchingTask(
+        prompt: data.prompt,
+        pairs: pairs,
+        buttonConfig: data.buttonConfig,
+      ),
     );
   }
 

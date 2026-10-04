@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
@@ -8,7 +9,7 @@ import 'package:school_tasks/features/learning/domain/tasks/interactions/matchin
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
 class MatchingTask extends LearningTask<MatchingAnswer, List<MatchingPair>> {
-  MatchingTask({required super.prompt, required this.pairs})
+  MatchingTask({required super.prompt, required this.pairs, this.buttonConfig})
     : super(
         interaction: const MatchingInteraction(),
         solution: Solution<MatchingAnswer, List<MatchingPair>>(
@@ -16,6 +17,8 @@ class MatchingTask extends LearningTask<MatchingAnswer, List<MatchingPair>> {
           evaluator: const MatchingEvaluator(),
         ),
       );
+
+  final MatchingButtonConfig? buttonConfig;
 
   /// Пари, відібрані для конкретного завдання.
   final List<MatchingPair> pairs;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/matching/matching_content_widget.dart';
 
@@ -10,18 +11,20 @@ class MatchingItemWidget extends StatelessWidget {
     required this.content,
     required this.isSelected,
     required this.onTap,
+    this.buttonConfig,
   });
-
-  static const double width = 160;
-  static const double height = 72;
 
   final TaskContent content;
   final bool isSelected;
   final VoidCallback onTap;
+  final MatchingButtonConfig? buttonConfig;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final width = buttonConfig?.buttonWidth ?? 160;
+    final height = buttonConfig?.buttonHeight ?? 72;
 
     return SizedBox(
       width: width,
@@ -47,11 +50,20 @@ class MatchingItemWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: MatchingContentWidget(
-                  content: content,
-                  isActive: isSelected,
+              child: ClipRect(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width: width - AppSpacing.sm * 2,
+                    child: MatchingContentWidget(
+                      content: content,
+                      isActive: isSelected,
+                      textStyle: TextStyle(
+                        fontSize: buttonConfig?.fontSize ?? 20,
+                      ),
+                      textScaler: buttonConfig?.textScaler,
+                    ),
+                  ),
                 ),
               ),
             ),

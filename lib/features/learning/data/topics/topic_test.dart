@@ -24,10 +24,10 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 0,
+      LearningTaskType.matching: 2,
       LearningTaskType.positionSelection: 0,
       LearningTaskType.input: 0,
-      LearningTaskType.selection: 2,
+      LearningTaskType.selection: 0,
       LearningTaskType.fraction: 0,
     },
     dataSource: FixedTaskDataSource([

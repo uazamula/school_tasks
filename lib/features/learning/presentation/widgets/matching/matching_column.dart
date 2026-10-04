@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/matching/matching_item_widget.dart';
 
@@ -13,6 +14,7 @@ class MatchingColumn extends StatelessWidget {
     required this.selectedIndex,
     required this.isLeft,
     required this.onItemTap,
+    this.buttonConfig,
   });
 
   final List<MatchingPair> pairs;
@@ -21,6 +23,7 @@ class MatchingColumn extends StatelessWidget {
   final int? selectedIndex;
   final bool isLeft;
   final ValueChanged<int> onItemTap;
+  final MatchingButtonConfig? buttonConfig;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,9 @@ class MatchingColumn extends StatelessWidget {
       children: [
         for (final index in order)
           Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            padding: EdgeInsets.only(
+              bottom: buttonConfig?.spacing ?? AppSpacing.md,
+            ),
             child: Visibility(
               visible: !completedPairIndices.contains(index),
               maintainSize: true,
@@ -39,6 +44,7 @@ class MatchingColumn extends StatelessWidget {
                 content: isLeft ? pairs[index].left : pairs[index].right,
                 isSelected: selectedIndex == index,
                 onTap: () => onItemTap(index),
+                buttonConfig: buttonConfig,
               ),
             ),
           ),

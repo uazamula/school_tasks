@@ -10,9 +10,14 @@ class MatchingContentWidget extends StatelessWidget {
     super.key,
     required this.content,
     this.isActive = false,
+    this.textStyle,
+    this.textScaler,
   });
+
   final TaskContent content;
   final bool isActive;
+  final TextStyle? textStyle;
+  final TextScaler? textScaler;
 
   @override
   Widget build(BuildContext context) {
@@ -27,21 +32,27 @@ class MatchingContentWidget extends StatelessWidget {
         child: MatchingContentWidget(
           content: linkedContent.content,
           isActive: isActive,
+          textStyle: textStyle,
+          textScaler: textScaler,
         ),
       );
     }
+
     if (content is TextContent) {
       return Text(
         (content as TextContent).text,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 20),
+        softWrap: true,
+        style: textStyle ?? const TextStyle(fontSize: 20),
+        textScaler: textScaler,
       );
     }
 
     if (content is EmojiContent) {
       return Text(
         (content as EmojiContent).emoji,
-        style: const TextStyle(fontSize: 50),
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 80),
       );
     }
 
@@ -75,7 +86,11 @@ class MatchingContentWidget extends StatelessWidget {
         ),
         itemCount: grid.rows * grid.columns,
         itemBuilder: (context, index) {
-          return MatchingContentWidget(content: grid.item);
+          return MatchingContentWidget(
+            content: grid.item,
+            textStyle: textStyle,
+            textScaler: textScaler,
+          );
         },
       );
     }

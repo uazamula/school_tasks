@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 
@@ -6,6 +7,7 @@ class MatchingTaskData extends TaskData {
     required super.prompt,
     required this.pairs,
     required this.pairCount,
+    this.buttonConfig,
   });
 
   /// Банк усіх можливих пар.
@@ -13,4 +15,5 @@ class MatchingTaskData extends TaskData {
 
   /// Кількість пар, які потрібно відібрати для конкретного завдання.
   final int pairCount;
+  final MatchingButtonConfig? buttonConfig;
 }
