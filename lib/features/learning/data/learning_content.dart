@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/data/topics/topic_addition_digits.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_addition_within_10.dart';
+import 'package:school_tasks/features/learning/data/topics/topic_coding.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_fractions.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_mult_sel.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_multiplication_table.dart';
@@ -42,6 +43,18 @@ abstract final class LearningContent {
             LearningNode(
               id: 'shapes',
               titleKey: 'tests',
+              type: LearningNodeType.topic,
+            ),
+          ],
+        ),
+        LearningNode(
+          id: 'coding_section',
+          titleKey: 'Кодування даних',
+          type: LearningNodeType.section,
+          children: [
+            LearningNode(
+              id: 'coding1',
+              titleKey: 'Кодування даних',
               type: LearningNodeType.topic,
             ),
           ],
@@ -92,6 +105,7 @@ abstract final class LearningContent {
     'multiplication_table_selected': MultiplicationTableSelected.topic,
     'fractions': Fractions.topic,
     'percents': Percents.topic,
+    'coding1': TopicCoding.topicCoding,
   };
 
   static Topic getTopic(String topicId) {
