@@ -21,6 +21,8 @@ class MatchingTaskWidget extends StatefulWidget {
     required this.onCorrectPair,
     required this.feedbackEnabled,
     required this.onIncorrectPair,
+    required this.onIncorrectPairAttempt,
+    required this.onAccuracyChanged,
   });
 
   final MatchingTask task;
@@ -31,6 +33,8 @@ class MatchingTaskWidget extends StatefulWidget {
   final VoidCallback onCorrectPair;
   final bool feedbackEnabled;
   final VoidCallback onIncorrectPair;
+  final bool Function() onIncorrectPairAttempt;
+  final ValueChanged<AccuracyResult> onAccuracyChanged;
 
   @override
   State<MatchingTaskWidget> createState() => _MatchingTaskWidgetState();
@@ -174,8 +178,14 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     final pairIndex = _findCorrectPair(answer);
 
     if (pairIndex == null) {
+      final shouldFinish = widget.onIncorrectPairAttempt();
+
       if (widget.feedbackEnabled) {
         widget.onIncorrectPair();
+      }
+
+      if (shouldFinish) {
+        return;
       }
 
       _registerIncorrectAttempt(leftIndex);
@@ -186,6 +196,13 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
 
     _registerCorrectAttempt(pairIndex);
     _completedPairIndices.add(pairIndex);
+
+    widget.onAccuracyChanged(
+      AccuracyResult(
+        correct: _firstAttemptCorrectPairIndices.length,
+        total: widget.task.pairs.length,
+      ),
+    );
 
     // Одна правильно складена пара = один крок прогресу.
     // Правильність першої спроби на прогрес не впливає.

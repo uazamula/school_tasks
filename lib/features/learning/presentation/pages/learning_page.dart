@@ -11,6 +11,7 @@ import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_generator.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
@@ -53,6 +54,10 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   late final Stopwatch _stopwatch;
 
+  int _failureCount = 0;
+
+  int? get _failureLimit => _topic.automaticTermination?.failureLimit;
+
   AudioService get _audioService => ref.read(audioServiceProvider);
 
   Timer? _timer;
@@ -63,6 +68,18 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   bool get _feedbackEnabled {
     return _topic.progressionMode != TopicProgressionMode.automatic;
+  }
+
+  bool _registerFailure() {
+    final failureLimit = _failureLimit;
+
+    if (failureLimit == null) {
+      return false;
+    }
+
+    _failureCount++;
+
+    return _failureCount >= failureLimit;
   }
 
   @override
@@ -134,6 +151,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       onIncorrectPair: _onIncorrectPair,
       feedbackEnabled: _feedbackEnabled,
       interactionScrollable: _topic.layout.interaction.scrollable,
+      onIncorrectPairAttempt: _onIncorrectPairAttempt,
+      onMatchingAccuracyChanged: _onMatchingAccuracyChanged,
     );
 
     return AppScaffold(
@@ -207,6 +226,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     }
 
     _attempt.recordResult(result);
+
+    if (!result.isCorrect && _registerFailure()) {
+      _handleFailureLimitReached();
+      return;
+    }
 
     if (_feedbackEnabled && currentTask.task is! MatchingTask) {
       if (result.isCorrect) {
@@ -422,5 +446,54 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     }
 
     _audioService.playFailure();
+  }
+
+  bool _onIncorrectPairAttempt() {
+    if (!mounted || _isFinishing) {
+      return true;
+    }
+
+    if (_registerFailure()) {
+      _handleFailureLimitReached();
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<void> _handleFailureLimitReached() async {
+    if (_isFinishing) {
+      return;
+    }
+
+    _isFinishing = true;
+
+    _timer?.cancel();
+    _timer = null;
+
+    _autoAdvanceTimer?.cancel();
+    _autoAdvanceTimer = null;
+
+    _stopwatch.stop();
+
+    if (!mounted) {
+      return;
+    }
+
+    await _finishAttempt();
+  }
+
+  void _onMatchingAccuracyChanged(AccuracyResult accuracy) {
+    if (_isFinishing) {
+      return;
+    }
+
+    final currentTask = _attempt.currentTask;
+
+    if (currentTask.task is! MatchingTask || currentTask.isAnswered) {
+      return;
+    }
+
+    _attempt.updateMatchingAccuracy(_attempt.currentTaskIndex, accuracy);
   }
 }

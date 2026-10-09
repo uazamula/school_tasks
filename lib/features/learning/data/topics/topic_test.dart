@@ -6,6 +6,7 @@ import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_p
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_rational.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_roots.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/inf/coding/coding.dart';
+import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
@@ -24,8 +25,8 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 2,
-      LearningTaskType.positionSelection: 0,
+      LearningTaskType.matching: 1,
+      LearningTaskType.positionSelection: 2,
       LearningTaskType.input: 0,
       LearningTaskType.selection: 0,
       LearningTaskType.fraction: 0,
@@ -42,8 +43,8 @@ abstract final class Tests {
       ...FractionData.fractions,
       // ...audioLinkedSelectionDemo,
       // ...roots,
-      ...audioLinkedPromptDemo,
-      // ...AdditionTaskData.within10,
+      // ...audioLinkedPromptDemo,
+      ...AdditionTaskData.within10,
       // ...rational,
       // ...MultiplicationTaskData.multiplicationTable,
       // ...OperationsTaskData.simpleOperations,
@@ -60,16 +61,17 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(
-      minimumAccuracy: 0.5,
-      maximumTime: Duration(seconds: 300),
+      // minimumAccuracy: 0.1,
+      maximumTime: Duration(seconds: 20),
     ),
     layout: TopicLayout(
       promptFlex: 2,
-      interactionFlex: 6,
+      interactionFlex: 3,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
-    progressionMode: TopicProgressionMode.automaticWithFeedback,
+    progressionMode: TopicProgressionMode.manual,
     feedbackDuration: Duration(milliseconds: 300),
+    automaticTermination: AutomaticTerminationConfig(failureLimit: 2),
   );
 }

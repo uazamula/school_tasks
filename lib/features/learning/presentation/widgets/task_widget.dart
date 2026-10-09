@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/rational.dart';
@@ -31,6 +32,8 @@ class TaskWidget extends StatelessWidget {
     required this.onIncorrectPair,
     required this.feedbackEnabled,
     this.interactionScrollable = false,
+    required this.onIncorrectPairAttempt,
+    required this.onMatchingAccuracyChanged,
   });
 
   final LearningTask<dynamic, dynamic> task;
@@ -42,6 +45,8 @@ class TaskWidget extends StatelessWidget {
   final VoidCallback onCorrectPair;
   final VoidCallback onIncorrectPair;
   final bool feedbackEnabled;
+  final bool Function() onIncorrectPairAttempt;
+  final ValueChanged<AccuracyResult> onMatchingAccuracyChanged;
 
   Widget buildPrompt() {
     return TaskPromptWidget(prompt: task.prompt, scrollable: promptScrollable);
@@ -91,6 +96,8 @@ class TaskWidget extends StatelessWidget {
         onCorrectPair: onCorrectPair,
         onIncorrectPair: onIncorrectPair,
         feedbackEnabled: feedbackEnabled,
+        onIncorrectPairAttempt: onIncorrectPairAttempt,
+        onAccuracyChanged: onMatchingAccuracyChanged,
       );
     }
 

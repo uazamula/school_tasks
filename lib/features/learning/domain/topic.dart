@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
@@ -16,6 +17,7 @@ class Topic {
     this.layout = const TopicLayout.standard(),
     this.progressionMode = TopicProgressionMode.automatic,
     this.feedbackDuration = const Duration(milliseconds: 500),
+    this.automaticTermination,
   });
 
   final String id;
@@ -27,6 +29,7 @@ class Topic {
   final TopicLayout layout;
   final TopicProgressionMode progressionMode;
   final Duration feedbackDuration;
+  final AutomaticTerminationConfig? automaticTermination;
 
   int get totalTasks {
     return taskTypeCounts.values.fold(0, (sum, count) => sum + count);
