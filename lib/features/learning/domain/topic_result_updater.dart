@@ -1,4 +1,6 @@
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_snapshot.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_completion_reason.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 
 class TopicResultUpdater {
@@ -8,39 +10,41 @@ class TopicResultUpdater {
     required TopicAttemptResult attempt,
     required DateTime currentAt,
     TopicResult? previous,
+    TopicCompletionReason completionReason = TopicCompletionReason.completed,
   }) {
     final isPassed = attempt.evaluation?.isPassed ?? false;
 
-    // За нашою домовленістю незарахований результат завжди дорівнює 0.
+    // Незарахований результат завжди дорівнює 0.
     final currentScore = isPassed
         ? (attempt.evaluation?.finalScore ?? 0.0)
         : 0.0;
 
+    final currentSnapshot = TopicAttemptSnapshot(
+      completedAt: currentAt,
+      duration: attempt.duration,
+      completedTasks: attempt.completedTasks,
+      totalTasks: attempt.totalTasks,
+      accuracy: attempt.accuracy,
+      score: currentScore,
+      isPassed: isPassed,
+      completionReason: completionReason,
+      evaluation: attempt.evaluation,
+    );
+
     // Перша спроба.
     if (previous == null) {
       return TopicResult(
-        currentScore: currentScore,
-        currentIsPassed: isPassed,
-        currentAt: currentAt,
-        currentDuration: attempt.duration,
-        bestScore: isPassed ? currentScore : 0.0,
-        bestAt: isPassed ? currentAt : null,
-        bestDuration: isPassed ? attempt.duration : null,
+        currentAttempt: currentSnapshot,
+        bestAttempt: isPassed ? currentSnapshot : null,
       );
     }
 
-    // Нова спроба стає найкращою тільки якщо вона зарахована
-    // і має кращий результат, ніж попередній найкращий.
+    // Залишаємо попереднє правило визначення найкращого результату.
     final isNewBest = isPassed && currentScore > previous.bestScore;
 
     return TopicResult(
-      currentScore: currentScore,
-      currentIsPassed: isPassed,
-      currentAt: currentAt,
-      currentDuration: attempt.duration,
-      bestScore: isNewBest ? currentScore : previous.bestScore,
-      bestAt: isNewBest ? currentAt : previous.bestAt,
-      bestDuration: isNewBest ? attempt.duration : previous.bestDuration,
+      currentAttempt: currentSnapshot,
+      bestAttempt: isNewBest ? currentSnapshot : previous.bestAttempt,
     );
   }
 }

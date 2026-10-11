@@ -362,10 +362,10 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    await _finishAttempt();
+    await _finishAttempt(countdownExpired: true);
   }
 
-  Future<void> _finishAttempt() async {
+  Future<void> _finishAttempt({bool countdownExpired = false}) async {
     _autoAdvanceTimer?.cancel();
     _autoAdvanceTimer = null;
 
@@ -383,6 +383,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       topic: _topic,
       result: topicResult,
       elapsedTime: elapsedTime,
+      countdownExpired: countdownExpired,
     );
 
     final evaluatedResult = TopicAttemptResult(

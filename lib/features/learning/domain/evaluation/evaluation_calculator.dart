@@ -13,6 +13,7 @@ class EvaluationCalculator {
     required Topic topic,
     required TopicAttemptResult result,
     Duration? elapsedTime,
+    bool countdownExpired = false,
   }) {
     final criterionResults =
         <EvaluationCriterionType, CriterionEvaluationResult>{};
@@ -61,6 +62,7 @@ class EvaluationCalculator {
           topic: topic,
           result: result,
           elapsedTime: elapsedTime,
+          countdownExpired: countdownExpired,
         ),
       );
     }
@@ -90,6 +92,7 @@ class EvaluationCalculator {
       topic: topic,
       result: result,
       elapsedTime: elapsedTime,
+      countdownExpired: countdownExpired,
     );
 
     return EvaluationResult(
@@ -124,6 +127,7 @@ class EvaluationCalculator {
     required Topic topic,
     required TopicAttemptResult result,
     Duration? elapsedTime,
+    required bool countdownExpired,
   }) {
     final criteria = topic.passingCriteria;
 
@@ -142,6 +146,15 @@ class EvaluationCalculator {
     if (maximumTime != null &&
         elapsedTime != null &&
         elapsedTime > maximumTime) {
+      return false;
+    }
+
+    final countdown = topic.automaticTermination?.countdown;
+
+    if (countdownExpired &&
+        countdown != null &&
+        maximumTime != null &&
+        countdown == maximumTime) {
       return false;
     }
 

@@ -61,8 +61,8 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(
-      // minimumAccuracy: 0.1,
-      // maximumTime: Duration(seconds: 15),
+      // minimumAccuracy: 0.6,
+      // maximumTime: Duration(seconds: 5),
     ),
     layout: TopicLayout(
       promptFlex: 2,
@@ -74,7 +74,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 1,
-      countdown: Duration(seconds: 5),
+      countdown: Duration(seconds: 5, milliseconds: 0),
     ),
   );
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:school_tasks/core/extensions/context_extension.dart';
 
 import 'package:school_tasks/core/formatters/duration_formatter.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_snapshot.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
@@ -83,49 +85,29 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
               'Нижче наведено правила оцінювання.',
             )
           else ...[
-            if (!result.currentIsPassed) ...[
-              const Text(
-                'Остання спроба не зарахована',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: AppSpacing.md),
-            ],
-
-            Text(
-              'Поточний результат: '
-              '${scale.formatScore(result.currentScore)}',
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-
-            Text(
-              'Зараховано: '
-              '${result.currentIsPassed ? 'так' : 'ні'}',
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-
-            Text(
-              'Час: '
-              '${DurationFormatter.formatDetailed(context, result.currentDuration)} '
-              '${context.l10n.secondsShort}',
+            _buildAttemptSummary(
+              context,
+              title: 'Остання спроба',
+              snapshot: result.currentAttempt,
+              score: result.currentScore,
+              scale: scale,
             ),
 
             const SizedBox(height: AppSpacing.md),
 
-            Text(
-              'Найкращий результат: '
-              '${scale.formatScore(result.bestScore)}',
-            ),
-
-            if (result.bestDuration != null) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Час найкращого результату: '
-                '${DurationFormatter.formatDetailed(context, result.bestDuration!)} '
-                '${context.l10n.secondsShort}',
+            if (result.bestAttempt != null)
+              _buildAttemptSummary(
+                context,
+                title: 'Найкраща спроба',
+                snapshot: result.bestAttempt!,
+                score: result.bestScore,
+                scale: scale,
+              )
+            else
+              const Text(
+                'Зарахованих спроб, які встановили найкращий результат, '
+                'ще немає.',
               ),
-            ],
 
             const SizedBox(height: AppSpacing.md),
           ],
@@ -142,6 +124,42 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAttemptSummary(
+    BuildContext context, {
+    required String title,
+    required TopicAttemptSnapshot snapshot,
+    required double score,
+    required GradeScale scale,
+  }) {
+    final locale = Localizations.localeOf(context);
+    final dateFormatter = DateFormat.yMd(locale.toLanguageTag()).add_Hm();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: AppSpacing.xs),
+        Text('Дата: ${dateFormatter.format(snapshot.completedAt)}'),
+        Text('Результат: ${scale.formatScore(score)}'),
+        Text('Зараховано: ${snapshot.isPassed ? 'так' : 'ні'}'),
+        Text(
+          'Завдань виконано: '
+          '${snapshot.completedTasks} із ${snapshot.totalTasks}',
+        ),
+        Text(
+          'Точність: ${snapshot.accuracy.correct} '
+          'із ${snapshot.accuracy.total} '
+          '(${(snapshot.accuracy.value * 100).toStringAsFixed(1)}%)',
+        ),
+        Text(
+          'Тривалість: '
+          '${DurationFormatter.formatDetailed(context, snapshot.duration)} '
+          '${context.l10n.secondsShort}',
+        ),
+      ],
     );
   }
 
