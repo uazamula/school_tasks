@@ -25,7 +25,7 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 1,
+      LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 2,
       LearningTaskType.input: 0,
       LearningTaskType.selection: 0,
@@ -62,7 +62,7 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(
       // minimumAccuracy: 0.1,
-      maximumTime: Duration(seconds: 20),
+      // maximumTime: Duration(seconds: 15),
     ),
     layout: TopicLayout(
       promptFlex: 2,
@@ -70,8 +70,11 @@ abstract final class Tests {
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
     ),
-    progressionMode: TopicProgressionMode.manual,
+    progressionMode: TopicProgressionMode.automatic,
     feedbackDuration: Duration(milliseconds: 300),
-    automaticTermination: AutomaticTerminationConfig(failureLimit: 2),
+    automaticTermination: AutomaticTerminationConfig(
+      failureLimit: 1,
+      countdown: Duration(seconds: 5),
+    ),
   );
 }

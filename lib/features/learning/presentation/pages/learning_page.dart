@@ -96,9 +96,9 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         return;
       }
 
-      final maximumTime = _topic.passingCriteria?.maximumTime;
+      final countdown = _topic.automaticTermination?.countdown;
 
-      if (maximumTime != null && _stopwatch.elapsed >= maximumTime) {
+      if (countdown != null && _stopwatch.elapsed >= countdown) {
         _handleTimeExpired();
         return;
       }
@@ -179,7 +179,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                       progress: _completedProgressSteps,
                       totalSteps: _totalProgressSteps,
                       elapsed: _stopwatch.elapsed,
-                      maximumTime: _topic.passingCriteria?.maximumTime,
+                      maximumTime: _topic.automaticTermination?.countdown,
                     ),
                   ),
                 ),
@@ -371,7 +371,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     _stopwatch.stop();
 
-    final elapsedTime = _stopwatch.elapsed;
+    final elapsedTime =
+        _topic.automaticTermination?.countdown != null &&
+            _stopwatch.elapsed >= _topic.automaticTermination!.countdown!
+        ? _topic.automaticTermination!.countdown!
+        : _stopwatch.elapsed;
 
     final topicResult = _attempt.getResult(duration: elapsedTime);
 
