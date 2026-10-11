@@ -55,8 +55,11 @@ class TopicEvaluationDetails extends StatelessWidget {
 
     final minimumAccuracy = topic.passingCriteria?.minimumAccuracy;
     final maximumPassingTime = topic.passingCriteria?.maximumTime;
+    final maximumFailures = topic.passingCriteria?.maximumFailures;
 
-    if (minimumAccuracy != null || maximumPassingTime != null) {
+    if (minimumAccuracy != null ||
+        maximumPassingTime != null ||
+        maximumFailures != null) {
       children.add(const SizedBox(height: AppSpacing.md));
       children.add(
         const Text(
@@ -82,6 +85,10 @@ class TopicEvaluationDetails extends StatelessWidget {
             '${_formatDuration(context, maximumPassingTime)}',
           ),
         );
+      }
+
+      if (maximumFailures != null) {
+        children.add(Text('Максимальна кількість помилок: $maximumFailures'));
       }
     }
 
@@ -259,8 +266,11 @@ class TopicEvaluationDetails extends StatelessWidget {
 
     final minimumAccuracy = topic.passingCriteria?.minimumAccuracy;
     final maximumPassingTime = topic.passingCriteria?.maximumTime;
+    final maximumFailures = topic.passingCriteria?.maximumFailures;
 
-    if (minimumAccuracy == null && maximumPassingTime == null) {
+    if (minimumAccuracy == null &&
+        maximumPassingTime == null &&
+        maximumFailures == null) {
       children.add(const Text('Додаткових умов зарахування не налаштовано.'));
     }
 
@@ -285,6 +295,19 @@ class TopicEvaluationDetails extends StatelessWidget {
           label:
               'Максимальний час: '
               '${_formatDuration(context, maximumPassingTime)}',
+          passed: passed,
+        ),
+      );
+    }
+
+    if (maximumFailures != null) {
+      final passed = snapshot.failureCount < maximumFailures;
+
+      children.add(
+        _buildConditionResult(
+          label:
+              'Максимальна кількість помилок: $maximumFailures '
+              '(фактично: ${snapshot.failureCount})',
           passed: passed,
         ),
       );

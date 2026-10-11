@@ -1,5 +1,9 @@
 class PassingCriteria {
-  const PassingCriteria({this.minimumAccuracy, this.maximumTime});
+  const PassingCriteria({
+    this.minimumAccuracy,
+    this.maximumTime,
+    this.maximumFailures,
+  });
 
   /// Мінімальна частка правильних відповідей для зарахування теми.
   ///
@@ -10,4 +14,10 @@ class PassingCriteria {
   ///
   /// Якщо проходження триває довше, тема не зараховується.
   final Duration? maximumTime;
+
+  /// Максимальна кількість помилкових спроб, дозволених для зарахування.
+  ///
+  /// Якщо кількість помилок досягає цього значення,
+  /// тема не зараховується.
+  final int? maximumFailures;
 }

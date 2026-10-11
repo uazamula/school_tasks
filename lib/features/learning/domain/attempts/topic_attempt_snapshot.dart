@@ -14,6 +14,7 @@ class TopicAttemptSnapshot {
     required this.score,
     required this.isPassed,
     required this.completionReason,
+    this.failureCount = 0,
     this.evaluation,
   });
 
@@ -22,6 +23,7 @@ class TopicAttemptSnapshot {
   final int completedTasks;
   final int totalTasks;
   final AccuracyResult accuracy;
+  final int failureCount;
 
   /// Фінальна оцінка, яку зберігаємо для відображення результату.
   ///
@@ -43,6 +45,7 @@ class TopicAttemptSnapshot {
       'isPassed': isPassed,
       'completionReason': completionReason.name,
       'evaluation': _evaluationToJson(evaluation),
+      'failureCount': failureCount,
     };
   }
 
@@ -64,6 +67,7 @@ class TopicAttemptSnapshot {
         json['completionReason'] as String,
       ),
       evaluation: _evaluationFromJson(json['evaluation']),
+      failureCount: (json['failureCount'] as num?)?.toInt() ?? 0,
     );
   }
 

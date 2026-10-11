@@ -11,6 +11,7 @@ class TopicResultUpdater {
     required DateTime currentAt,
     TopicResult? previous,
     TopicCompletionReason completionReason = TopicCompletionReason.completed,
+    int failureCount = 0,
   }) {
     final isPassed = attempt.evaluation?.isPassed ?? false;
 
@@ -28,6 +29,7 @@ class TopicResultUpdater {
       score: currentScore,
       isPassed: isPassed,
       completionReason: completionReason,
+      failureCount: failureCount,
       evaluation: attempt.evaluation,
     );
 

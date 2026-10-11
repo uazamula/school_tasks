@@ -14,6 +14,7 @@ class EvaluationCalculator {
     required TopicAttemptResult result,
     Duration? elapsedTime,
     bool countdownExpired = false,
+    int failureCount = 0,
   }) {
     final criterionResults =
         <EvaluationCriterionType, CriterionEvaluationResult>{};
@@ -63,6 +64,7 @@ class EvaluationCalculator {
           result: result,
           elapsedTime: elapsedTime,
           countdownExpired: countdownExpired,
+          failureCount: failureCount,
         ),
       );
     }
@@ -93,6 +95,7 @@ class EvaluationCalculator {
       result: result,
       elapsedTime: elapsedTime,
       countdownExpired: countdownExpired,
+      failureCount: failureCount,
     );
 
     return EvaluationResult(
@@ -128,6 +131,7 @@ class EvaluationCalculator {
     required TopicAttemptResult result,
     Duration? elapsedTime,
     required bool countdownExpired,
+    required int failureCount,
   }) {
     final criteria = topic.passingCriteria;
 
@@ -138,6 +142,12 @@ class EvaluationCalculator {
     final minimumAccuracy = criteria.minimumAccuracy;
 
     if (minimumAccuracy != null && result.score < minimumAccuracy) {
+      return false;
+    }
+
+    final maximumFailures = criteria.maximumFailures;
+
+    if (maximumFailures != null && failureCount >= maximumFailures) {
       return false;
     }
 

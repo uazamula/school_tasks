@@ -11,6 +11,7 @@ import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_generator.dart';
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_completion_reason.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
@@ -71,13 +72,13 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   }
 
   bool _registerFailure() {
+    _failureCount++;
+
     final failureLimit = _failureLimit;
 
     if (failureLimit == null) {
       return false;
     }
-
-    _failureCount++;
 
     return _failureCount >= failureLimit;
   }
@@ -362,10 +363,16 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    await _finishAttempt(countdownExpired: true);
+    await _finishAttempt(
+      countdownExpired: true,
+      completionReason: TopicCompletionReason.timeExpired,
+    );
   }
 
-  Future<void> _finishAttempt({bool countdownExpired = false}) async {
+  Future<void> _finishAttempt({
+    bool countdownExpired = false,
+    TopicCompletionReason completionReason = TopicCompletionReason.completed,
+  }) async {
     _autoAdvanceTimer?.cancel();
     _autoAdvanceTimer = null;
 
@@ -384,6 +391,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       result: topicResult,
       elapsedTime: elapsedTime,
       countdownExpired: countdownExpired,
+      failureCount: _failureCount,
     );
 
     final evaluatedResult = TopicAttemptResult(
@@ -402,6 +410,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       attempt: evaluatedResult,
       currentAt: DateTime.now(),
       previous: previousResult,
+      completionReason: completionReason,
+      failureCount: _failureCount,
     );
 
     final preferences = await ref.read(appPreferencesProvider.future);
@@ -485,7 +495,9 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    await _finishAttempt();
+    await _finishAttempt(
+      completionReason: TopicCompletionReason.failureLimitReached,
+    );
   }
 
   void _onMatchingAccuracyChanged(AccuracyResult accuracy) {
