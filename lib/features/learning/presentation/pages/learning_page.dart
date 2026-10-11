@@ -19,6 +19,7 @@ import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/failure_limit_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_progress_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
@@ -184,6 +185,13 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                     ),
                   ),
                 ),
+                if (_failureLimit != null) ...[
+                  const SizedBox(width: 12),
+                  FailureLimitIndicator(
+                    failureLimit: _failureLimit!,
+                    failureCount: _failureCount,
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 16),
