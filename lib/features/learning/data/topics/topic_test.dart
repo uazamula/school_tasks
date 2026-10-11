@@ -26,7 +26,7 @@ abstract final class Tests {
     id: 'shapes',
     taskTypeCounts: {
       LearningTaskType.matching: 0,
-      LearningTaskType.positionSelection: 3,
+      LearningTaskType.positionSelection: 1,
       LearningTaskType.input: 0,
       LearningTaskType.selection: 0,
       LearningTaskType.fraction: 0,
@@ -61,9 +61,9 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(
-      minimumAccuracy: 0.6,
+      // minimumAccuracy: 0.6,
       maximumTime: Duration(seconds: 15),
-      maximumFailures: 1,
+      // maximumFailures: 1,
     ),
     layout: TopicLayout(
       promptFlex: 2,
@@ -74,7 +74,7 @@ abstract final class Tests {
     progressionMode: TopicProgressionMode.automatic,
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
-      failureLimit: 2,
+      // failureLimit: 2,
       countdown: Duration(seconds: 15, milliseconds: 0),
     ),
   );

@@ -270,6 +270,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   void _moveAutomatically() {
     if (_attempt.isFinished) {
+      _stopwatch.stop();
+
       _autoAdvanceTimer?.cancel();
 
       _autoAdvanceTimer = Timer(

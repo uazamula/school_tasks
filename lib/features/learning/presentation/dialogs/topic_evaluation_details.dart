@@ -288,8 +288,10 @@ class TopicEvaluationDetails extends StatelessWidget {
     }
 
     if (maximumPassingTime != null) {
-      final passed = snapshot.duration <= maximumPassingTime;
-
+      final passed =
+          snapshot.duration <= maximumPassingTime &&
+          !(snapshot.completionReason == TopicCompletionReason.timeExpired &&
+              snapshot.duration >= maximumPassingTime);
       children.add(
         _buildConditionResult(
           label:
