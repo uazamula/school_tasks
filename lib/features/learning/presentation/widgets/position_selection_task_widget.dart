@@ -15,6 +15,7 @@ class PositionSelectionTaskWidget extends StatefulWidget {
     required this.result,
     required this.onTaskAnswered,
     this.interactionScrollable = false,
+    required this.feedbackEnabled,
   });
 
   final PositionSelectionTask task;
@@ -22,6 +23,7 @@ class PositionSelectionTaskWidget extends StatefulWidget {
   final ValueChanged<TaskResult<List<GridPosition>, List<GridPosition>>>
   onTaskAnswered;
   final bool interactionScrollable;
+  final bool feedbackEnabled;
 
   @override
   State<PositionSelectionTaskWidget> createState() =>
@@ -204,6 +206,10 @@ class _PositionSelectionTaskWidgetState
   }
 
   TaskAnswerState _getPositionState(GridPosition position) {
+    if (!widget.feedbackEnabled) {
+      return TaskAnswerState.neutral;
+    }
+
     final result = widget.result;
 
     if (result == null) {

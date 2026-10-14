@@ -17,12 +17,14 @@ class InputTaskWidget extends StatefulWidget {
     required this.result,
     required this.interactionScrollable,
     required this.onTaskAnswered,
+    required this.feedbackEnabled,
   });
 
   final InputTask task;
   final TaskResult<Rational, Rational>? result;
   final bool interactionScrollable;
   final ValueChanged<TaskResult<Rational, Rational>> onTaskAnswered;
+  final bool feedbackEnabled;
 
   @override
   State<InputTaskWidget> createState() => _InputTaskWidgetState();
@@ -181,7 +183,12 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
             color: _getInputBackgroundColor(colorScheme),
             border: Border.all(
               color: _getInputBorderColor(colorScheme),
-              width: _isAnswered && widget.result!.isCorrect ? 3 : 2,
+              width:
+                  _isAnswered &&
+                      widget.feedbackEnabled &&
+                      widget.result!.isCorrect
+                  ? 3
+                  : 2,
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -226,11 +233,15 @@ class _InputTaskWidgetState extends State<InputTaskWidget> {
       return _input.isEmpty ? colorScheme.outline : colorScheme.primary;
     }
 
+    if (!widget.feedbackEnabled) {
+      return colorScheme.outline;
+    }
+
     return widget.result!.isCorrect ? Colors.green : colorScheme.error;
   }
 
   Color _getInputBackgroundColor(ColorScheme colorScheme) {
-    if (!_isAnswered) {
+    if (!_isAnswered || !widget.feedbackEnabled) {
       return colorScheme.surfaceContainerHighest;
     }
 

@@ -72,6 +72,7 @@ class TaskWidget extends StatelessWidget {
           result: result as TaskResult<Set<int>, int>?,
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
+          feedbackEnabled: feedbackEnabled,
         ),
       );
     }
@@ -83,6 +84,7 @@ class TaskWidget extends StatelessWidget {
           result: result as TaskResult<List<GridPosition>, List<GridPosition>>?,
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
+          feedbackEnabled: feedbackEnabled,
         ),
       );
     }
@@ -108,6 +110,7 @@ class TaskWidget extends StatelessWidget {
           result: result as TaskResult<Rational, Rational>?,
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
+          feedbackEnabled: feedbackEnabled,
         ),
       );
     }

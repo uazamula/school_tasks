@@ -27,9 +27,9 @@ abstract final class Tests {
     taskTypeCounts: {
       LearningTaskType.matching: 0,
       LearningTaskType.positionSelection: 1,
-      LearningTaskType.input: 0,
-      LearningTaskType.selection: 0,
-      LearningTaskType.fraction: 0,
+      LearningTaskType.input: 1,
+      LearningTaskType.selection: 1,
+      LearningTaskType.fraction: 1,
     },
     dataSource: FixedTaskDataSource([
       // ...GeometryShapesData.simpleShapes,
@@ -62,7 +62,7 @@ abstract final class Tests {
     ),
     passingCriteria: PassingCriteria(
       // minimumAccuracy: 0.6,
-      maximumTime: Duration(seconds: 15),
+      // maximumTime: Duration(seconds: 15),
       // maximumFailures: 1,
     ),
     layout: TopicLayout(
@@ -75,7 +75,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
       // failureLimit: 2,
-      countdown: Duration(seconds: 15, milliseconds: 0),
+      countdown: Duration(seconds: 25, milliseconds: 0),
     ),
   );
 }

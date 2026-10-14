@@ -14,12 +14,14 @@ class FractionTaskWidget extends StatefulWidget {
     required this.result,
     required this.onTaskAnswered,
     this.interactionScrollable = false,
+    required this.feedbackEnabled,
   });
 
   final FractionTask task;
   final TaskResult<Set<int>, int>? result;
   final ValueChanged<TaskResult<Set<int>, int>> onTaskAnswered;
   final bool interactionScrollable;
+  final bool feedbackEnabled;
 
   @override
   State<FractionTaskWidget> createState() => _FractionTaskWidgetState();
@@ -184,6 +186,10 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
   }
 
   TaskAnswerState _getPartState(int index) {
+    if (!widget.feedbackEnabled) {
+      return TaskAnswerState.neutral;
+    }
+
     final result = widget.result;
 
     if (result == null || !result.isAnswered) {
