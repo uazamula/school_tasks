@@ -26,11 +26,19 @@ class MatchingItemWidget extends StatelessWidget {
     final width = buttonConfig?.buttonWidth ?? 160;
     final height = buttonConfig?.buttonHeight ?? 72;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? buttonConfig?.darkBackgroundColor
+        : buttonConfig?.lightBackgroundColor;
+
     return SizedBox(
       width: width,
       height: height,
       child: Material(
-        color: isSelected ? colorScheme.primaryContainer : colorScheme.surface,
+        color: isSelected
+            ? colorScheme.primaryContainer
+            : backgroundColor ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onTap,

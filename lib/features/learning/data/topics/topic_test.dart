@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:school_tasks/features/learning/data/data_words/word_mathing_demo_data.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_addition.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
@@ -21,6 +23,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
+import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
@@ -46,8 +49,16 @@ abstract final class Tests {
         words: wordMatchingDemoWords,
         concepts: wordMatchingDemoConcepts,
         language: Language.en,
-        taskCount: 1,
-        pairCount: 4,
+        taskCount: 2,
+        pairCount: 5,
+        buttonConfig: MatchingButtonConfig(
+          fontSize: 20,
+          buttonWidth: 160,
+          buttonHeight: 120,
+          spacing: 8,
+          lightBackgroundColor: const Color(0xFFE0E0E0),
+          darkBackgroundColor: const Color(0xFF424242),
+        ),
       ),
     ]),
     // GeneratedTaskDataSource([
@@ -117,7 +128,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
       // failureLimit: 2,
-      countdown: Duration(seconds: 25, milliseconds: 0),
+      // countdown: Duration(seconds: 25, milliseconds: 0),
     ),
   );
 }
