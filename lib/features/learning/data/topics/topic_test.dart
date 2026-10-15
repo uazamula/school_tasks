@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/data/data_words/word_mathing_demo_data.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_addition.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
@@ -6,6 +7,12 @@ import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_p
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_rational.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_roots.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/inf/coding/coding.dart';
+import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_generator_config.dart';
+import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_operation.dart';
+import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_task_data_generator.dart';
+import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
+import 'package:school_tasks/features/learning/data/generation/word_matching_task_data_generation.dart';
+import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
@@ -15,9 +22,11 @@ import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dar
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 
 import '../fixed_task_data/fixed_data_audio.dart';
 
@@ -25,31 +34,64 @@ abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
     taskTypeCounts: {
-      LearningTaskType.matching: 0,
+      LearningTaskType.matching: 1,
       LearningTaskType.positionSelection: 1,
-      LearningTaskType.input: 1,
-      LearningTaskType.selection: 1,
-      LearningTaskType.fraction: 1,
+      LearningTaskType.input: 0,
+      LearningTaskType.selection: 0,
+      LearningTaskType.fraction: 0,
     },
-    dataSource: FixedTaskDataSource([
-      // ...GeometryShapesData.simpleShapes,
-      // ...GeometryShapesData.shapes,
-      // ...CodingTasks.codingForTest,
-      // ...CodingTasks.codingTasksSel,
-      // ...matchingTasks,
-      // ...additionWithSound,
-      ...matchingTasks,
-      ...positionSelectionTasks,
-      ...FractionData.fractions,
-      // ...audioLinkedSelectionDemo,
-      // ...roots,
-      // ...audioLinkedPromptDemo,
-      ...AdditionTaskData.within10,
-      // ...rational,
-      // ...MultiplicationTaskData.multiplicationTable,
-      // ...OperationsTaskData.simpleOperations,
+    taskOrderMode: TaskOrderMode.deterministic,
+    dataSource: GeneratedTaskDataSource([
+      WordMatchingTaskDataGenerator(
+        words: wordMatchingDemoWords,
+        concepts: wordMatchingDemoConcepts,
+        language: Language.en,
+        taskCount: 1,
+        pairCount: 4,
+      ),
     ]),
+    // GeneratedTaskDataSource([
+    //   ArithmeticTaskDataGenerator(
+    //     operation: ArithmeticOperation.multiplication,
+    //     // imageForGrid: 'assets/images/tasks/square.png',
+    //     inputMode: null,
+    //     config: ArithmeticGeneratorConfig(
+    //       minA: 4,
+    //       maxA: 9,
+    //       minB: 1,
+    //       maxB: 9,
+    //       minimumResult: 7,
+    //       maximumResult: 40,
+    //       wrongAnswerMinimumResult: 4,
+    //       wrongAnswerMaximumResult: 29,
+    //       wrongAnswerStrategy: WrongAnswerStrategy.randomInRange,
+    //       wrongAnswerCount: 4,
+    //       divisibilityA: 2,
+    //       resultDivisibility: 3,
+    //       wrongAnswerDivisibility: 2,
+    //     ),
+    //   ),
+    // ]),
+    // FixedTaskDataSource([
+    // ...GeometryShapesData.simpleShapes,
+    // ...GeometryShapesData.shapes,
+    // ...CodingTasks.codingForTest,
+    // ...CodingTasks.codingTasksSel,
+    // ...matchingTasks,
+    // ...additionWithSound,
+    // ...matchingTasks,
+    // ...positionSelectionTasks,
+    // ...FractionData.fractions,
+    // ...audioLinkedSelectionDemo,
+    // ...roots,
+    // ...audioLinkedPromptDemo,
+    // ...AdditionTaskData.within10,
+    // ...rational,
+    // ...MultiplicationTaskData.multiplicationTable,
+    // ...OperationsTaskData.simpleOperations,
+    // ]),
     help: 'Тестування різних типів завдань',
+
     evaluation: EvaluationConfig(
       weights: {
         EvaluationCriterionType.accuracy: 1,

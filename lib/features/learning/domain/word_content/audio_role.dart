@@ -1,0 +1,1 @@
+enum AudioRole { soundEffect, ambientSound }

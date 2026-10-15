@@ -1,0 +1,1 @@
+enum TaskOrderMode { random, deterministic }

@@ -10,6 +10,7 @@ import 'package:school_tasks/features/learning/domain/task_data/input_task_data.
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/position_selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
@@ -25,6 +26,7 @@ import 'package:school_tasks/features/learning/domain/tasks/solutions/set_equals
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/tolerance_config.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 class TopicAttemptGenerator {
@@ -38,6 +40,13 @@ class TopicAttemptGenerator {
   final PredefinedAnswerSelector _answerSelector;
 
   TopicAttempt generate(Topic topic) {
+    if (topic.taskOrderMode == TaskOrderMode.deterministic) {
+      final data = topic.dataSource.getData();
+
+      final tasks = data.map(_createTaskFromData).toList();
+
+      return TopicAttempt(tasks: tasks);
+    }
     final taskTypes = <LearningTaskType>[];
 
     for (final entry in topic.taskTypeCounts.entries) {
@@ -221,5 +230,29 @@ class TopicAttemptGenerator {
         );
     }
     throw StateError('Unsupported ToleranceConfig: ${tolerance.runtimeType}');
+  }
+
+  AttemptTask<dynamic, dynamic> _createTaskFromData(TaskData data) {
+    if (data is SelectionTaskData<dynamic>) {
+      return _createSelectionTask(data);
+    }
+
+    if (data is InputTaskData) {
+      return AttemptTask<Rational, Rational>(task: _createInputTask(data));
+    }
+
+    if (data is FractionTaskData) {
+      return _createFractionTask(data);
+    }
+
+    if (data is PositionSelectionTaskData) {
+      return _createPositionSelectionTask(data);
+    }
+
+    if (data is MatchingTaskData) {
+      return _createMatchingTask(data);
+    }
+
+    throw StateError('Unsupported task data type: ${data.runtimeType}');
   }
 }
