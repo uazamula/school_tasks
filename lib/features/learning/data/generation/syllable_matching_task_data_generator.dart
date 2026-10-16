@@ -4,10 +4,13 @@ import 'package:school_tasks/features/learning/data/generation/task_data_generat
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
+import 'package:school_tasks/features/learning/domain/word_content/syllable_audio.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_concept.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_entry.dart';
@@ -18,6 +21,19 @@ import 'package:school_tasks/features/learning/domain/word_content/word_entry.da
 /// [syllablePattern]. If several syllables match, one is selected randomly.
 ///
 /// Different words may produce pairs with the same syllable.
+
+const String _pronunciationAudioDirectory = 'assets/audio/pronunciation/';
+
+String _resolveAudioPath(String audio) {
+  final value = audio.trim();
+
+  if (value.startsWith('assets/')) {
+    return value;
+  }
+
+  return '$_pronunciationAudioDirectory$value';
+}
+
 class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
   SyllableMatchingTaskDataGenerator({
     required List<WordEntry> words,
@@ -31,14 +47,22 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     this.prompt = const TaskPrompt(
       content: [TextContent('Зістав зображення зі складом')],
     ),
+    this.includeWordAudio = false,
+    this.includeSyllableAudio = false,
+    Map<String, String> syllableAudio = const {},
     Random? random,
   }) : _words = List.unmodifiable(words),
        _concepts = List.unmodifiable(concepts),
+       syllableAudio = Map.unmodifiable(syllableAudio),
        _random = random ?? Random();
 
   final List<WordEntry> _words;
   final List<WordConcept> _concepts;
   final Random _random;
+
+  final bool includeWordAudio;
+  final bool includeSyllableAudio;
+  final Map<String, String> syllableAudio;
 
   /// Number of matching tasks to generate.
   final int taskCount;
@@ -124,12 +148,31 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       final selectedSyllable =
           matchingSyllables[_random.nextInt(matchingSyllables.length)];
 
-      pairs.add(
-        MatchingPair(
-          left: ImageContent(imagePath),
-          right: TextContent(selectedSyllable),
-        ),
-      );
+      TaskContent imageContent = ImageContent(imagePath);
+
+      final wordAudio = word.audio?.trim();
+
+      if (includeWordAudio && wordAudio != null && wordAudio.isNotEmpty) {
+        imageContent = AudioLinkedContent(
+          content: imageContent,
+          audio: AudioContent.fixed(_resolveAudioPath(wordAudio)),
+        );
+      }
+
+      TaskContent syllableContent = TextContent(selectedSyllable);
+
+      if (includeSyllableAudio) {
+        final audioFile = syllableAudio[selectedSyllable.trim().toLowerCase()];
+
+        if (audioFile != null && audioFile.trim().isNotEmpty) {
+          syllableContent = AudioLinkedContent(
+            content: syllableContent,
+            audio: AudioContent.fixed(_resolveAudioPath(audioFile)),
+          );
+        }
+      }
+
+      pairs.add(MatchingPair(left: imageContent, right: syllableContent));
 
       usedConceptIds.add(conceptId);
     }

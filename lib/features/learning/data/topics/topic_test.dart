@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:school_tasks/features/learning/data/data_words/syllable_demo_data.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_addition.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
@@ -16,6 +15,9 @@ import 'package:school_tasks/features/learning/data/generation/generated_task_da
 import 'package:school_tasks/features/learning/data/generation/syllable_matching_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/word_matching_task_data_generation.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
+import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
+import 'package:school_tasks/features/learning/data/word_content/syllable_demo_data.dart';
+import 'package:school_tasks/features/learning/data/word_content/word_matching_demo_data.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
@@ -33,9 +35,6 @@ import 'package:school_tasks/features/learning/domain/topic_progression_mode.dar
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
 
-import '../data_words/word_matching_demo_data.dart';
-import '../fixed_task_data/fixed_data_audio.dart';
-
 abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
@@ -52,24 +51,13 @@ abstract final class Tests {
         words: syllableDemoWords,
         concepts: syllableDemoConcepts,
         language: Language.uk,
-        syllablePattern: '*р?',
+        syllablePattern: 'р?',
         position: SyllableSearchPosition.any,
         taskCount: 2,
         pairCount: 4,
-        buttonConfig: MatchingButtonConfig(
-          fontSize: 20,
-          buttonWidth: 160,
-          buttonHeight: 120,
-          spacing: 8,
-        ),
-      ),
-
-      WordMatchingTaskDataGenerator(
-        words: wordMatchingDemoWords,
-        concepts: wordMatchingDemoConcepts,
-        language: Language.en,
-        taskCount: 2,
-        pairCount: 5,
+        includeWordAudio: true,
+        includeSyllableAudio: true,
+        syllableAudio: syllableAudioUk,
         buttonConfig: MatchingButtonConfig(
           fontSize: 20,
           buttonWidth: 160,
