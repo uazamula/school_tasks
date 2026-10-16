@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:school_tasks/features/learning/data/data_words/word_mathing_demo_data.dart';
+import 'package:school_tasks/features/learning/data/data_words/syllable_demo_data.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_addition.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
@@ -13,6 +13,7 @@ import 'package:school_tasks/features/learning/data/generation/arithmetic/arithm
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_operation.dart';
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
+import 'package:school_tasks/features/learning/data/generation/syllable_matching_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/word_matching_task_data_generation.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
@@ -30,7 +31,9 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
+import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
 
+import '../data_words/word_matching_demo_data.dart';
 import '../fixed_task_data/fixed_data_audio.dart';
 
 abstract final class Tests {
@@ -45,6 +48,22 @@ abstract final class Tests {
     },
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: GeneratedTaskDataSource([
+      SyllableMatchingTaskDataGenerator(
+        words: syllableDemoWords,
+        concepts: syllableDemoConcepts,
+        language: Language.uk,
+        syllablePattern: '*р?',
+        position: SyllableSearchPosition.any,
+        taskCount: 2,
+        pairCount: 4,
+        buttonConfig: MatchingButtonConfig(
+          fontSize: 20,
+          buttonWidth: 160,
+          buttonHeight: 120,
+          spacing: 8,
+        ),
+      ),
+
       WordMatchingTaskDataGenerator(
         words: wordMatchingDemoWords,
         concepts: wordMatchingDemoConcepts,

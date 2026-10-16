@@ -42,10 +42,6 @@ final List<WordEntry> wordMatchingDemoWords = [
   WordEntry(language: Language.en, word: 'horns', conceptId: 'horns'),
   WordEntry(language: Language.en, word: 'marlin', conceptId: 'marlin'),
   WordEntry(language: Language.en, word: 'mouth', conceptId: 'mouth'),
-  WordEntry(
-    language: Language.en,
-    word: 'peregrine falcon',
-    conceptId: 'peregrine',
-  ),
+  WordEntry(language: Language.en, word: 'peregrine', conceptId: 'peregrine'),
   WordEntry(language: Language.en, word: 'river', conceptId: 'river'),
 ];
