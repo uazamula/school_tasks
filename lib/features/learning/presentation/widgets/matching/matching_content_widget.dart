@@ -28,7 +28,7 @@ class MatchingContentWidget extends StatelessWidget {
 
       return TaskAudioWidget(
         content: linkedContent.audio,
-        isActive: isActive,
+        isActive: false,
         interactive: false,
         showIcon: false,
         controller: audioController,

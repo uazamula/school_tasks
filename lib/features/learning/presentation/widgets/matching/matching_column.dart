@@ -15,6 +15,7 @@ class MatchingColumn extends StatelessWidget {
     required this.isLeft,
     required this.onItemTap,
     this.buttonConfig,
+    this.onAudioPlaybackStarted,
   });
 
   final List<MatchingPair> pairs;
@@ -24,6 +25,7 @@ class MatchingColumn extends StatelessWidget {
   final bool isLeft;
   final ValueChanged<int> onItemTap;
   final MatchingButtonConfig? buttonConfig;
+  final ValueChanged<Future<void>?>? onAudioPlaybackStarted;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,7 @@ class MatchingColumn extends StatelessWidget {
                 isSelected: selectedIndex == index,
                 onTap: () => onItemTap(index),
                 buttonConfig: buttonConfig,
+                onAudioPlaybackStarted: onAudioPlaybackStarted,
               ),
             ),
           ),

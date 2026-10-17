@@ -91,6 +91,7 @@ class TaskWidget extends StatelessWidget {
 
     if (task is MatchingTask) {
       return MatchingTaskWidget(
+        key: ObjectKey(task),
         task: task as MatchingTask,
         result: result as TaskResult<MatchingAnswer, List<MatchingPair>>?,
         onTaskAnswered: onTaskAnswered,

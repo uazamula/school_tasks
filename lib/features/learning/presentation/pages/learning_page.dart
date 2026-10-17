@@ -67,6 +67,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   int _completedProgressSteps = 0;
   bool _isFinishing = false;
+  bool _hasSavedResult = false;
 
   bool get _feedbackEnabled {
     return _topic.progressionMode != TopicProgressionMode.automatic;
@@ -270,6 +271,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   void _moveAutomatically() {
     if (_attempt.isFinished) {
+      _isFinishing = true;
+
+      _timer?.cancel();
+      _timer = null;
+
       _stopwatch.stop();
 
       _autoAdvanceTimer?.cancel();
@@ -383,6 +389,12 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     bool countdownExpired = false,
     TopicCompletionReason completionReason = TopicCompletionReason.completed,
   }) async {
+    if (_hasSavedResult) {
+      return;
+    }
+
+    _hasSavedResult = true;
+
     _autoAdvanceTimer?.cancel();
     _autoAdvanceTimer = null;
 

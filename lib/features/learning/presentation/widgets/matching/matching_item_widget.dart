@@ -14,12 +14,14 @@ class MatchingItemWidget extends StatefulWidget {
     required this.isSelected,
     required this.onTap,
     this.buttonConfig,
+    this.onAudioPlaybackStarted,
   });
 
   final TaskContent content;
   final bool isSelected;
   final VoidCallback onTap;
   final MatchingButtonConfig? buttonConfig;
+  final ValueChanged<Future<void>?>? onAudioPlaybackStarted;
 
   @override
   State<MatchingItemWidget> createState() => _MatchingItemWidgetState();
@@ -41,9 +43,13 @@ class _MatchingItemWidgetState extends State<MatchingItemWidget> {
   }
 
   void _handleTap() {
+    Future<void>? playback;
+
     if (widget.content is AudioLinkedContent) {
-      _audioController.toggle();
+      playback = _audioController.playAndWait();
     }
+
+    widget.onAudioPlaybackStarted?.call(playback);
 
     widget.onTap();
   }

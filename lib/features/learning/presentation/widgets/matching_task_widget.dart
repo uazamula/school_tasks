@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -53,6 +54,9 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   late List<int> _rightOrder;
   late List<int> _leftOrder;
 
+  Future<void>? _pendingAudioPlayback;
+  bool _isFinishing = false;
+
   @override
   void initState() {
     super.initState();
@@ -107,6 +111,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
       isLeft: true,
       onItemTap: _selectLeft,
       buttonConfig: widget.task.buttonConfig,
+      onAudioPlaybackStarted: _rememberAudioPlayback,
     );
   }
 
@@ -119,6 +124,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
       isLeft: false,
       onItemTap: _selectRight,
       buttonConfig: widget.task.buttonConfig,
+      onAudioPlaybackStarted: _rememberAudioPlayback,
     );
   }
 
@@ -213,13 +219,11 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     widget.onProgressStep();
 
     _clearSelection();
+    setState(() {});
 
     if (_completedPairIndices.length == widget.task.pairs.length) {
-      _finishTask();
-      return;
+      unawaited(_finishTask());
     }
-
-    setState(() {});
   }
 
   int? _findCorrectPair(MatchingAnswer answer) {
@@ -257,7 +261,12 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     _selectedRightIndex = null;
   }
 
-  void _finishTask() {
+  Future<void> _finishTask() async {
+    if (_isFinishing) {
+      return;
+    }
+    _isFinishing = true;
+
     final accuracy = AccuracyResult(
       correct: _firstAttemptCorrectPairIndices.length,
       total: widget.task.pairs.length,
@@ -268,6 +277,23 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
       accuracy: accuracy,
     );
 
+    final playback = _pendingAudioPlayback;
+    _pendingAudioPlayback = null;
+
+    if (playback != null) {
+      await playback;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
     widget.onTaskAnswered(result);
+  }
+
+  void _rememberAudioPlayback(Future<void>? playback) {
+    if (playback != null) {
+      _pendingAudioPlayback = playback;
+    }
   }
 }

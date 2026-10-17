@@ -6,14 +6,20 @@ import 'package:school_tasks/features/learning/domain/tasks/content/audio_conten
 
 class AudioPlaybackController {
   Future<void> Function()? _togglePlayback;
+  Future<void> Function()? _playAndWait;
 
-  void attach(Future<void> Function() callback) {
+  void attach(
+    Future<void> Function() callback, {
+    Future<void> Function()? playAndWait,
+  }) {
     _togglePlayback = callback;
+    _playAndWait = playAndWait;
   }
 
   void detach(Future<void> Function() callback) {
     if (identical(_togglePlayback, callback)) {
       _togglePlayback = null;
+      _playAndWait = null;
     }
   }
 
@@ -25,8 +31,17 @@ class AudioPlaybackController {
     }
   }
 
+  Future<void> playAndWait() async {
+    final callback = _playAndWait;
+
+    if (callback != null) {
+      await callback();
+    }
+  }
+
   void dispose() {
     _togglePlayback = null;
+    _playAndWait = null;
   }
 }
 
@@ -69,19 +84,25 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
 
   PlayerState _playerState = PlayerState.stopped;
   String? _currentAudioPath;
+  late final Future<void> Function() _playAndWaitCallback;
+
+  Completer<void>? _playbackCompleter;
 
   @override
   void initState() {
     super.initState();
 
     _player = AudioPlayer();
-    _controllerCallback = () => _togglePlayback(force: true);
 
-    widget.controller?.attach(_controllerCallback);
+    _controllerCallback = () => _togglePlayback(force: true);
+    _playAndWaitCallback = _playAndWaitForCompletion;
+
+    widget.controller?.attach(
+      _controllerCallback,
+      playAndWait: _playAndWaitCallback,
+    );
 
     _player.onPlayerStateChanged.listen((state) {
-      debugPrint('AUDIO EVENT: state=$state');
-
       if (mounted) {
         setState(() {
           _playerState = state;
@@ -90,7 +111,12 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     });
 
     _player.onPlayerComplete.listen((_) {
-      debugPrint('AUDIO EVENT: completed');
+      final completer = _playbackCompleter;
+
+      if (completer != null && !completer.isCompleted) {
+        completer.complete();
+      }
+      widget.onCompleted?.call();
     });
   }
 
@@ -113,7 +139,11 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
 
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller?.detach(_controllerCallback);
-      widget.controller?.attach(_controllerCallback);
+
+      widget.controller?.attach(
+        _controllerCallback,
+        playAndWait: _playAndWaitCallback,
+      );
     }
 
     final oldPath = _resolveAudioPathFor(oldWidget.content);
@@ -136,7 +166,12 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
 
   @override
   void dispose() {
-    debugPrint('AUDIO: widget disposed');
+    final completer = _playbackCompleter;
+
+    if (completer != null && !completer.isCompleted) {
+      completer.complete();
+    }
+
     widget.controller?.detach(_controllerCallback);
     unawaited(_player.dispose());
     super.dispose();
@@ -285,5 +320,42 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
       icon: icon,
       tooltip: isPlaying ? 'Зупинити' : 'Відтворити',
     );
+  }
+
+  Future<void> _playAndWaitForCompletion() async {
+    final audioPath = _resolveAudioPath();
+
+    if (!mounted || audioPath == null || audioPath.trim().isEmpty) {
+      return;
+    }
+
+    final completer = Completer<void>();
+    _playbackCompleter = completer;
+
+    try {
+      if (_playerState == PlayerState.playing ||
+          _playerState == PlayerState.paused) {
+        await _player.stop();
+      }
+
+      if (!mounted) return;
+
+      _currentAudioPath = audioPath;
+
+      await _player.play(AssetSource(_assetPath(audioPath)));
+
+      // Очікуємо завершення самого аудіо.
+      await completer.future;
+    } catch (error) {
+      // Помилка аудіо не повинна блокувати завершення завдання.
+    } finally {
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+
+      if (identical(_playbackCompleter, completer)) {
+        _playbackCompleter = null;
+      }
+    }
   }
 }

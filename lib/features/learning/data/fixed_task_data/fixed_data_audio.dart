@@ -159,6 +159,7 @@ const List<TaskData> audioLinkedSelectionDemo = [
     ],
     wrongAnswers: [EmojiContent('🍌'), EmojiContent('🍐')],
     wrongAnswerCount: 2,
+    correctAnswerCount: 2,
     requiresConfirmation: true,
   ),
 ];
