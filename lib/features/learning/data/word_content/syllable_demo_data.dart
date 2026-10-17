@@ -7,7 +7,7 @@ import 'package:school_tasks/features/learning/domain/word_content/word_entry.da
 /// Image paths are relative to the Flutter project's asset root.
 final List<WordConcept> syllableDemoConcepts = [
   WordConcept(id: 'anchor', image: 'assets/images/anchor.png'),
-  WordConcept(id: 'ant', image: 'assets/images/ant.png'),
+  WordConcept(id: 'ants', image: 'assets/images/ants.png'),
   WordConcept(id: 'apron', image: 'assets/images/apron.png'),
   WordConcept(id: 'arc', image: 'assets/images/arc.png'),
   WordConcept(id: 'arm', image: 'assets/images/arm.png'),
@@ -35,9 +35,10 @@ final List<WordEntry> syllableDemoWords = [
   ),
   WordEntry(
     language: Language.uk,
-    word: 'мураха',
-    syllables: ['му', 'ра', 'ха'],
-    conceptId: 'ant',
+    word: 'мурахи',
+    audio: 'uk_murakhy.mp3',
+    syllables: ['му', 'ра', 'хи'],
+    conceptId: 'ants',
   ),
   WordEntry(
     language: Language.uk,
@@ -48,36 +49,42 @@ final List<WordEntry> syllableDemoWords = [
   WordEntry(
     language: Language.uk,
     word: 'арка',
+    audio: 'uk_arka.mp3',
     syllables: ['ар', 'ка'],
     conceptId: 'arc',
   ),
   WordEntry(
     language: Language.uk,
     word: 'рука',
+    audio: 'uk_ruka.mp3',
     syllables: ['ру', 'ка'],
     conceptId: 'arm',
   ),
   WordEntry(
     language: Language.uk,
     word: 'сокира',
+    audio: 'uk_sokyra.mp3',
     syllables: ['со', 'ки', 'ра'],
     conceptId: 'axe',
   ),
   WordEntry(
     language: Language.uk,
     word: 'кора',
+    audio: 'uk_kora.mp3',
     syllables: ['ко', 'ра'],
     conceptId: 'bark',
   ),
   WordEntry(
     language: Language.uk,
     word: 'береза',
+    audio: 'uk_bereza.mp3',
     syllables: ['бе', 'ре', 'за'],
     conceptId: 'birch',
   ),
   WordEntry(
     language: Language.uk,
     word: 'сир',
+    audio: 'uk_syr.mp3',
     syllables: ['сир'],
     conceptId: 'cheese',
   ),
@@ -90,12 +97,14 @@ final List<WordEntry> syllableDemoWords = [
   WordEntry(
     language: Language.uk,
     word: 'корова',
+    audio: 'uk_korova.mp3',
     syllables: ['ко', 'ро', 'ва'],
     conceptId: 'cow',
   ),
   WordEntry(
     language: Language.uk,
     word: 'риба',
+    audio: 'uk_ryba.mp3',
     syllables: ['ри', 'ба'],
     conceptId: 'fish',
   ),
@@ -109,6 +118,7 @@ final List<WordEntry> syllableDemoWords = [
   WordEntry(
     language: Language.uk,
     word: 'рот',
+    audio: 'uk_rot.mp3',
     syllables: ['рот'],
     conceptId: 'mouth',
   ),

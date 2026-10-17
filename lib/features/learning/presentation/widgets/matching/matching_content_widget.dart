@@ -12,12 +12,14 @@ class MatchingContentWidget extends StatelessWidget {
     this.isActive = false,
     this.textStyle,
     this.textScaler,
+    this.audioController,
   });
 
   final TaskContent content;
   final bool isActive;
   final TextStyle? textStyle;
   final TextScaler? textScaler;
+  final AudioPlaybackController? audioController;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +31,13 @@ class MatchingContentWidget extends StatelessWidget {
         isActive: isActive,
         interactive: false,
         showIcon: false,
+        controller: audioController,
         child: MatchingContentWidget(
           content: linkedContent.content,
           isActive: isActive,
           textStyle: textStyle,
           textScaler: textScaler,
+          audioController: audioController,
         ),
       );
     }
@@ -72,6 +76,7 @@ class MatchingContentWidget extends StatelessWidget {
         content: content as AudioContent,
         isActive: isActive,
         interactive: false,
+        controller: audioController,
       );
     }
 
@@ -90,6 +95,7 @@ class MatchingContentWidget extends StatelessWidget {
             content: grid.item,
             textStyle: textStyle,
             textScaler: textScaler,
+            audioController: audioController,
           );
         },
       );

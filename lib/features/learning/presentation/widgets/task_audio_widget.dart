@@ -1,6 +1,34 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+
+class AudioPlaybackController {
+  Future<void> Function()? _togglePlayback;
+
+  void attach(Future<void> Function() callback) {
+    _togglePlayback = callback;
+  }
+
+  void detach(Future<void> Function() callback) {
+    if (identical(_togglePlayback, callback)) {
+      _togglePlayback = null;
+    }
+  }
+
+  void toggle() {
+    final callback = _togglePlayback;
+
+    if (callback != null) {
+      unawaited(callback());
+    }
+  }
+
+  void dispose() {
+    _togglePlayback = null;
+  }
+}
 
 class TaskAudioWidget extends StatefulWidget {
   const TaskAudioWidget({
@@ -12,38 +40,23 @@ class TaskAudioWidget extends StatefulWidget {
     this.child,
     this.showIcon = true,
     this.onCompleted,
+    this.controller,
   });
 
   final AudioContent content;
   final VoidCallback? onCompleted;
 
+  /// true — аудіо запускається натисканням на віджет.
+  /// false — натисканням керує зовнішній віджет або controller.
+  final bool interactive;
+
   /// Керує відтворенням ззовні.
-  ///
-  /// true  → аудіо повинно відтворюватися.
-  /// false → аудіо повинно бути зупинене.
   final bool isActive;
 
   final Color? iconColor;
-
-  /// true  → TaskAudioWidget сам реагує на натискання.
-  /// false → відтворення контролюється через [isActive].
-  final bool interactive;
-
-  /// Необов'язковий вміст, який потрібно зробити аудіо-активним.
-  ///
-  /// Наприклад:
-  /// Text(...)
-  /// Image.asset(...)
-  /// ChoiceAnswerButton(...)
-  ///
-  /// Якщо [child] не заданий, відображається стандартна кнопка
-  /// з іконкою відтворення/зупинки.
   final Widget? child;
-
-  /// Чи показувати стандартну аудіо-іконку.
-  ///
-  /// Для AudioLinkedContent буде false.
   final bool showIcon;
+  final AudioPlaybackController? controller;
 
   @override
   State<TaskAudioWidget> createState() => _TaskAudioWidgetState();
@@ -51,6 +64,8 @@ class TaskAudioWidget extends StatefulWidget {
 
 class _TaskAudioWidgetState extends State<TaskAudioWidget> {
   late final AudioPlayer _player;
+
+  late final Future<void> Function() _controllerCallback;
 
   PlayerState _playerState = PlayerState.stopped;
   String? _currentAudioPath;
@@ -60,17 +75,22 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     super.initState();
 
     _player = AudioPlayer();
+    _controllerCallback = () => _togglePlayback(force: true);
+
+    widget.controller?.attach(_controllerCallback);
 
     _player.onPlayerStateChanged.listen((state) {
-      if (!mounted) return;
+      debugPrint('AUDIO EVENT: state=$state');
 
-      setState(() {
-        _playerState = state;
-      });
-
-      if (state == PlayerState.completed) {
-        widget.onCompleted?.call();
+      if (mounted) {
+        setState(() {
+          _playerState = state;
+        });
       }
+    });
+
+    _player.onPlayerComplete.listen((_) {
+      debugPrint('AUDIO EVENT: completed');
     });
   }
 
@@ -81,7 +101,7 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     final audioPath = _resolveAudioPath();
 
     if (_currentAudioPath != null && _currentAudioPath != audioPath) {
-      _stop();
+      unawaited(_stop());
     }
 
     _currentAudioPath = audioPath;
@@ -91,38 +111,50 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
   void didUpdateWidget(covariant TaskAudioWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.detach(_controllerCallback);
+      widget.controller?.attach(_controllerCallback);
+    }
+
     final oldPath = _resolveAudioPathFor(oldWidget.content);
     final newPath = _resolveAudioPath();
 
     if (oldPath != newPath) {
-      _stop();
+      unawaited(_stop());
     }
 
     _currentAudioPath = newPath;
 
     if (oldWidget.isActive != widget.isActive) {
       if (widget.isActive) {
-        _play();
+        unawaited(_play());
       } else {
-        _stop();
+        unawaited(_stop());
       }
     }
   }
 
   @override
   void dispose() {
-    _player.dispose();
+    debugPrint('AUDIO: widget disposed');
+    widget.controller?.detach(_controllerCallback);
+    unawaited(_player.dispose());
     super.dispose();
   }
 
-  Future<void> _togglePlayback() async {
-    if (!widget.interactive) {
+  Future<void> _togglePlayback({bool force = false}) async {
+    debugPrint('AUDIO: toggle started, state=$_playerState');
+
+    if (!widget.interactive && !force) {
+      debugPrint('AUDIO: interaction disabled');
       return;
     }
 
     final audioPath = _resolveAudioPath();
+    debugPrint('AUDIO: path=$audioPath');
 
-    if (audioPath == null) {
+    if (audioPath == null || audioPath.trim().isEmpty) {
+      debugPrint('AUDIO: path is empty');
       return;
     }
 
@@ -131,13 +163,19 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     switch (_playerState) {
       case PlayerState.playing:
       case PlayerState.paused:
+        debugPrint('AUDIO: stopping');
         await _player.stop();
+        break;
 
       case PlayerState.stopped:
       case PlayerState.completed:
+        debugPrint('AUDIO: starting playback');
         await _player.play(AssetSource(_assetPath(audioPath)));
+        debugPrint('AUDIO: playback started');
+        break;
 
       case PlayerState.disposed:
+        debugPrint('AUDIO: player disposed');
         return;
     }
   }
@@ -145,7 +183,7 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
   Future<void> _play() async {
     final audioPath = _resolveAudioPath();
 
-    if (audioPath == null) {
+    if (audioPath == null || audioPath.trim().isEmpty) {
       return;
     }
 
@@ -203,6 +241,7 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     if (widget.child != null) {
       final child = widget.child!;
 
+      // Зовнішній віджет керує натисканням.
       if (!widget.interactive) {
         return child;
       }
@@ -210,7 +249,8 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
       final colorScheme = Theme.of(context).colorScheme;
 
       return GestureDetector(
-        onTap: _resolveAudioPath() == null ? null : _togglePlayback,
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _togglePlayback(),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           padding: const EdgeInsets.all(4),
@@ -241,7 +281,7 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     }
 
     return IconButton.filled(
-      onPressed: _resolveAudioPath() == null ? null : _togglePlayback,
+      onPressed: _resolveAudioPath() == null ? null : () => _togglePlayback(),
       icon: icon,
       tooltip: isPlaying ? 'Зупинити' : 'Відтворити',
     );
