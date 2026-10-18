@@ -12,8 +12,9 @@ import 'package:school_tasks/features/learning/data/generation/arithmetic/arithm
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_operation.dart';
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
-import 'package:school_tasks/features/learning/data/generation/syllable_matching_task_data_generator.dart';
-import 'package:school_tasks/features/learning/data/generation/word_matching_task_data_generation.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/word_matching_task_data_generation.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_demo_data.dart';
@@ -59,8 +60,15 @@ abstract final class Tests {
           position: SyllableSearchPosition.any,
           taskCount: 2,
           pairCount: 4,
-          includeWordAudio: true,
-          includeSyllableAudio: true,
+
+          leftColumnElement:MatchingColumnElement.none,
+          leftColumnAudio:MatchingColumnAudio.word,
+
+          rightColumnElement:MatchingColumnElement.image,
+          rightColumnAudio:MatchingColumnAudio.none,
+
+          swapColumns: false,
+
           syllableAudio: syllableAudioUk,
           buttonConfig: MatchingButtonConfig(
             fontSize: 20,
