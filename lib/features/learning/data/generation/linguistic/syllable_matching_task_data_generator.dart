@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
@@ -52,6 +53,7 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     this.leftColumnAudio = MatchingColumnAudio.none,
     this.rightColumnAudio = MatchingColumnAudio.none,
     this.swapColumns = false,
+    this.textCase = MatchingTextCase.unchanged,
     Map<String, String> syllableAudio = const {},
     Random? random,
   }) : _words = List.unmodifiable(words),
@@ -90,6 +92,7 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
   final MatchingColumnAudio rightColumnAudio;
 
   final bool swapColumns;
+  final MatchingTextCase textCase;
 
   final Map<String, String> syllableAudio;
 
@@ -269,11 +272,11 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
         break;
 
       case MatchingColumnElement.word:
-        visibleContent = TextContent(word.word);
+        visibleContent = TextContent(_formatText(word.word));
         break;
 
       case MatchingColumnElement.syllable:
-        visibleContent = TextContent(syllable);
+        visibleContent = TextContent(_formatText(syllable));
         break;
     }
 
@@ -361,6 +364,25 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     }
 
     return maskIndex == mask.length;
+  }
+
+  String _formatText(String text) {
+    switch (textCase) {
+      case MatchingTextCase.unchanged:
+        return text;
+
+      case MatchingTextCase.uppercase:
+        return text.toUpperCase();
+
+      case MatchingTextCase.lowercase:
+        return text.toLowerCase();
+
+      case MatchingTextCase.title:
+        final value = text.toLowerCase();
+        if (value.isEmpty) return value;
+
+        return '${value[0].toUpperCase()}${value.substring(1)}';
+    }
   }
 }
 

@@ -13,6 +13,7 @@ import 'package:school_tasks/features/learning/data/generation/arithmetic/arithm
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/word_matching_task_data_generation.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
@@ -61,13 +62,14 @@ abstract final class Tests {
           taskCount: 2,
           pairCount: 4,
 
-          leftColumnElement:MatchingColumnElement.none,
+          leftColumnElement:MatchingColumnElement.word,
           leftColumnAudio:MatchingColumnAudio.word,
 
-          rightColumnElement:MatchingColumnElement.image,
-          rightColumnAudio:MatchingColumnAudio.none,
+          rightColumnElement:MatchingColumnElement.syllable,
+          rightColumnAudio:MatchingColumnAudio.syllable,
 
           swapColumns: false,
+          textCase: MatchingTextCase.title,
 
           syllableAudio: syllableAudioUk,
           buttonConfig: MatchingButtonConfig(
