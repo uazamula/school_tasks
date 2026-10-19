@@ -4,4 +4,5 @@ enum LearningTaskType {
   fraction,
   positionSelection,
   matching,
+  slotAssembly,
 }

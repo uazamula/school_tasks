@@ -10,6 +10,7 @@ import 'package:school_tasks/features/learning/domain/task_data/input_task_data.
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/position_selection_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data_pool.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
@@ -20,6 +21,7 @@ import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.d
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/approximate_equals_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/equals_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/set_equals_evaluator.dart';
@@ -82,6 +84,11 @@ class TopicAttemptGenerator {
       random: _random,
     );
 
+    final slotAssemblyDataPool = TaskDataPool<SlotAssemblyTaskData<dynamic>>(
+      items: data.whereType<SlotAssemblyTaskData<dynamic>>().toList(),
+      random: _random,
+    );
+
     final tasks = taskTypes.map((type) {
       switch (type) {
         case LearningTaskType.selection:
@@ -102,6 +109,9 @@ class TopicAttemptGenerator {
 
         case LearningTaskType.matching:
           return _createMatchingTask(matchingDataPool.takeRandom());
+
+        case LearningTaskType.slotAssembly:
+          return _createSlotAssemblyTask(slotAssemblyDataPool.takeRandom());
       }
     }).toList();
 
@@ -213,6 +223,31 @@ class TopicAttemptGenerator {
     );
   }
 
+  AttemptTask<List<dynamic>, List<dynamic>> _createSlotAssemblyTask(
+    SlotAssemblyTaskData<dynamic> data,
+  ) {
+    final correctAnswers = data.correctAnswers;
+
+    final wrongAnswers = _answerSelector.select(
+      items: data.wrongAnswers,
+      count: data.wrongAnswerCount,
+      random: _random,
+    );
+
+    final options = [...correctAnswers, ...wrongAnswers]..shuffle(_random);
+
+    return AttemptTask<List<dynamic>, List<dynamic>>(
+      task: SlotAssemblyTask<dynamic>(
+        prompt: data.prompt,
+        target: data.target,
+        correctAnswers: correctAnswers,
+        options: options,
+        requiresSequentialSelection: data.requiresSequentialSelection,
+        buttonConfig: data.buttonConfig,
+      ),
+    );
+  }
+
   SolutionEvaluator<Rational, Rational> _createInputEvaluator(
     ToleranceConfig tolerance,
   ) {
@@ -251,6 +286,10 @@ class TopicAttemptGenerator {
 
     if (data is MatchingTaskData) {
       return _createMatchingTask(data);
+    }
+
+    if (data is SlotAssemblyTaskData<dynamic>) {
+      return _createSlotAssemblyTask(data);
     }
 
     throw StateError('Unsupported task data type: ${data.runtimeType}');
