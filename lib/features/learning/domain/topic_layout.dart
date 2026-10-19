@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
+import 'package:school_tasks/features/learning/domain/topic_area_order.dart';
 
 class TopicLayout {
   const TopicLayout({
@@ -7,6 +8,7 @@ class TopicLayout {
     this.interactionFlex = 2,
     this.interaction = const InteractionLayout(),
     this.prompt = const PromptLayout(),
+    this.areaOrder = TopicAreaOrder.promptFirst,
   });
 
   /// Відносний розмір області умови.
@@ -17,11 +19,13 @@ class TopicLayout {
 
   final InteractionLayout interaction;
   final PromptLayout prompt;
+  final TopicAreaOrder areaOrder;
 
   /// Співвідношення 1/3 : 2/3.
   const TopicLayout.standard({
     this.interaction = const InteractionLayout(),
     this.prompt = const PromptLayout(),
+    this.areaOrder = TopicAreaOrder.promptFirst,
   }) : promptFlex = 1,
        interactionFlex = 2;
 
@@ -31,6 +35,7 @@ class TopicLayout {
   const TopicLayout.largePrompt({
     this.interaction = const InteractionLayout(),
     this.prompt = const PromptLayout(),
+    this.areaOrder = TopicAreaOrder.promptFirst,
   }) : promptFlex = 3,
        interactionFlex = 2;
 
@@ -40,6 +45,7 @@ class TopicLayout {
   const TopicLayout.minimalPrompt({
     this.interaction = const InteractionLayout(),
     this.prompt = const PromptLayout(),
+    this.areaOrder = TopicAreaOrder.promptFirst,
   }) : promptFlex = 1,
        interactionFlex = 4;
 

@@ -34,6 +34,7 @@ import 'package:school_tasks/features/learning/domain/task_data/matching_button_
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
+import 'package:school_tasks/features/learning/domain/topic_area_order.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
@@ -146,6 +147,7 @@ abstract final class Tests {
       interactionFlex: 3,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
+      areaOrder: TopicAreaOrder.interactionFirst,
     ),
     progressionMode: TopicProgressionMode.automatic,
     feedbackDuration: Duration(milliseconds: 300),

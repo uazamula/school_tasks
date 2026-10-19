@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/topic_area_order.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
@@ -27,34 +28,54 @@ class TopicLayoutWidget extends StatelessWidget {
     final bool interactionHandlesScaling =
         interaction is TaskInteractionScalingBoundary;
 
+    final promptArea = _buildLayoutArea(
+      isPrompt: true,
+      scrollable: scrollablePrompt,
+      child: prompt,
+      scaleWhenNotScrollable: true,
+    );
+
+    final interactionArea = _buildLayoutArea(
+      isPrompt: false,
+      scrollable: scrollableInteraction,
+      child: interaction,
+      scaleWhenNotScrollable: !interactionHandlesScaling,
+    );
+
+    final areas = layout.areaOrder == TopicAreaOrder.promptFirst
+        ? [
+            Expanded(flex: layout.promptFlex, child: promptArea),
+            Expanded(flex: layout.interactionFlex, child: interactionArea),
+          ]
+        : [
+            Expanded(flex: layout.interactionFlex, child: interactionArea),
+            Expanded(flex: layout.promptFlex, child: promptArea),
+          ];
+
     return Stack(
       children: [
-        Column(
-          children: [
-            Expanded(
-              flex: layout.promptFlex,
-              child: Opacity(
-                opacity: dimmed ? 0.45 : 1.0,
-                child: _buildPromptArea(scrollable: scrollablePrompt),
-              ),
-            ),
-            Expanded(
-              flex: layout.interactionFlex,
-              child: Opacity(
-                opacity: dimmed ? 0.45 : 1.0,
-                child: _buildArea(
-                  child: interaction,
-                  scrollable: scrollableInteraction,
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  scaleWhenNotScrollable: !interactionHandlesScaling,
-                ),
-              ),
-            ),
-          ],
-        ),
+        Column(children: areas),
         if (dimmed && promptOverlay != null) _buildPromptOverlay(),
       ],
     );
+  }
+
+  Widget _buildLayoutArea({
+    required bool isPrompt,
+    required bool scrollable,
+    required Widget child,
+    required bool scaleWhenNotScrollable,
+  }) {
+    final area = isPrompt
+        ? _buildPromptArea(scrollable: scrollable)
+        : _buildArea(
+            child: child,
+            scrollable: scrollable,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            scaleWhenNotScrollable: scaleWhenNotScrollable,
+          );
+
+    return Opacity(opacity: dimmed ? 0.45 : 1.0, child: area);
   }
 
   Widget _buildPromptArea({required bool scrollable}) {
