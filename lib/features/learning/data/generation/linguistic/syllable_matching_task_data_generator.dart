@@ -16,25 +16,6 @@ import 'package:school_tasks/features/learning/domain/word_content/syllable_sear
 import 'package:school_tasks/features/learning/domain/word_content/word_concept.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_entry.dart';
 
-/// Generates matching tasks where learners match a word's image to a syllable.
-///
-/// A word is included if at least one eligible syllable matches
-/// [syllablePattern]. If several syllables match, one is selected randomly.
-///
-/// Different words may produce pairs with the same syllable.
-
-const String _pronunciationAudioDirectory = 'assets/audio/pronunciation/';
-
-String _resolveAudioPath(String audio) {
-  final value = audio.trim();
-
-  if (value.startsWith('assets/')) {
-    return value;
-  }
-
-  return '$_pronunciationAudioDirectory$value';
-}
-
 class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
   SyllableMatchingTaskDataGenerator({
     required List<WordEntry> words,
@@ -45,9 +26,7 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     this.language = Language.uk,
     this.position = SyllableSearchPosition.any,
     this.buttonConfig,
-    this.prompt = const TaskPrompt(
-      content: [TextContent('Зістав елементи')],
-    ),
+    this.prompt = const TaskPrompt(content: [TextContent('Зістав елементи')]),
     this.leftColumnElement = MatchingColumnElement.image,
     this.rightColumnElement = MatchingColumnElement.syllable,
     this.leftColumnAudio = MatchingColumnAudio.none,
@@ -57,9 +36,9 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     Map<String, String> syllableAudio = const {},
     Random? random,
   }) : _words = List.unmodifiable(words),
-        _concepts = List.unmodifiable(concepts),
-        syllableAudio = Map.unmodifiable(syllableAudio),
-        _random = random ?? Random() {
+       _concepts = List.unmodifiable(concepts),
+       syllableAudio = Map.unmodifiable(syllableAudio),
+       _random = random ?? Random() {
     _validateColumnConfiguration(
       leftColumnElement,
       leftColumnAudio,
@@ -100,15 +79,13 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       'assets/audio/pronunciation/';
 
   static void _validateColumnConfiguration(
-      MatchingColumnElement element,
-      MatchingColumnAudio audio,
-      String columnName,
-      ) {
+    MatchingColumnElement element,
+    MatchingColumnAudio audio,
+    String columnName,
+  ) {
     if (element == MatchingColumnElement.none &&
         audio == MatchingColumnAudio.none) {
-      throw ArgumentError(
-        '$columnName must have a visible element or audio.',
-      );
+      throw ArgumentError('$columnName must have a visible element or audio.');
     }
   }
 
@@ -146,7 +123,7 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
 
     final needsImage =
         leftColumnElement == MatchingColumnElement.image ||
-            rightColumnElement == MatchingColumnElement.image;
+        rightColumnElement == MatchingColumnElement.image;
 
     final pairs = <MatchingPair>[];
     final usedConceptIds = <String>{};
@@ -181,16 +158,15 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       final matchingSyllables = eligibleSyllables
           .where(
             (syllable) =>
-        syllable.trim().isNotEmpty &&
-            _matchesPattern(syllable, syllablePattern),
-      )
+                syllable.trim().isNotEmpty &&
+                _matchesPattern(syllable, syllablePattern),
+          )
           .toList();
 
       if (matchingSyllables.isEmpty) continue;
 
-      final selectedSyllable = matchingSyllables[
-      _random.nextInt(matchingSyllables.length)
-      ];
+      final selectedSyllable =
+          matchingSyllables[_random.nextInt(matchingSyllables.length)];
 
       final leftContent = _createColumnContent(
         word: word,
@@ -227,20 +203,20 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     if (pairs.isEmpty) {
       throw StateError(
         'No matching pairs found for the selected configuration '
-            'and syllable pattern "$syllablePattern".',
+        'and syllable pattern "$syllablePattern".',
       );
     }
 
     if (pairCount > pairs.length) {
       throw StateError(
         'Requested $pairCount pairs, but only ${pairs.length} '
-            'eligible pairs are available.',
+        'eligible pairs are available.',
       );
     }
 
     return List<MatchingTaskData>.generate(
       taskCount,
-          (_) => MatchingTaskData(
+      (_) => MatchingTaskData(
         prompt: prompt,
         pairs: List.unmodifiable(pairs),
         pairCount: pairCount,
@@ -298,7 +274,6 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       case MatchingColumnAudio.syllable:
         audioFile = syllableAudio[syllable.trim().toLowerCase()];
         break;
-
     }
 
     final normalizedAudio = audioFile?.trim();
@@ -308,19 +283,14 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       return null;
     }
 
-    final audioContent = AudioContent.fixed(
-      _resolveAudioPath(normalizedAudio),
-    );
+    final audioContent = AudioContent.fixed(_resolveAudioPath(normalizedAudio));
 
     // Аудіо без тексту/зображення стає самостійним елементом.
     if (visibleContent == null) {
       return audioContent;
     }
 
-    return AudioLinkedContent(
-      content: visibleContent,
-      audio: audioContent,
-    );
+    return AudioLinkedContent(content: visibleContent, audio: audioContent);
   }
 
   /// Matches a string against a wildcard pattern.
@@ -385,5 +355,3 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     }
   }
 }
-
-

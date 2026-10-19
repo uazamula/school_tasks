@@ -22,6 +22,7 @@ import 'package:school_tasks/features/learning/data/word_content/syllable_demo_d
 import 'package:school_tasks/features/learning/data/word_content/word_matching_demo_data.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/composite_task_data_source.dart';
+import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
@@ -62,11 +63,11 @@ abstract final class Tests {
           taskCount: 2,
           pairCount: 4,
 
-          leftColumnElement:MatchingColumnElement.word,
-          leftColumnAudio:MatchingColumnAudio.word,
+          leftColumnElement: MatchingColumnElement.word,
+          leftColumnAudio: MatchingColumnAudio.word,
 
-          rightColumnElement:MatchingColumnElement.syllable,
-          rightColumnAudio:MatchingColumnAudio.syllable,
+          rightColumnElement: MatchingColumnElement.syllable,
+          rightColumnAudio: MatchingColumnAudio.syllable,
 
           swapColumns: false,
           textCase: MatchingTextCase.title,
@@ -149,8 +150,13 @@ abstract final class Tests {
     progressionMode: TopicProgressionMode.automatic,
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
-      // failureLimit: 2,
-      // countdown: Duration(seconds: 25, milliseconds: 0),
+      failureLimit: 4,
+      // countdown: Duration(seconds: 15, milliseconds: 0),
+    ),
+    dashboard: DashboardConfig(
+      showProgress: true,
+      showTimer: true,
+      showRemainingAttempts: true,
     ),
   );
 }

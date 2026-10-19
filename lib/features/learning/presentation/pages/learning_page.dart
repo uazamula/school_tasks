@@ -174,22 +174,42 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                     icon: const Icon(Icons.arrow_back),
                   ),
                 ),
-                const SizedBox(width: 0),
                 Expanded(
-                  child: Opacity(
-                    opacity: isManualAnswered ? 0.15 : 1.0,
-                    child: LearningProgressIndicator(
-                      progress: _completedProgressSteps,
-                      totalSteps: _totalProgressSteps,
-                      elapsed: _stopwatch.elapsed,
-                      maximumTime: _topic.automaticTermination?.countdown,
-                    ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (_topic.dashboard.showProgress)
+                        Align(
+                          alignment: Alignment.center,
+                          child: Opacity(
+                            opacity: isManualAnswered ? 0.15 : 1.0,
+                            child: LearningProgressIndicator(
+                              progress: _completedProgressSteps,
+                              totalSteps: _totalProgressSteps,
+                              elapsed: _stopwatch.elapsed,
+                              maximumTime:
+                                  _topic.automaticTermination?.countdown,
+                              showProgress: true,
+                              showTimer: _topic.dashboard.showTimer,
+                            ),
+                          ),
+                        )
+                      else if (_topic.dashboard.showTimer)
+                        LearningProgressIndicator(
+                          progress: _completedProgressSteps,
+                          totalSteps: _totalProgressSteps,
+                          elapsed: _stopwatch.elapsed,
+                          maximumTime: _topic.automaticTermination?.countdown,
+                          showProgress: false,
+                          showTimer: true,
+                        ),
+                    ],
                   ),
                 ),
-                if (_failureLimit != null) ...[
+                if (_topic.dashboard.showRemainingAttempts) ...[
                   const SizedBox(width: 12),
                   FailureLimitIndicator(
-                    failureLimit: _failureLimit!,
+                    failureLimit: _failureLimit,
                     failureCount: _failureCount,
                   ),
                 ],

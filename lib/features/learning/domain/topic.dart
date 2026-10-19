@@ -1,4 +1,5 @@
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
+import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
@@ -20,6 +21,7 @@ class Topic {
     this.feedbackDuration = const Duration(milliseconds: 500),
     this.automaticTermination,
     this.taskOrderMode = TaskOrderMode.random,
+    this.dashboard = const DashboardConfig(),
   });
 
   final String id;
@@ -33,6 +35,7 @@ class Topic {
   final Duration feedbackDuration;
   final AutomaticTerminationConfig? automaticTermination;
   final TaskOrderMode taskOrderMode;
+  final DashboardConfig dashboard;
 
   // int get totalTasks {
   //   return taskTypeCounts.values.fold(0, (sum, count) => sum + count);

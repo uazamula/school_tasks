@@ -8,7 +8,12 @@ class LearningProgressIndicator extends StatelessWidget {
     required this.totalSteps,
     required this.elapsed,
     this.maximumTime,
+    this.showProgress = true,
+    this.showTimer = true,
   });
+
+  final bool showProgress;
+  final bool showTimer;
 
   final int progress;
   final int totalSteps;
@@ -38,27 +43,34 @@ class LearningProgressIndicator extends StatelessWidget {
     final displayedTime = _displayedTime;
 
     return Container(
-      padding: const EdgeInsets.all(_indicatorPadding),
-      decoration: BoxDecoration(
-        border: Border.all(color: colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(_borderRadius),
-      ),
+      padding: EdgeInsets.all(showProgress ? _indicatorPadding : 0),
+      decoration: showProgress
+          ? BoxDecoration(
+              border: Border.all(color: colorScheme.outlineVariant),
+              borderRadius: BorderRadius.circular(_borderRadius),
+            )
+          : null,
       child: Row(
+        mainAxisAlignment: showProgress
+            ? MainAxisAlignment.start
+            : MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: _AnimatedProgressBar(
-              value: progressValue,
-              progressColor: colorScheme.primary,
-              indicatorColor: colorScheme.primaryContainer,
-              indicatorBorderColor: colorScheme.primary,
-              backgroundColor: colorScheme.surfaceContainerHighest,
+          if (showProgress)
+            Expanded(
+              child: _AnimatedProgressBar(
+                value: progressValue,
+                progressColor: colorScheme.primary,
+                indicatorColor: colorScheme.primaryContainer,
+                indicatorBorderColor: colorScheme.primary,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+              ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Text(
-            _formatDuration(displayedTime),
-            style: theme.textTheme.titleMedium?.copyWith(color: timeColor),
-          ),
+          if (showProgress && showTimer) const SizedBox(width: AppSpacing.md),
+          if (showTimer)
+            Text(
+              _formatDuration(displayedTime),
+              style: theme.textTheme.titleMedium?.copyWith(color: timeColor),
+            ),
         ],
       ),
     );
