@@ -1,9 +1,9 @@
-import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
@@ -16,7 +16,7 @@ final myButtonConfig = SelectionButtonConfig(
   textScaler: TextScaler.noScaling,
 );
 final List<TaskData> slotAssemblyWord = [
-  SlotAssemblyTaskData<String>(
+  SlotAssemblyTaskData<AudioLinkedContent>(
     prompt: TaskPrompt(
       content: [TextContent('Склади слово')],
       target: TargetContent(
@@ -27,9 +27,27 @@ final List<TaskData> slotAssemblyWord = [
         ),
       ),
     ),
-    correctAnswers: ['ко', 'ро', 'ва'],
-    wrongAnswers: ['ма', 'ши', 'на'],
-    wrongAnswerCount: 2,
+    correctAnswers: [
+      AudioLinkedContent(
+        content: TextContent('ко'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ko.mp3'),
+      ),
+      AudioLinkedContent(
+        content: TextContent('ро'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ro.mp3'),
+      ),
+      AudioLinkedContent(
+        content: TextContent('ва'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_va.mp3'),
+      ),
+    ],
+    wrongAnswers: [
+      AudioLinkedContent(
+        content: TextContent('ра'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
+      ),
+    ],
+    wrongAnswerCount: 1,
     buttonConfig: myButtonConfig,
   ),
   SlotAssemblyTaskData<String>(

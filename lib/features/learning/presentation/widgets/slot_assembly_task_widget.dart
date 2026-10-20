@@ -9,6 +9,7 @@ import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_as
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection/choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
 class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
@@ -44,6 +45,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   final Set<int> _attemptedSlots = {};
   final Set<int> _firstAttemptCorrectSlots = {};
   int _correctSlotsCount = 0;
+  AudioLinkedContent? _activeAudioOption;
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
@@ -63,6 +65,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     if (oldWidget.task != widget.task) {
       _resetSlots();
+      _activeAudioOption = null;
     }
   }
 
@@ -71,6 +74,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       widget.task.correctAnswers.length,
       null,
     );
+    _activeAudioOption = null;
     _correctSlotsCount = 0;
     _usedOptionIndices.clear();
     _attemptedSlots.clear();
@@ -100,12 +104,15 @@ class _SlotAssemblyTaskWidgetState<TOption>
     if (_isAnswered || _usedOptionIndices.contains(optionIndex)) return;
 
     final option = widget.task.options[optionIndex];
-    final nextEmptySlot = _nextEmptySlot();
 
+    // Аудіо запускається незалежно від правильності відповіді.
+    setState(() {
+      _activeAudioOption = option is AudioLinkedContent ? option : null;
+    });
+
+    final nextEmptySlot = _nextEmptySlot();
     if (nextEmptySlot == null) return;
 
-    // У послідовному режимі правильним є лише наступний склад.
-    // У довільному режимі шукаємо відповідний незаповнений слот.
     final targetSlot = _requiresSequentialSelection
         ? (widget.task.correctAnswers[nextEmptySlot] == option
               ? nextEmptySlot
@@ -114,12 +121,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     if (targetSlot == null) {
       setState(() {
-        // Оскільки користувач не вибирає конкретний слот,
-        // помилку зараховуємо до першого незаповненого слота.
         _attemptedSlots.add(nextEmptySlot);
       });
       widget.onIncorrectAttempt();
-
       return;
     }
 
@@ -134,7 +138,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
     });
 
     widget.onCorrectSlotFilled?.call(_correctSlotsCount);
-    // widget.onCorrectSlotFilled?.call(_firstAttemptCorrectSlots.length);
     _notifyAccuracy();
 
     if (_slotOptionIndices.every((index) => index != null)) {
@@ -194,7 +197,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
             child: Text(
               _slotOptionIndices[i] == null
                   ? '___'
-                  : widget.task.options[_slotOptionIndices[i]!].toString(),
+                  : _displayText(widget.task.options[_slotOptionIndices[i]!]),
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
@@ -203,23 +206,17 @@ class _SlotAssemblyTaskWidgetState<TOption>
   }
 
   Widget _buildOptions() {
-    final availableIndices = [
-      for (var i = 0; i < widget.task.options.length; i++)
-        if (!_usedOptionIndices.contains(i)) i,
-    ];
-
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: AppSpacing.md,
       runSpacing: AppSpacing.md,
       children: [
-        for (final index in availableIndices)
-          ChoiceAnswerButton(
-            answer: widget.task.options[index].toString(),
-            state: TaskAnswerState.neutral,
-            isSelected: false,
-            onPressed: _isAnswered ? null : () => _onOptionSelected(index),
-            buttonConfig: widget.task.buttonConfig,
+        for (var i = 0; i < widget.task.options.length; i++)
+          Visibility(
+            key: ValueKey(i),
+            visible: !_usedOptionIndices.contains(i),
+            maintainState: true,
+            child: _buildOptionButton(i),
           ),
       ],
     );
@@ -242,6 +239,53 @@ class _SlotAssemblyTaskWidgetState<TOption>
           _buildSlots(),
         ],
       ),
+    );
+  }
+
+  String _displayText(Object? value) {
+    if (value is AudioLinkedContent) {
+      return _displayText(value.content);
+    }
+
+    if (value is TextContent) {
+      return value.text;
+    }
+
+    if (value is EmojiContent) {
+      return value.emoji;
+    }
+
+    return value.toString();
+  }
+
+  Widget _buildOptionButton(int index) {
+    final option = widget.task.options[index];
+
+    final button = ChoiceAnswerButton(
+      answer: _displayText(option),
+      state: TaskAnswerState.neutral,
+      isSelected: false,
+      onPressed: _isAnswered ? null : () => _onOptionSelected(index),
+      buttonConfig: widget.task.buttonConfig,
+    );
+
+    if (option is! AudioLinkedContent) {
+      return button;
+    }
+
+    return TaskAudioWidget(
+      content: option.audio,
+      isActive: _activeAudioOption == option,
+      interactive: false,
+      showIcon: false,
+      onCompleted: () {
+        if (!mounted || _activeAudioOption != option) return;
+
+        setState(() {
+          _activeAudioOption = null;
+        });
+      },
+      child: button,
     );
   }
 }
