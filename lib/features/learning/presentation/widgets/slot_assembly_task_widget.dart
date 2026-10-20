@@ -163,25 +163,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     );
   }
 
-  Widget _buildTarget(TaskContent target) {
-    if (target is ImageContent) {
-      return Image.asset(target.imagePath, height: 140, fit: BoxFit.contain);
-    }
 
-    if (target is EmojiContent) {
-      return Text(target.emoji, style: const TextStyle(fontSize: 80));
-    }
-
-    if (target is AudioLinkedContent) {
-      return _buildTarget(target.content);
-    }
-
-    return Text(
-      target.toString(),
-      textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.titleLarge,
-    );
-  }
 
   Widget _buildSlots() {
     return Wrap(
@@ -241,13 +223,17 @@ class _SlotAssemblyTaskWidgetState<TOption>
       scrollable: widget.interactionScrollable,
       content: Column(
         mainAxisSize: MainAxisSize.min,
+
         children: [
-          _buildTarget(widget.task.target),
-          const SizedBox(height: AppSpacing.md),
-          _buildSlots(),
-          const SizedBox(height: AppSpacing.md),
           _buildOptions(),
+          const SizedBox(height: AppSpacing.md),
+
+          // Тимчасова область для майбутнього падіння елементів.
+          const SizedBox(height: 160),
+
+          _buildSlots(),
         ],
+
       ),
     );
   }

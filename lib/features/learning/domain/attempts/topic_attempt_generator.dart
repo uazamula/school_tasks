@@ -224,8 +224,8 @@ class TopicAttemptGenerator {
   }
 
   AttemptTask<List<dynamic>, List<dynamic>> _createSlotAssemblyTask(
-    SlotAssemblyTaskData<dynamic> data,
-  ) {
+      SlotAssemblyTaskData<dynamic> data,
+      ) {
     final correctAnswers = data.correctAnswers;
 
     final wrongAnswers = _answerSelector.select(
@@ -239,7 +239,6 @@ class TopicAttemptGenerator {
     return AttemptTask<List<dynamic>, List<dynamic>>(
       task: SlotAssemblyTask<dynamic>(
         prompt: data.prompt,
-        target: data.target,
         correctAnswers: correctAnswers,
         options: options,
         requiresSequentialSelection: data.requiresSequentialSelection,

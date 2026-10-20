@@ -56,34 +56,34 @@ abstract final class Tests {
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([
       GeneratedTaskDataSource([
-        SyllableMatchingTaskDataGenerator(
-          words: syllableDemoWords,
-          concepts: syllableDemoConcepts,
-          language: Language.uk,
-          syllablePattern: 'р?',
-          position: SyllableSearchPosition.any,
-          taskCount: 1,
-          pairCount: 4,
-
-          leftColumnElement: MatchingColumnElement.word,
-          leftColumnAudio: MatchingColumnAudio.word,
-
-          rightColumnElement: MatchingColumnElement.syllable,
-          rightColumnAudio: MatchingColumnAudio.syllable,
-
-          swapColumns: false,
-          textCase: MatchingTextCase.title,
-
-          syllableAudio: syllableAudioUk,
-          buttonConfig: MatchingButtonConfig(
-            fontSize: 20,
-            buttonWidth: 160,
-            buttonHeight: 120,
-            spacing: 8,
-            lightBackgroundColor: const Color(0xFFE0E0E0),
-            darkBackgroundColor: const Color(0xFF424242),
-          ),
-        ),
+        // SyllableMatchingTaskDataGenerator(
+        //   words: syllableDemoWords,
+        //   concepts: syllableDemoConcepts,
+        //   language: Language.uk,
+        //   syllablePattern: 'р?',
+        //   position: SyllableSearchPosition.any,
+        //   taskCount: 1,
+        //   pairCount: 4,
+        //
+        //   leftColumnElement: MatchingColumnElement.word,
+        //   leftColumnAudio: MatchingColumnAudio.word,
+        //
+        //   rightColumnElement: MatchingColumnElement.syllable,
+        //   rightColumnAudio: MatchingColumnAudio.syllable,
+        //
+        //   swapColumns: false,
+        //   textCase: MatchingTextCase.title,
+        //
+        //   syllableAudio: syllableAudioUk,
+        //   buttonConfig: MatchingButtonConfig(
+        //     fontSize: 20,
+        //     buttonWidth: 160,
+        //     buttonHeight: 120,
+        //     spacing: 8,
+        //     lightBackgroundColor: const Color(0xFFE0E0E0),
+        //     darkBackgroundColor: const Color(0xFF424242),
+        //   ),
+        // ),
       ]),
       // GeneratedTaskDataSource([
       //   ArithmeticTaskDataGenerator(
@@ -108,8 +108,9 @@ abstract final class Tests {
       //   ),
       // ]),
       FixedTaskDataSource([
-        ...slotAssemblyWord,
         // ...GeometryShapesData.simpleShapes,
+        ...slotAssemblyWord,
+
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,
         // ...CodingTasks.codingTasksSel,

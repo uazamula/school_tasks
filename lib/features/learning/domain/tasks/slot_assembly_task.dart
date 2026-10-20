@@ -1,6 +1,5 @@
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
@@ -11,26 +10,23 @@ class SlotAssemblyTask<TOption>
     extends LearningTask<List<TOption>, List<TOption>> {
   SlotAssemblyTask({
     required super.prompt,
-    required this.target,
     required List<TOption> correctAnswers,
     required this.options,
     required bool requiresSequentialSelection,
     this.buttonConfig,
   }) : super(
-    interaction: SlotAssemblyInteraction(
-      requiresSequentialSelection: requiresSequentialSelection,
-    ),
-    solution: Solution<List<TOption>, List<TOption>>(
-      value: List.unmodifiable(correctAnswers),
-      evaluator: const SlotAssemblySolutionEvaluator(),
-    ),
-  ) {
+         interaction: SlotAssemblyInteraction(
+           requiresSequentialSelection: requiresSequentialSelection,
+         ),
+         solution: Solution<List<TOption>, List<TOption>>(
+           value: List.unmodifiable(correctAnswers),
+           evaluator: SlotAssemblySolutionEvaluator<TOption>(),
+         ),
+       ) {
     if (correctAnswers.isEmpty) {
       throw ArgumentError('correctAnswers must not be empty.');
     }
   }
-
-  final TaskContent target;
 
   /// Варіанти, доступні для вибору.
   final List<TOption> options;
@@ -40,15 +36,11 @@ class SlotAssemblyTask<TOption>
   final SelectionButtonConfig? buttonConfig;
 
   @override
-  TaskResult<List<TOption>, List<TOption>> checkAnswer(
-      List<TOption> answer,
-      ) {
+  TaskResult<List<TOption>, List<TOption>> checkAnswer(List<TOption> answer) {
     final isCorrect = solution.evaluate(answer);
 
     return TaskResult<List<TOption>, List<TOption>>(
-      state: isCorrect
-          ? TaskAnswerState.correct
-          : TaskAnswerState.incorrect,
+      state: isCorrect ? TaskAnswerState.correct : TaskAnswerState.incorrect,
       selectedAnswer: answer,
       solution: solution,
     );
@@ -60,10 +52,7 @@ class SlotAssemblySolutionEvaluator<TOption>
   const SlotAssemblySolutionEvaluator();
 
   @override
-  bool evaluate(
-      List<TOption> answer,
-      List<TOption> solution,
-      ) {
+  bool evaluate(List<TOption> answer, List<TOption> solution) {
     if (answer.length != solution.length) {
       return false;
     }
