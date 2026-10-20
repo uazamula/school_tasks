@@ -3,20 +3,24 @@ import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/math_content_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
 class TaskPromptWidget extends StatelessWidget {
-  const TaskPromptWidget({
+   const TaskPromptWidget({
     super.key,
     required this.prompt,
     this.scrollable = false,
+     this.targetProgress = 0,
   });
 
   final TaskPrompt prompt;
   final bool scrollable;
+   /// Кількість правильно заповнених слотів.
+   final int targetProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +32,18 @@ class TaskPromptWidget extends StatelessWidget {
       color: colorScheme.onSurfaceVariant,
     );
     if (scrollable) {
-      return _buildScrollableContent(context, prompt.content, textStyle);
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildScrollableContent(context, prompt.content, textStyle),
+          if (prompt.target != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            _buildTargetContent(context, prompt.target!, textStyle),
+          ],
+        ],
+      );
     }
+    debugPrint('TaskPrompt target: ${prompt.target?.target}');
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.hasBoundedWidth
@@ -42,7 +56,28 @@ class TaskPromptWidget extends StatelessWidget {
         if (firstVisualIndex == -1) {
           return SizedBox(
             width: maxWidth,
-            child: _buildNonVisualContent(context, prompt.content, textStyle),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildNonVisualContent(
+                  context,
+                  prompt.content,
+                  textStyle,
+                ),
+                if (prompt.target != null) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(
+                    width: maxWidth,
+                    height: 120,
+                    child: _buildTargetContent(
+                      context,
+                      prompt.target!,
+                      textStyle,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           );
         }
 
@@ -54,16 +89,39 @@ class TaskPromptWidget extends StatelessWidget {
           child: Column(
             children: [
               if (nonVisualContent.isNotEmpty)
-                _buildNonVisualContent(context, nonVisualContent, textStyle),
+                _buildNonVisualContent(
+                  context,
+                  nonVisualContent,
+                  textStyle,
+                ),
 
               if (nonVisualContent.isNotEmpty)
                 const SizedBox(height: AppSpacing.md),
 
               Expanded(
-                child: _buildScalableContent(
-                  context,
-                  scalableContent,
-                  textStyle,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: _buildScalableContent(
+                        context,
+                        scalableContent,
+                        textStyle,
+                      ),
+                    ),
+
+                    if (prompt.target != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      SizedBox(
+                        height: 120,
+                        width: maxWidth,
+                        child: _buildTargetContent(
+                          context,
+                          prompt.target!,
+                          textStyle,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
@@ -256,4 +314,65 @@ class TaskPromptWidget extends StatelessWidget {
       ],
     );
   }
+
+   Widget _buildTargetContent(
+       BuildContext context,
+       TargetContent target,
+       TextStyle? textStyle,
+       ) {
+     final effect = target.effect;
+
+     if (effect == null || target.target is! ImageContent) {
+       return _buildContent(
+         context,
+         target.target,
+         textStyle,
+         fullWidthText: true,
+       );
+     }
+
+     switch (effect.type) {
+       case TargetEffectType.saturation:
+         final progress = (targetProgress / effect.steps)
+             .clamp(0.0, 1.0)
+             .toDouble();
+
+         final image = _buildContent(
+           context,
+           target.target,
+           textStyle,
+           fullWidthText: true,
+         );
+
+         if (progress >= 1.0) {
+           return image;
+         }
+
+         return ColorFiltered(
+           colorFilter: ColorFilter.matrix(
+             _saturationMatrix(progress),
+           ),
+           child: image,
+         );
+     }
+   }
+
+   List<double> _saturationMatrix(double saturation) {
+     const red = 0.2126;
+     const green = 0.7152;
+     const blue = 0.0722;
+
+     final inverse = 1 - saturation;
+
+     final r = inverse * red;
+     final g = inverse * green;
+     final b = inverse * blue;
+
+     return [
+       r + saturation, g, b, 0, 0,
+       r, g + saturation, b, 0, 0,
+       r, g, b + saturation, 0, 0,
+       0, 0, 0, 1, 0,
+     ];
+   }
 }

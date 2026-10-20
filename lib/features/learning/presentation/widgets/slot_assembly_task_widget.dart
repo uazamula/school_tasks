@@ -19,6 +19,7 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
     required this.onTaskAnswered,
     required this.onAccuracyChanged,
     this.interactionScrollable = false,
+    this.onCorrectSlotFilled,
   });
 
   final SlotAssemblyTask<TOption> task;
@@ -26,6 +27,8 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
   final ValueChanged<TaskResult<List<TOption>, List<TOption>>> onTaskAnswered;
   final ValueChanged<AccuracyResult> onAccuracyChanged;
   final bool interactionScrollable;
+  final ValueChanged<int>? onCorrectSlotFilled;
+
 
   @override
   State<SlotAssemblyTaskWidget<TOption>> createState() =>
@@ -39,6 +42,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   final Set<int> _usedOptionIndices = {};
   final Set<int> _attemptedSlots = {};
   final Set<int> _firstAttemptCorrectSlots = {};
+  int _correctSlotsCount = 0;
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
@@ -66,7 +70,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       widget.task.correctAnswers.length,
       null,
     );
-
+    _correctSlotsCount = 0;
     _usedOptionIndices.clear();
     _attemptedSlots.clear();
     _firstAttemptCorrectSlots.clear();
@@ -119,12 +123,15 @@ class _SlotAssemblyTaskWidgetState<TOption>
     setState(() {
       _slotOptionIndices[targetSlot] = optionIndex;
       _usedOptionIndices.add(optionIndex);
+      _correctSlotsCount++;
 
       if (!_attemptedSlots.contains(targetSlot)) {
         _firstAttemptCorrectSlots.add(targetSlot);
       }
     });
 
+    widget.onCorrectSlotFilled?.call(_correctSlotsCount);
+    // widget.onCorrectSlotFilled?.call(_firstAttemptCorrectSlots.length);
     _notifyAccuracy();
 
     if (_slotOptionIndices.every((index) => index != null)) {

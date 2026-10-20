@@ -4,21 +4,26 @@ import 'package:school_tasks/features/learning/domain/task_data/matching_button_
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 
 final List<TaskData> slotAssemblyWord = [
   SlotAssemblyTaskData<String>(
     prompt: TaskPrompt(
-      content: [
-        TextContent('Склади слово'),
-        ImageContent('assets/images/cow.png'),
-      ],
+      content: [TextContent('Склади слово')],
+      target: TargetContent(
+        target: ImageContent('assets/images/cow.png'),
+        effect: const TargetEffectConfig(
+          type: TargetEffectType.saturation,
+          steps: 3,
+        ),
+      ),
     ),
-    correctAnswers: ['КО', 'РО', 'ВА'],
-    wrongAnswers: ['ЛА', 'СИ', 'МО'],
+    correctAnswers: ['ко', 'ро', 'ва'],
+    wrongAnswers: ['ма', 'ши', 'на'],
     wrongAnswerCount: 2,
-    requiresSequentialSelection: true,
+
     buttonConfig: SelectionButtonConfig(
       fontSize: 10,
       buttonWidth: 60,

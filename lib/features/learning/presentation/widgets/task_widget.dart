@@ -36,6 +36,8 @@ class TaskWidget extends StatelessWidget {
     this.interactionScrollable = false,
     required this.onIncorrectPairAttempt,
     required this.onMatchingAccuracyChanged,
+    this.targetProgress = 0,
+    this.onCorrectSlotFilled,
   });
 
   final LearningTask<dynamic, dynamic> task;
@@ -49,9 +51,15 @@ class TaskWidget extends StatelessWidget {
   final bool feedbackEnabled;
   final bool Function() onIncorrectPairAttempt;
   final ValueChanged<AccuracyResult> onMatchingAccuracyChanged;
+  final int targetProgress;
+  final ValueChanged<int>? onCorrectSlotFilled;
 
   Widget buildPrompt() {
-    return TaskPromptWidget(prompt: task.prompt, scrollable: promptScrollable);
+    return TaskPromptWidget(
+      prompt: task.prompt,
+      scrollable: promptScrollable,
+      targetProgress: targetProgress,
+    );
   }
 
   Widget buildInteraction() {
@@ -127,6 +135,7 @@ class TaskWidget extends StatelessWidget {
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
           onAccuracyChanged: onMatchingAccuracyChanged,
+          onCorrectSlotFilled: onCorrectSlotFilled,
         ),
       );
     }

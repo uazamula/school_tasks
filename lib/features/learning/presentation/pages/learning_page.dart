@@ -69,6 +69,16 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   bool _isFinishing = false;
   bool _hasSavedResult = false;
 
+  int _targetProgress = 0;
+
+  void _onCorrectSlotFilled(int progress) {
+    if (!mounted) return;
+
+    setState(() {
+      _targetProgress = progress;
+    });
+  }
+
   bool get _feedbackEnabled {
     return _topic.progressionMode != TopicProgressionMode.automatic;
   }
@@ -156,6 +166,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       interactionScrollable: _topic.layout.interaction.scrollable,
       onIncorrectPairAttempt: _onIncorrectPairAttempt,
       onMatchingAccuracyChanged: _onMatchingAccuracyChanged,
+      targetProgress: _targetProgress,
+      onCorrectSlotFilled: _onCorrectSlotFilled,
     );
 
     return AppScaffold(
@@ -485,6 +497,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     }
 
     setState(() {
+      _targetProgress = 0;
       _attempt.moveToNextTask();
     });
   }
