@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
@@ -46,6 +48,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
   final Set<int> _firstAttemptCorrectSlots = {};
   int _correctSlotsCount = 0;
   AudioLinkedContent? _activeAudioOption;
+  final Map<int, AudioPlaybackController> _audioControllers = {};
+  Future<void>? _pendingAudioPlayback;
+  bool _isFinishing = false;
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
@@ -107,7 +112,13 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     // Аудіо запускається незалежно від правильності відповіді.
     setState(() {
-      _activeAudioOption = option is AudioLinkedContent ? option : null;
+      if (option is AudioLinkedContent) {
+        final playback = _audioControllers[optionIndex]?.playAndWait();
+
+        if (playback != null) {
+          _pendingAudioPlayback = playback;
+        }
+      }
     });
 
     final nextEmptySlot = _nextEmptySlot();
@@ -141,7 +152,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     _notifyAccuracy();
 
     if (_slotOptionIndices.every((index) => index != null)) {
-      _finishTask();
+      unawaited(_finishTask());
     }
   }
 
@@ -154,8 +165,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
     );
   }
 
-  void _finishTask() {
-    if (_isAnswered) return;
+  Future<void> _finishTask() async {
+    if (_isAnswered || _isFinishing) return;
+
+    _isFinishing = true;
 
     final answer = <TOption>[
       for (final index in _slotOptionIndices) widget.task.options[index!],
@@ -163,17 +176,26 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     final checkedResult = widget.task.checkAnswer(answer);
 
-    widget.onTaskAnswered(
-      TaskResult<List<TOption>, List<TOption>>(
-        state: checkedResult.state,
-        selectedAnswer: checkedResult.selectedAnswer,
-        solution: checkedResult.solution,
-        accuracy: AccuracyResult(
-          correct: _firstAttemptCorrectSlots.length,
-          total: widget.task.correctAnswers.length,
-        ),
+    final result = TaskResult<List<TOption>, List<TOption>>(
+      state: checkedResult.state,
+      selectedAnswer: checkedResult.selectedAnswer,
+      solution: checkedResult.solution,
+      accuracy: AccuracyResult(
+        correct: _firstAttemptCorrectSlots.length,
+        total: widget.task.correctAnswers.length,
       ),
     );
+
+    final playback = _pendingAudioPlayback;
+    _pendingAudioPlayback = null;
+
+    if (playback != null) {
+      await playback;
+    }
+
+    if (!mounted) return;
+
+    widget.onTaskAnswered(result);
   }
 
   Widget _buildSlots() {
@@ -272,6 +294,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
     if (option is! AudioLinkedContent) {
       return button;
     }
+    final controller = _audioControllers.putIfAbsent(
+      index,
+      AudioPlaybackController.new,
+    );
 
     return TaskAudioWidget(
       content: option.audio,
@@ -285,6 +311,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
           _activeAudioOption = null;
         });
       },
+      controller: controller,
       child: button,
     );
   }
