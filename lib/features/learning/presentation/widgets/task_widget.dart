@@ -12,11 +12,13 @@ import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/fraction_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/matching_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
@@ -112,6 +114,19 @@ class TaskWidget extends StatelessWidget {
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
           feedbackEnabled: feedbackEnabled,
+        ),
+      );
+    }
+
+    if (task is SlotAssemblyTask) {
+      return TaskInteractionScalingBoundary(
+        child: SlotAssemblyTaskWidget<dynamic>(
+          key: ObjectKey(task),
+          task: task as SlotAssemblyTask<dynamic>,
+          result: result as TaskResult<List<dynamic>, List<dynamic>>?,
+          interactionScrollable: interactionScrollable,
+          onTaskAnswered: onTaskAnswered,
+          onAccuracyChanged: onMatchingAccuracyChanged,
         ),
       );
     }

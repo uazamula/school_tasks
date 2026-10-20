@@ -7,6 +7,7 @@ import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_m
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_position_selection.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_rational.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_roots.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_slot_assembly.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/inf/coding/coding.dart';
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_generator_config.dart';
 import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_operation.dart';
@@ -61,7 +62,7 @@ abstract final class Tests {
           language: Language.uk,
           syllablePattern: 'р?',
           position: SyllableSearchPosition.any,
-          taskCount: 2,
+          taskCount: 1,
           pairCount: 4,
 
           leftColumnElement: MatchingColumnElement.word,
@@ -107,6 +108,7 @@ abstract final class Tests {
       //   ),
       // ]),
       FixedTaskDataSource([
+        ...slotAssemblyWord,
         // ...GeometryShapesData.simpleShapes,
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,
