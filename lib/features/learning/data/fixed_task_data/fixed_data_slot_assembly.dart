@@ -8,6 +8,13 @@ import 'package:school_tasks/features/learning/domain/tasks/content/target_conte
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 
+final myButtonConfig = SelectionButtonConfig(
+  fontSize: 10,
+  buttonWidth: 60,
+  buttonHeight: 60,
+  spacing: 4,
+  textScaler: TextScaler.noScaling,
+);
 final List<TaskData> slotAssemblyWord = [
   SlotAssemblyTaskData<String>(
     prompt: TaskPrompt(
@@ -23,13 +30,22 @@ final List<TaskData> slotAssemblyWord = [
     correctAnswers: ['ко', 'ро', 'ва'],
     wrongAnswers: ['ма', 'ши', 'на'],
     wrongAnswerCount: 2,
-
-    buttonConfig: SelectionButtonConfig(
-      fontSize: 10,
-      buttonWidth: 60,
-      buttonHeight: 60,
-      spacing: 4,
-      textScaler: TextScaler.noScaling,
+    buttonConfig: myButtonConfig,
+  ),
+  SlotAssemblyTaskData<String>(
+    prompt: TaskPrompt(
+      content: [TextContent('Склади слово')],
+      target: TargetContent(
+        target: ImageContent('assets/images/fish.png'),
+        effect: const TargetEffectConfig(
+          type: TargetEffectType.saturation,
+          steps: 2,
+        ),
+      ),
     ),
+    correctAnswers: ['ри', 'ба'],
+    wrongAnswers: ['ма', 'ши', 'на'],
+    wrongAnswerCount: 3,
+    buttonConfig: myButtonConfig,
   ),
 ];

@@ -20,6 +20,7 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
     required this.onAccuracyChanged,
     this.interactionScrollable = false,
     this.onCorrectSlotFilled,
+    required this.onIncorrectAttempt,
   });
 
   final SlotAssemblyTask<TOption> task;
@@ -28,7 +29,7 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
   final ValueChanged<AccuracyResult> onAccuracyChanged;
   final bool interactionScrollable;
   final ValueChanged<int>? onCorrectSlotFilled;
-
+  final bool Function() onIncorrectAttempt;
 
   @override
   State<SlotAssemblyTaskWidget<TOption>> createState() =>
@@ -117,6 +118,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
         // помилку зараховуємо до першого незаповненого слота.
         _attemptedSlots.add(nextEmptySlot);
       });
+      widget.onIncorrectAttempt();
+
       return;
     }
 
@@ -169,8 +172,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
       ),
     );
   }
-
-
 
   Widget _buildSlots() {
     return Wrap(
@@ -240,7 +241,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
           _buildSlots(),
         ],
-
       ),
     );
   }

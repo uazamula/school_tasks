@@ -156,7 +156,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,
-      // countdown: Duration(seconds: 15, milliseconds: 0),
+      countdown: Duration(seconds: 15, milliseconds: 0),
     ),
     dashboard: DashboardConfig(
       showProgress: true,

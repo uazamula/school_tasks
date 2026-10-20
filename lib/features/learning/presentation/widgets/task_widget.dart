@@ -136,6 +136,7 @@ class TaskWidget extends StatelessWidget {
           onTaskAnswered: onTaskAnswered,
           onAccuracyChanged: onMatchingAccuracyChanged,
           onCorrectSlotFilled: onCorrectSlotFilled,
+          onIncorrectAttempt: onIncorrectPairAttempt,
         ),
       );
     }

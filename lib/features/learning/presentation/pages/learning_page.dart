@@ -16,6 +16,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
@@ -74,8 +75,13 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   void _onCorrectSlotFilled(int progress) {
     if (!mounted) return;
 
+    final addedSteps = progress - _targetProgress;
+
     setState(() {
       _targetProgress = progress;
+      if (addedSteps > 0) {
+        _completedProgressSteps += addedSteps;
+      }
     });
   }
 
@@ -84,9 +90,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   }
 
   bool _registerFailure() {
-    _failureCount++;
-
     final failureLimit = _failureLimit;
+
+    setState(() {
+      _failureCount++;
+    });
 
     if (failureLimit == null) {
       return false;
@@ -137,6 +145,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
       if (task is MatchingTask) {
         total += task.pairs.length;
+      } else if (task is SlotAssemblyTask) {
+        total += task.correctAnswers.length;
       } else {
         total += 1;
       }
@@ -282,7 +292,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       }
     }
 
-    if (currentTask.task is! MatchingTask) {
+    if (currentTask.task is! MatchingTask &&
+        currentTask.task is! SlotAssemblyTask) {
       _completedProgressSteps++;
     }
 
@@ -566,6 +577,6 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    _attempt.updateMatchingAccuracy(_attempt.currentTaskIndex, accuracy);
+    _attempt.updateTaskAccuracy(_attempt.currentTaskIndex, accuracy);
   }
 }

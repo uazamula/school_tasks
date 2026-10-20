@@ -3,6 +3,7 @@ import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_res
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 
 class TopicAttempt {
   TopicAttempt({required List<AttemptTask<dynamic, dynamic>> tasks})
@@ -18,7 +19,7 @@ class TopicAttempt {
 
   int get completedTasks => tasks.where((task) => task.isAnswered).length;
 
-  final Map<int, AccuracyResult> _matchingAccuracy = {};
+  final Map<int, AccuracyResult> _taskAccuracy = {};
 
   int get incorrectAnswers {
     var incorrect = 0;
@@ -76,13 +77,15 @@ class TopicAttempt {
         }
       } else {
         final task = taskAttempt.task;
-        final matchingAccuracy = _matchingAccuracy[index];
+        final accuracy = _taskAccuracy[index];
 
-        if (matchingAccuracy != null) {
-          correct += matchingAccuracy.correct;
-          total += matchingAccuracy.total;
+        if (accuracy != null) {
+          correct += accuracy.correct;
+          total += accuracy.total;
         } else if (task is MatchingTask) {
           total += task.pairs.length;
+        } else if (task is SlotAssemblyTask) {
+          total += task.correctAnswers.length;
         } else {
           total += 1;
         }
@@ -97,7 +100,7 @@ class TopicAttempt {
     );
   }
 
-  void updateMatchingAccuracy(int taskIndex, AccuracyResult accuracy) {
-    _matchingAccuracy[taskIndex] = accuracy;
+  void updateTaskAccuracy(int taskIndex, AccuracyResult accuracy) {
+    _taskAccuracy[taskIndex] = accuracy;
   }
 }
