@@ -1,1 +1,6 @@
-enum TopicCompletionReason { completed, timeExpired, failureLimitReached }
+enum TopicCompletionReason {
+  completed,
+  timeExpired,
+  failureLimitReached,
+  elementReachedEdge,
+}

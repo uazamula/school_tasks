@@ -14,6 +14,7 @@ class SlotAssemblyTask<TOption>
     required this.options,
     required bool requiresSequentialSelection,
     this.buttonConfig,
+    this.fallingElementsEnabled = false,
   }) : super(
          interaction: SlotAssemblyInteraction(
            requiresSequentialSelection: requiresSequentialSelection,
@@ -34,6 +35,9 @@ class SlotAssemblyTask<TOption>
   /// Правильні елементи в порядку слотів.
   List<TOption> get correctAnswers => solution.value;
   final SelectionButtonConfig? buttonConfig;
+
+  /// Чи відображати варіанти як елементи, що падають.
+  final bool fallingElementsEnabled;
 
   @override
   TaskResult<List<TOption>, List<TOption>> checkAnswer(List<TOption> answer) {

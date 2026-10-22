@@ -20,6 +20,33 @@ final List<TaskData> slotAssemblyWord = [
     prompt: TaskPrompt(
       content: [TextContent('Склади слово')],
       target: TargetContent(
+        target: ImageContent('assets/images/cheese.png'),
+        effect: const TargetEffectConfig(
+          type: TargetEffectType.saturation,
+          steps: 1,
+        ),
+      ),
+    ),
+    correctAnswers: [
+      AudioLinkedContent(
+        content: TextContent('сир'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_syr.mp3'),
+      ),
+    ],
+    wrongAnswers: [
+      AudioLinkedContent(
+        content: TextContent('ра'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
+      ),
+    ],
+    wrongAnswerCount: 1,
+    buttonConfig: myButtonConfig,
+    fallingElementsEnabled: true,
+  ),
+  SlotAssemblyTaskData<AudioLinkedContent>(
+    prompt: TaskPrompt(
+      content: [TextContent('Склади слово')],
+      target: TargetContent(
         target: ImageContent('assets/images/cow.png'),
         effect: const TargetEffectConfig(
           type: TargetEffectType.saturation,
@@ -49,6 +76,7 @@ final List<TaskData> slotAssemblyWord = [
     ],
     wrongAnswerCount: 1,
     buttonConfig: myButtonConfig,
+    fallingElementsEnabled: false,
   ),
   SlotAssemblyTaskData<String>(
     prompt: TaskPrompt(

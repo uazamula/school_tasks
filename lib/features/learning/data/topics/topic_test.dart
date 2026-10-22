@@ -146,8 +146,8 @@ abstract final class Tests {
       // maximumFailures: 1,
     ),
     layout: TopicLayout(
-      promptFlex: 2,
-      interactionFlex: 3,
+      promptFlex: 1,
+      interactionFlex: 2,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
       areaOrder: TopicAreaOrder.interactionFirst,

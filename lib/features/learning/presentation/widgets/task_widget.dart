@@ -38,6 +38,7 @@ class TaskWidget extends StatelessWidget {
     required this.onMatchingAccuracyChanged,
     this.targetProgress = 0,
     this.onCorrectSlotFilled,
+    this.onElementReachedEdge,
   });
 
   final LearningTask<dynamic, dynamic> task;
@@ -53,6 +54,7 @@ class TaskWidget extends StatelessWidget {
   final ValueChanged<AccuracyResult> onMatchingAccuracyChanged;
   final int targetProgress;
   final ValueChanged<int>? onCorrectSlotFilled;
+  final VoidCallback? onElementReachedEdge;
 
   Widget buildPrompt() {
     return TaskPromptWidget(
@@ -137,6 +139,7 @@ class TaskWidget extends StatelessWidget {
           onAccuracyChanged: onMatchingAccuracyChanged,
           onCorrectSlotFilled: onCorrectSlotFilled,
           onIncorrectAttempt: onIncorrectPairAttempt,
+          onElementReachedEdge: onElementReachedEdge,
         ),
       );
     }

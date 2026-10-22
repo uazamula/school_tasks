@@ -178,6 +178,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       onMatchingAccuracyChanged: _onMatchingAccuracyChanged,
       targetProgress: _targetProgress,
       onCorrectSlotFilled: _onCorrectSlotFilled,
+      onElementReachedEdge: _handleElementReachedEdge,
     );
 
     return AppScaffold(
@@ -578,5 +579,25 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     }
 
     _attempt.updateTaskAccuracy(_attempt.currentTaskIndex, accuracy);
+  }
+
+  void _handleElementReachedEdge() {
+    if (!mounted || _isFinishing) return;
+
+    _isFinishing = true;
+
+    _timer?.cancel();
+    _timer = null;
+
+    _autoAdvanceTimer?.cancel();
+    _autoAdvanceTimer = null;
+
+    _stopwatch.stop();
+
+    unawaited(
+      _finishAttempt(
+        completionReason: TopicCompletionReason.elementReachedEdge,
+      ),
+    );
   }
 }

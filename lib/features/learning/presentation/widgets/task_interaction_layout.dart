@@ -16,17 +16,20 @@ class TaskInteractionScalingBoundary extends StatelessWidget {
 
 /// Layout for interactions that have scalable content and an optional
 /// non-scalable confirmation button.
+
 class TaskInteractionLayout extends StatelessWidget {
   const TaskInteractionLayout({
     super.key,
     required this.content,
     required this.scrollable,
     this.confirmation,
+    this.alignment = Alignment.center,
   });
 
   final Widget content;
   final bool scrollable;
   final Widget? confirmation;
+  final AlignmentGeometry alignment;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +51,8 @@ class TaskInteractionLayout extends StatelessWidget {
       children: [
         Flexible(
           fit: FlexFit.loose,
-          child: Center(
+          child: Align(
+            alignment: alignment,
             child: FittedBox(fit: BoxFit.contain, child: content),
           ),
         ),

@@ -24,6 +24,7 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
     this.interactionScrollable = false,
     this.onCorrectSlotFilled,
     required this.onIncorrectAttempt,
+    this.onElementReachedEdge,
   });
 
   final SlotAssemblyTask<TOption> task;
@@ -33,6 +34,7 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
   final bool interactionScrollable;
   final ValueChanged<int>? onCorrectSlotFilled;
   final bool Function() onIncorrectAttempt;
+  final VoidCallback? onElementReachedEdge;
 
   @override
   State<SlotAssemblyTaskWidget<TOption>> createState() =>
@@ -40,7 +42,8 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
 }
 
 class _SlotAssemblyTaskWidgetState<TOption>
-    extends State<SlotAssemblyTaskWidget<TOption>> {
+    extends State<SlotAssemblyTaskWidget<TOption>>
+    with SingleTickerProviderStateMixin {
   late List<int?> _slotOptionIndices;
 
   final Set<int> _usedOptionIndices = {};
@@ -50,7 +53,25 @@ class _SlotAssemblyTaskWidgetState<TOption>
   AudioLinkedContent? _activeAudioOption;
   final Map<int, AudioPlaybackController> _audioControllers = {};
   Future<void>? _pendingAudioPlayback;
+
+  static const double _fallingElementSize = 48;
+  static const double _fallingAreaHeight = 360;
+
+  late final AnimationController _fallController;
+
+  int? _fallingOptionIndex;
+  bool _fallingAreaStarted = false;
   bool _isFinishing = false;
+
+  int? _nextFallingOptionIndex() {
+    for (var i = 0; i < widget.task.options.length; i++) {
+      if (!_usedOptionIndices.contains(i)) {
+        return i;
+      }
+    }
+
+    return null;
+  }
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
@@ -62,6 +83,28 @@ class _SlotAssemblyTaskWidgetState<TOption>
   void initState() {
     super.initState();
     _resetSlots();
+    _fallController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    );
+
+    _fallController.addStatusListener((status) {
+      if (status == AnimationStatus.completed &&
+          mounted &&
+          widget.task.fallingElementsEnabled &&
+          !_isAnswered &&
+          !_isFinishing &&
+          _fallingOptionIndex != null) {
+        widget.onElementReachedEdge?.call();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _fallController.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,6 +115,25 @@ class _SlotAssemblyTaskWidgetState<TOption>
       _resetSlots();
       _activeAudioOption = null;
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TaskInteractionLayout(
+      scrollable: widget.interactionScrollable,
+      alignment: Alignment.topCenter,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.task.fallingElementsEnabled)
+            _buildFallingArea()
+          else
+            _buildOptions(),
+          const SizedBox(height: AppSpacing.md),
+          _buildSlots(),
+        ],
+      ),
+    );
   }
 
   void _resetSlots() {
@@ -244,26 +306,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return TaskInteractionLayout(
-      scrollable: widget.interactionScrollable,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-
-        children: [
-          _buildOptions(),
-          const SizedBox(height: AppSpacing.md),
-
-          // Тимчасова область для майбутнього падіння елементів.
-          const SizedBox(height: 160),
-
-          _buildSlots(),
-        ],
-      ),
-    );
-  }
-
   String _displayText(Object? value) {
     if (value is AudioLinkedContent) {
       return _displayText(value.content);
@@ -313,6 +355,153 @@ class _SlotAssemblyTaskWidgetState<TOption>
       },
       controller: controller,
       child: button,
+    );
+  }
+
+  void _startFalling([int? optionIndex]) {
+    if (!mounted ||
+        _isAnswered ||
+        _isFinishing ||
+        !widget.task.fallingElementsEnabled) {
+      return;
+    }
+
+    final index = optionIndex ?? _nextFallingOptionIndex();
+
+    if (index == null) {
+      return;
+    }
+
+    _fallController.stop();
+    _fallController.value = 0;
+
+    setState(() {
+      _fallingOptionIndex = index;
+    });
+
+    _fallController.forward();
+  }
+
+  void _onFallingOptionTapped(int optionIndex) {
+    if (_isAnswered || _isFinishing || _fallingOptionIndex != optionIndex) {
+      return;
+    }
+
+    _fallController.stop();
+
+    setState(() {
+      _fallingOptionIndex = null;
+    });
+
+    _onOptionSelected(optionIndex);
+
+    if (!mounted || _isAnswered || _isFinishing) {
+      return;
+    }
+
+    // Якщо елемент правильний, він уже використаний,
+    // тому наступним впаде інший доступний елемент.
+    // Якщо відповідь неправильна, цей елемент можна
+    // спробувати вибрати ще раз.
+    final nextIndex = _usedOptionIndices.contains(optionIndex)
+        ? _nextFallingOptionIndex()
+        : optionIndex;
+
+    if (nextIndex == null) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_isAnswered && !_isFinishing) {
+        _startFalling(nextIndex);
+      }
+    });
+  }
+
+  Widget _buildFallingArea() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.blue, width: 2),
+      ),
+      child: SizedBox(
+        height: _fallingAreaHeight,
+        width: 240,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (!_fallingAreaStarted) {
+              _fallingAreaStarted = true;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && !_isAnswered && !_isFinishing) {
+                  _startFalling();
+                }
+              });
+            }
+
+            return ClipRect(
+              child: AnimatedBuilder(
+                animation: _fallController,
+                builder: (context, child) {
+                  final optionIndex = _fallingOptionIndex;
+
+                  if (optionIndex == null) {
+                    return const SizedBox.expand();
+                  }
+
+                  final availableHeight =
+                      (constraints.maxHeight - _fallingElementSize).clamp(
+                        0.0,
+                        double.infinity,
+                      );
+
+                  final top = availableHeight * _fallController.value;
+
+                  return Stack(
+                    alignment: Alignment.topLeft,
+                    children: [
+                      Positioned(
+                        top: top,
+                        left: (constraints.maxWidth - _fallingElementSize) / 2,
+                        width: _fallingElementSize,
+                        height: _fallingElementSize,
+                        child: GestureDetector(
+                          onTap: () => _onFallingOptionTapped(optionIndex),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(
+                                _fallingElementSize / 2,
+                              ),
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    _displayText(
+                                      widget.task.options[optionIndex],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

@@ -1,4 +1,3 @@
-
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 
@@ -10,6 +9,7 @@ class SlotAssemblyTaskData<TOption> extends TaskData {
     required this.wrongAnswerCount,
     this.buttonConfig,
     this.requiresSequentialSelection = true,
+    this.fallingElementsEnabled = false,
   });
 
   final List<TOption> correctAnswers;
@@ -17,4 +17,5 @@ class SlotAssemblyTaskData<TOption> extends TaskData {
   final int wrongAnswerCount;
   final SelectionButtonConfig? buttonConfig;
   final bool requiresSequentialSelection;
+  final bool fallingElementsEnabled;
 }

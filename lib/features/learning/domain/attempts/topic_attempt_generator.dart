@@ -224,8 +224,8 @@ class TopicAttemptGenerator {
   }
 
   AttemptTask<List<dynamic>, List<dynamic>> _createSlotAssemblyTask(
-      SlotAssemblyTaskData<dynamic> data,
-      ) {
+    SlotAssemblyTaskData<dynamic> data,
+  ) {
     final correctAnswers = data.correctAnswers;
 
     final wrongAnswers = _answerSelector.select(
@@ -243,6 +243,7 @@ class TopicAttemptGenerator {
         options: options,
         requiresSequentialSelection: data.requiresSequentialSelection,
         buttonConfig: data.buttonConfig,
+        fallingElementsEnabled: data.fallingElementsEnabled,
       ),
     );
   }

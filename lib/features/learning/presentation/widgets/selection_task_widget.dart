@@ -131,8 +131,6 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
   }
 
   void _onLinkedAudioCompleted(AudioLinkedContent option) {
-    debugPrint('SelectionTask: linked audio completed');
-
     if (_isAnswered) return;
 
     if (_activeAudioOption != option) return;
