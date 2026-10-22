@@ -51,15 +51,6 @@ class TaskPromptWidget extends StatelessWidget {
             : MediaQuery.sizeOf(context).width;
 
         final firstVisualIndex = prompt.content.indexWhere(_isVisual);
-        debugPrint(
-          'TaskPrompt: '
-          'maxWidth=${constraints.maxWidth}, '
-          'maxHeight=${constraints.maxHeight}, '
-          'boundedWidth=${constraints.hasBoundedWidth}, '
-          'boundedHeight=${constraints.hasBoundedHeight}, '
-          'firstVisualIndex=$firstVisualIndex, '
-          'hasTarget=${prompt.target != null}',
-        );
         // Увесь prompt є невізуальним.
         if (firstVisualIndex == -1) {
           return SizedBox(

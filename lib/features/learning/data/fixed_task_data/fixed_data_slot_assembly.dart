@@ -35,7 +35,7 @@ final List<TaskData> slotAssemblyWord = [
     ],
     wrongAnswers: [
       AudioLinkedContent(
-        content: TextContent('ра'),
+        content: TextContent('ршша'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
       ),
     ],
@@ -76,7 +76,7 @@ final List<TaskData> slotAssemblyWord = [
     ],
     wrongAnswerCount: 1,
     buttonConfig: myButtonConfig,
-    fallingElementsEnabled: false,
+    fallingElementsEnabled: true,
   ),
   SlotAssemblyTaskData<String>(
     prompt: TaskPrompt(

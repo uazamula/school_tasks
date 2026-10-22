@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
@@ -11,6 +9,7 @@ import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_as
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection/choice_answer_button.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_options_area.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
@@ -54,13 +53,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
   final Map<int, AudioPlaybackController> _audioControllers = {};
   Future<void>? _pendingAudioPlayback;
 
-  static const double _fallingElementSize = 48;
-  static const double _fallingAreaHeight = 360;
-
   late final AnimationController _fallController;
 
   int? _fallingOptionIndex;
-  bool _fallingAreaStarted = false;
   bool _isFinishing = false;
 
   int? _nextFallingOptionIndex() {
@@ -85,7 +80,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     _resetSlots();
     _fallController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 10),
     );
 
     _fallController.addStatusListener((status) {
@@ -102,7 +97,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _fallController.dispose();
     super.dispose();
   }
@@ -399,10 +393,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
       return;
     }
 
-    // Якщо елемент правильний, він уже використаний,
-    // тому наступним впаде інший доступний елемент.
-    // Якщо відповідь неправильна, цей елемент можна
-    // спробувати вибрати ще раз.
     final nextIndex = _usedOptionIndices.contains(optionIndex)
         ? _nextFallingOptionIndex()
         : optionIndex;
@@ -419,89 +409,18 @@ class _SlotAssemblyTaskWidgetState<TOption>
   }
 
   Widget _buildFallingArea() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue, width: 2),
-      ),
-      child: SizedBox(
-        height: _fallingAreaHeight,
-        width: 240,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            if (!_fallingAreaStarted) {
-              _fallingAreaStarted = true;
+    final optionIndex = _fallingOptionIndex;
 
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && !_isAnswered && !_isFinishing) {
-                  _startFalling();
-                }
-              });
-            }
-
-            return ClipRect(
-              child: AnimatedBuilder(
-                animation: _fallController,
-                builder: (context, child) {
-                  final optionIndex = _fallingOptionIndex;
-
-                  if (optionIndex == null) {
-                    return const SizedBox.expand();
-                  }
-
-                  final availableHeight =
-                      (constraints.maxHeight - _fallingElementSize).clamp(
-                        0.0,
-                        double.infinity,
-                      );
-
-                  final top = availableHeight * _fallController.value;
-
-                  return Stack(
-                    alignment: Alignment.topLeft,
-                    children: [
-                      Positioned(
-                        top: top,
-                        left: (constraints.maxWidth - _fallingElementSize) / 2,
-                        width: _fallingElementSize,
-                        height: _fallingElementSize,
-                        child: GestureDetector(
-                          onTap: () => _onFallingOptionTapped(optionIndex),
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(
-                                _fallingElementSize / 2,
-                              ),
-                              border: Border.all(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                            ),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    _displayText(
-                                      widget.task.options[optionIndex],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            );
-          },
-        ),
-      ),
+    return FallingOptionsArea(
+      animation: _fallController,
+      optionIndex: optionIndex,
+      text: optionIndex == null
+          ? null
+          : _displayText(widget.task.options[optionIndex]),
+      canStart: !_isAnswered && !_isFinishing,
+      onStartFalling: _startFalling,
+      onOptionTapped: _onFallingOptionTapped,
+      colorSeed: widget.task,
     );
   }
 }
