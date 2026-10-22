@@ -150,9 +150,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.task.fallingElementsEnabled)
-            _buildFallingArea()
-          else
+          if (widget.task.fallingElementsEnabled) ...[
+            _buildFallingArea(),
+            _buildAudioControllerHosts(),
+          ] else
             _buildOptions(),
           const SizedBox(height: AppSpacing.md),
           _buildSlots(),
@@ -592,5 +593,29 @@ class _SlotAssemblyTaskWidgetState<TOption>
     }
 
     return completed && mounted;
+  }
+
+  Widget _buildAudioControllerHosts() {
+    return Offstage(
+      offstage: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var index = 0; index < widget.task.options.length; index++)
+            if (widget.task.options[index] is AudioLinkedContent)
+              TaskAudioWidget(
+                content:
+                    (widget.task.options[index] as AudioLinkedContent).audio,
+                interactive: false,
+                showIcon: false,
+                isActive: false,
+                controller: _audioControllers.putIfAbsent(
+                  index,
+                  AudioPlaybackController.new,
+                ),
+              ),
+        ],
+      ),
+    );
   }
 }
