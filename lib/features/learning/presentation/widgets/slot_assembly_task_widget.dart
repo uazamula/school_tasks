@@ -115,7 +115,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     });
     _flightController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 700),
     );
   }
 
@@ -429,18 +429,18 @@ class _SlotAssemblyTaskWidgetState<TOption>
       return;
     }
 
-    await _animateOptionToSlot(
+    final completed = await _animateOptionToSlot(
       optionIndex: optionIndex,
       targetSlot: targetSlot,
       sourceRect: sourceRect,
       color: bubbleColor,
     );
 
-    if (!mounted || _isAnswered || _isFinishing) {
+    if (!completed || !mounted || _isAnswered || _isFinishing) {
       return;
     }
 
-    // Фіксуємо відповідь лише після завершення польоту.
+    // Фіксуємо відповідь після завершення польоту.
     _onOptionSelected(optionIndex);
 
     if (!mounted || _isAnswered || _isFinishing) {
@@ -508,7 +508,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     return renderObject.localToGlobal(Offset.zero) & renderObject.size;
   }
 
-  Future<void> _animateOptionToSlot({
+  Future<bool> _animateOptionToSlot({
     required int optionIndex,
     required int targetSlot,
     required Rect sourceRect,
@@ -517,7 +517,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     final targetGlobalRect = _getSlotRect(targetSlot);
 
     if (targetGlobalRect == null) {
-      return;
+      return false;
     }
 
     final overlay = Overlay.of(context, rootOverlay: true);
@@ -526,7 +526,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     if (overlayObject is! RenderBox ||
         !overlayObject.hasSize ||
         !overlayObject.attached) {
-      return;
+      return false;
     }
 
     final startTopLeft = overlayObject.globalToLocal(sourceRect.topLeft);
@@ -586,16 +586,11 @@ class _SlotAssemblyTaskWidgetState<TOption>
     } finally {
       _removeFlightOverlay();
 
-      if (!mounted) {
-        return;
-      }
-
-      _isFlying = false;
-
-      if (completed) {
-        // Наступним кроком тут зафіксуємо відповідь
-        // і відновимо падіння наступної бульбашки.
+      if (mounted) {
+        _isFlying = false;
       }
     }
+
+    return completed && mounted;
   }
 }

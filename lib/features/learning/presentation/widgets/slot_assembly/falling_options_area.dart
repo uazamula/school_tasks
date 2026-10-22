@@ -48,6 +48,7 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
   final Map<int, Color> _bubbleColorsByOption = {};
 
   bool _fallingAreaStarted = false;
+  int? _hiddenOptionIndex;
 
   @override
   void didUpdateWidget(covariant FallingOptionsArea oldWidget) {
@@ -55,6 +56,10 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
 
     if (oldWidget.colorSeed != widget.colorSeed) {
       _bubbleColorsByOption.clear();
+    }
+
+    if (oldWidget.optionIndex != widget.optionIndex) {
+      _hiddenOptionIndex = null;
     }
   }
 
@@ -117,29 +122,39 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
                           builder: (bubbleContext) {
                             final bubbleColor = _bubbleColorFor(optionIndex);
 
-                            return FallingOptionBubble(
-                              text: widget.text!,
-                              color: bubbleColor,
-                              size: widget.elementSize,
-                              onTap: () {
-                                final renderObject = bubbleContext
-                                    .findRenderObject();
+                            return Visibility(
+                              visible: _hiddenOptionIndex != optionIndex,
+                              maintainSize: true,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              child: FallingOptionBubble(
+                                text: widget.text!,
+                                color: bubbleColor,
+                                size: widget.elementSize,
+                                onTap: () {
+                                  final renderObject = bubbleContext
+                                      .findRenderObject();
 
-                                if (renderObject is! RenderBox ||
-                                    !renderObject.hasSize) {
-                                  return;
-                                }
+                                  if (renderObject is! RenderBox ||
+                                      !renderObject.hasSize) {
+                                    return;
+                                  }
 
-                                final sourceRect =
-                                    renderObject.localToGlobal(Offset.zero) &
-                                    renderObject.size;
+                                  final sourceRect =
+                                      renderObject.localToGlobal(Offset.zero) &
+                                      renderObject.size;
 
-                                widget.onOptionTapped(
-                                  widget.optionIndex!,
-                                  sourceRect,
-                                  bubbleColor,
-                                );
-                              },
+                                  setState(() {
+                                    _hiddenOptionIndex = optionIndex;
+                                  });
+
+                                  widget.onOptionTapped(
+                                    widget.optionIndex!,
+                                    sourceRect,
+                                    bubbleColor,
+                                  );
+                                },
+                              ),
                             );
                           },
                         ),
