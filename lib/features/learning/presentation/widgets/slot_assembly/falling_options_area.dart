@@ -23,7 +23,8 @@ class FallingOptionsArea extends StatefulWidget {
   final String? text;
   final bool canStart;
   final VoidCallback onStartFalling;
-  final ValueChanged<int> onOptionTapped;
+  final void Function(int optionIndex, Rect sourceRect, Color color)
+  onOptionTapped;
   final Object colorSeed;
 
   final double width;
@@ -112,11 +113,35 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
                         left: (constraints.maxWidth - widget.elementSize) / 2,
                         width: widget.elementSize,
                         height: widget.elementSize,
-                        child: FallingOptionBubble(
-                          text: text,
-                          color: _bubbleColorFor(optionIndex),
-                          size: widget.elementSize,
-                          onTap: () => widget.onOptionTapped(optionIndex),
+                        child: Builder(
+                          builder: (bubbleContext) {
+                            final bubbleColor = _bubbleColorFor(optionIndex);
+
+                            return FallingOptionBubble(
+                              text: widget.text!,
+                              color: bubbleColor,
+                              size: widget.elementSize,
+                              onTap: () {
+                                final renderObject = bubbleContext
+                                    .findRenderObject();
+
+                                if (renderObject is! RenderBox ||
+                                    !renderObject.hasSize) {
+                                  return;
+                                }
+
+                                final sourceRect =
+                                    renderObject.localToGlobal(Offset.zero) &
+                                    renderObject.size;
+
+                                widget.onOptionTapped(
+                                  widget.optionIndex!,
+                                  sourceRect,
+                                  bubbleColor,
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
                     ],
