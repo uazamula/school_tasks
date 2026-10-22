@@ -24,12 +24,14 @@ class TaskInteractionLayout extends StatelessWidget {
     required this.scrollable,
     this.confirmation,
     this.alignment = Alignment.center,
+    this.fillAvailableSpace = false,
   });
 
   final Widget content;
   final bool scrollable;
   final Widget? confirmation;
   final AlignmentGeometry alignment;
+  final bool fillAvailableSpace;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,21 @@ class TaskInteractionLayout extends StatelessWidget {
         ],
       );
     }
-
+    if (fillAvailableSpace) {
+      return SizedBox.expand(
+        child: Column(
+          children: [
+            Expanded(
+              child: Align(alignment: alignment, child: content),
+            ),
+            if (confirmation != null) ...[
+              const SizedBox(height: AppSpacing.lg),
+              confirmation!,
+            ],
+          ],
+        ),
+      );
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

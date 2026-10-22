@@ -144,21 +144,37 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   @override
   Widget build(BuildContext context) {
+    final fallingEnabled = widget.task.fallingElementsEnabled;
+
     return TaskInteractionLayout(
       scrollable: widget.interactionScrollable,
       alignment: Alignment.topCenter,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.task.fallingElementsEnabled) ...[
-            _buildFallingArea(),
-            _buildAudioControllerHosts(),
-          ] else
-            _buildOptions(),
-          const SizedBox(height: AppSpacing.md),
-          _buildSlots(),
-        ],
-      ),
+      fillAvailableSpace: !fallingEnabled,
+      content: fallingEnabled
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildFallingArea(),
+                _buildAudioControllerHosts(),
+                const SizedBox(height: AppSpacing.md),
+                _buildSlots(),
+              ],
+            )
+          : SizedBox.expand(
+              child: Column(
+                children: [
+                  Align(alignment: Alignment.topCenter, child: _buildOptions()),
+                  const Spacer(),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: UnconstrainedBox(
+                      constrainedAxis: Axis.vertical,
+                      child: _buildSlots(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
