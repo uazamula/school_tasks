@@ -10,6 +10,7 @@ class SlotAssemblyTaskData<TOption> extends TaskData {
     this.buttonConfig,
     this.requiresSequentialSelection = true,
     this.fallingElementsEnabled = false,
+    this.flightAnimationEnabled = false,
   });
 
   final List<TOption> correctAnswers;
@@ -18,4 +19,5 @@ class SlotAssemblyTaskData<TOption> extends TaskData {
   final SelectionButtonConfig? buttonConfig;
   final bool requiresSequentialSelection;
   final bool fallingElementsEnabled;
+  final bool flightAnimationEnabled;
 }

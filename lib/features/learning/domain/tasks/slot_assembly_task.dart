@@ -15,6 +15,7 @@ class SlotAssemblyTask<TOption>
     required bool requiresSequentialSelection,
     this.buttonConfig,
     this.fallingElementsEnabled = false,
+    this.flightAnimationEnabled = false,
   }) : super(
          interaction: SlotAssemblyInteraction(
            requiresSequentialSelection: requiresSequentialSelection,
@@ -38,6 +39,7 @@ class SlotAssemblyTask<TOption>
 
   /// Чи відображати варіанти як елементи, що падають.
   final bool fallingElementsEnabled;
+  final bool flightAnimationEnabled;
 
   @override
   TaskResult<List<TOption>, List<TOption>> checkAnswer(List<TOption> answer) {

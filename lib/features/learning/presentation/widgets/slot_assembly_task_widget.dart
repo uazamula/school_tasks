@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
@@ -73,6 +74,24 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   int? _fallingOptionIndex;
   bool _isFinishing = false;
+
+  static const List<Color> _bubbleColors = [
+    Color(0xFF2879C7),
+    Color(0xFF159B88),
+    Color(0xFF8054C7),
+    Color(0xFFD66B35),
+    Color(0xFFC74770),
+    Color(0xFF647D35),
+  ];
+
+  final Map<int, Color> _bubbleColorsByOption = {};
+
+  Color _bubbleColorFor(int optionIndex) {
+    return _bubbleColorsByOption.putIfAbsent(
+      optionIndex,
+      () => _bubbleColors[math.Random().nextInt(_bubbleColors.length)],
+    );
+  }
 
   int? _nextFallingOptionIndex() {
     for (var i = 0; i < widget.task.options.length; i++) {
@@ -352,17 +371,17 @@ class _SlotAssemblyTaskWidgetState<TOption>
   Widget _buildOptionButton(int index) {
     final option = widget.task.options[index];
 
-    final button = ChoiceAnswerButton(
-      answer: _displayText(option),
-      state: TaskAnswerState.neutral,
-      isSelected: false,
-      onPressed: _isAnswered ? null : () => _onOptionSelected(index),
-      buttonConfig: widget.task.buttonConfig,
+    final bubble = FallingOptionBubble(
+      text: _displayText(option),
+      color: _bubbleColorFor(index),
+      size: 48,
+      onTap: _isAnswered ? () {} : () => _onOptionSelected(index),
     );
 
     if (option is! AudioLinkedContent) {
-      return button;
+      return bubble;
     }
+
     final controller = _audioControllers.putIfAbsent(
       index,
       AudioPlaybackController.new,
@@ -381,7 +400,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         });
       },
       controller: controller,
-      child: button,
+      child: bubble,
     );
   }
 
