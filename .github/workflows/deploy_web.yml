@@ -142,7 +142,7 @@ jobs:
 
   deploy:
     needs: build
-    if: needs.build.result == 'success'
+    if: always() && needs.build.result == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
