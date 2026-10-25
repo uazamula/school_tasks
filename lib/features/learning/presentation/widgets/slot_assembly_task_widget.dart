@@ -47,6 +47,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   late List<int?> _slotOptionIndices;
 
   final Set<int> _usedOptionIndices = {};
+  final Set<int> _flyingOptionIndices = {};
   final Set<int> _temporarilyHiddenFallingOptions = {};
   final Set<int> _attemptedSlots = {};
   final Set<int> _firstAttemptCorrectSlots = {};
@@ -342,7 +343,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
         for (var i = 0; i < widget.task.options.length; i++)
           Visibility(
             key: ValueKey(i),
-            visible: !_usedOptionIndices.contains(i),
+            visible:
+                !_usedOptionIndices.contains(i) &&
+                !_flyingOptionIndices.contains(i),
             maintainState: true,
             child: KeyedSubtree(
               key: _optionKeys[i],
@@ -712,6 +715,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
       return;
     }
 
+    setState(() {
+      _flyingOptionIndices.add(optionIndex);
+    });
+
     final completed = await _animateOptionToSlot(
       optionIndex: optionIndex,
       targetSlot: targetSlot,
@@ -719,8 +726,13 @@ class _SlotAssemblyTaskWidgetState<TOption>
       color: _bubbleColorFor(optionIndex),
     );
 
+    if (!mounted) return;
+
+    setState(() {
+      _flyingOptionIndices.remove(optionIndex);
+    });
+
     if (!completed ||
-        !mounted ||
         _isAnswered ||
         _isFinishing ||
         _usedOptionIndices.contains(optionIndex)) {
