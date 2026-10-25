@@ -73,8 +73,20 @@ final List<TaskData> slotAssemblyWord = [
         content: TextContent('ра'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
       ),
+      AudioLinkedContent(
+        content: TextContent('ру'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ru.mp3'),
+      ),
+      AudioLinkedContent(
+        content: TextContent('ре'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_re.mp3'),
+      ),
+      AudioLinkedContent(
+        content: TextContent('ри'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
+      ),
     ],
-    wrongAnswerCount: 1,
+    wrongAnswerCount: 4,
     buttonConfig: myButtonConfig,
     fallingElementsEnabled: false,
     flightAnimationEnabled: true,
@@ -95,5 +107,6 @@ final List<TaskData> slotAssemblyWord = [
     wrongAnswers: ['ма', 'ши', 'на'],
     wrongAnswerCount: 3,
     buttonConfig: myButtonConfig,
+    flightAnimationEnabled: true
   ),
 ];

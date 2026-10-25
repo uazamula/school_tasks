@@ -334,25 +334,66 @@ class _SlotAssemblyTaskWidgetState<TOption>
     );
   }
 
+  List<List<int>> _buildOptionRows(int itemCount) {
+    if (itemCount == 0) return [];
+
+    const maxColumns = 4;
+
+    final rowCount = (itemCount + maxColumns - 1) ~/ maxColumns;
+    final baseCount = itemCount ~/ rowCount;
+    final extraCount = itemCount % rowCount;
+
+    var index = 0;
+
+    return List.generate(rowCount, (rowIndex) {
+      final count = baseCount + (rowIndex < extraCount ? 1 : 0);
+      final row = List.generate(count, (_) => index++);
+      return row;
+    });
+  }
+
   Widget _buildOptions() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: AppSpacing.md,
-      runSpacing: AppSpacing.md,
+    final rows = _buildOptionRows(widget.task.options.length);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        for (var i = 0; i < widget.task.options.length; i++)
-          Visibility(
-            key: ValueKey(i),
-            visible:
-                !_usedOptionIndices.contains(i) &&
-                !_flyingOptionIndices.contains(i),
-            maintainState: true,
-            child: KeyedSubtree(
-              key: _optionKeys[i],
-              child: _buildOptionButton(i),
-            ),
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) ...[
+          if (rowIndex > 0) const SizedBox(height: AppSpacing.md),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (
+                var columnIndex = 0;
+                columnIndex < rows[rowIndex].length;
+                columnIndex++
+              ) ...[
+                if (columnIndex > 0) const SizedBox(width: AppSpacing.md),
+                _buildOptionSlot(rows[rowIndex][columnIndex]),
+              ],
+            ],
           ),
+        ],
       ],
+    );
+  }
+
+  Widget _buildOptionSlot(int index) {
+    final isVisible =
+        !_usedOptionIndices.contains(index) &&
+        !_flyingOptionIndices.contains(index);
+
+    return Visibility(
+      key: ValueKey(index),
+      visible: isVisible,
+      maintainState: true,
+      maintainAnimation: true,
+      maintainSize: true,
+      child: KeyedSubtree(
+        key: _optionKeys[index],
+        child: _buildOptionButton(index),
+      ),
     );
   }
 
@@ -492,15 +533,17 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   Widget _buildFallingArea() {
     final optionIndices = [
-      for (var i = 0; i < widget.task.options.length; i++)
-        if (!_usedOptionIndices.contains(i)) i,
+      for (var i = 0; i < widget.task.options.length; i++) i,
     ];
 
     return FallingOptionsArea(
       animation: _fallController,
       optionIndices: optionIndices,
       textForOption: (index) => _displayText(widget.task.options[index]),
-      hiddenOptionIndices: _temporarilyHiddenFallingOptions,
+      hiddenOptionIndices: {
+        ..._usedOptionIndices,
+        ..._temporarilyHiddenFallingOptions,
+      },
       canStart: !_isAnswered && !_isFinishing,
       onStartFalling: _startFalling,
       onOptionTapped: _onFallingOptionTapped,
@@ -686,6 +729,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   Future<void> _onStaticOptionTapped(int optionIndex) async {
     if (_isAnswered ||
         _isFinishing ||
+        _isFlying ||
         _usedOptionIndices.contains(optionIndex)) {
       return;
     }

@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -50,9 +49,20 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
     Color(0xFF647D35),
   ];
 
+  static const int _maxColumns = 4;
+
   final Map<int, Color> _bubbleColorsByOption = {};
 
   bool _fallingAreaStarted = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.canStart) {
+      _scheduleFallingStart();
+    }
+  }
 
   @override
   void didUpdateWidget(covariant FallingOptionsArea oldWidget) {
@@ -61,53 +71,62 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
     if (oldWidget.colorSeed != widget.colorSeed) {
       _bubbleColorsByOption.clear();
     }
+
+    if (widget.canStart && !oldWidget.canStart) {
+      _scheduleFallingStart();
+    }
+  }
+
+  void _scheduleFallingStart() {
+    if (_fallingAreaStarted) return;
+
+    _fallingAreaStarted = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.canStart) {
+        widget.onStartFalling();
+      } else if (mounted) {
+        // Allow a later update to start the animation when canStart
+        // becomes true.
+        _fallingAreaStarted = false;
+      }
+    });
   }
 
   Color _bubbleColorFor(int optionIndex) {
     return _bubbleColorsByOption.putIfAbsent(
       optionIndex,
-          () => _bubbleColors[
-      math.Random().nextInt(_bubbleColors.length)
-      ],
+      () => _bubbleColors[math.Random().nextInt(_bubbleColors.length)],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final itemCount = widget.optionIndices.length;
-    final rowWidth = itemCount == 0
-        ? widget.width
-        : itemCount * widget.elementSize +
-        (itemCount - 1) * widget.spacing;
-    final areaWidth = math.max(widget.width, rowWidth);
+    final rows = _buildRows(widget.optionIndices);
+    final rowCount = rows.length;
+
+    // Each row uses a fixed set of slots. Hidden bubbles keep their space,
+    // so selecting one does not move the remaining bubbles.
+    final gridHeight = rowCount == 0
+        ? 0.0
+        : rowCount * widget.elementSize + (rowCount - 1) * widget.spacing;
 
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.blue, width: 2),
       ),
       child: SizedBox(
+        width: widget.width,
         height: widget.height,
-        width: areaWidth,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            if (!_fallingAreaStarted) {
-              _fallingAreaStarted = true;
-
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && widget.canStart) {
-                  widget.onStartFalling();
-                }
-              });
-            }
-
             return ClipRect(
               child: AnimatedBuilder(
                 animation: widget.animation,
                 builder: (context, child) {
-                  final availableHeight =
-                  (constraints.maxHeight - widget.elementSize).clamp(
+                  final availableHeight = math.max(
                     0.0,
-                    double.infinity,
+                    constraints.maxHeight - gridHeight,
                   );
 
                   final top = availableHeight * widget.animation.value;
@@ -118,21 +137,30 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
                         top: top,
                         left: 0,
                         right: 0,
-                        child: Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              for (var i = 0;
-                              i < widget.optionIndices.length;
-                              i++) ...[
-                                if (i > 0)
-                                  SizedBox(width: widget.spacing),
-                                _buildBubble(
-                                  widget.optionIndices[i],
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (var row = 0; row < rowCount; row++) ...[
+                              if (row > 0) SizedBox(height: widget.spacing),
+                              Center(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    for (
+                                      var column = 0;
+                                      column < rows[row].length;
+                                      column++
+                                    ) ...[
+                                      if (column > 0)
+                                        SizedBox(width: widget.spacing),
+                                      _buildBubble(rows[row][column]),
+                                    ],
+                                  ],
                                 ),
-                              ],
+                              ),
                             ],
-                          ),
+                          ],
                         ),
                       ),
                     ],
@@ -178,19 +206,31 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
                 }
 
                 final sourceRect =
-                renderObject.localToGlobal(Offset.zero) &
-                renderObject.size;
+                    renderObject.localToGlobal(Offset.zero) & renderObject.size;
 
-                widget.onOptionTapped(
-                  optionIndex,
-                  sourceRect,
-                  bubbleColor,
-                );
+                widget.onOptionTapped(optionIndex, sourceRect, bubbleColor);
               },
             ),
           );
         },
       ),
     );
+  }
+
+  List<List<int>> _buildRows(List<int> optionIndices) {
+    final itemCount = optionIndices.length;
+    if (itemCount == 0) return [];
+
+    final rowCount = (itemCount + _maxColumns - 1) ~/ _maxColumns;
+    final baseCount = itemCount ~/ rowCount;
+    final extraCount = itemCount % rowCount;
+
+    var offset = 0;
+    return List.generate(rowCount, (rowIndex) {
+      final count = baseCount + (rowIndex < extraCount ? 1 : 0);
+      final row = optionIndices.sublist(offset, offset + count);
+      offset += count;
+      return row;
+    });
   }
 }
