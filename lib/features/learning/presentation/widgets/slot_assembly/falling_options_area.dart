@@ -1,3 +1,4 @@
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,8 +8,9 @@ class FallingOptionsArea extends StatefulWidget {
   const FallingOptionsArea({
     super.key,
     required this.animation,
-    required this.optionIndex,
-    required this.text,
+    required this.optionIndices,
+    required this.textForOption,
+    required this.hiddenOptionIndices,
     required this.canStart,
     required this.onStartFalling,
     required this.onOptionTapped,
@@ -16,11 +18,13 @@ class FallingOptionsArea extends StatefulWidget {
     this.width = 240,
     this.height = 360,
     this.elementSize = 48,
+    this.spacing = 8,
   });
 
   final Animation<double> animation;
-  final int? optionIndex;
-  final String? text;
+  final List<int> optionIndices;
+  final String Function(int optionIndex) textForOption;
+  final Set<int> hiddenOptionIndices;
   final bool canStart;
   final VoidCallback onStartFalling;
   final void Function(int optionIndex, Rect sourceRect, Color color)
@@ -30,6 +34,7 @@ class FallingOptionsArea extends StatefulWidget {
   final double width;
   final double height;
   final double elementSize;
+  final double spacing;
 
   @override
   State<FallingOptionsArea> createState() => _FallingOptionsAreaState();
@@ -48,7 +53,6 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
   final Map<int, Color> _bubbleColorsByOption = {};
 
   bool _fallingAreaStarted = false;
-  int? _hiddenOptionIndex;
 
   @override
   void didUpdateWidget(covariant FallingOptionsArea oldWidget) {
@@ -57,28 +61,33 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
     if (oldWidget.colorSeed != widget.colorSeed) {
       _bubbleColorsByOption.clear();
     }
-
-    if (oldWidget.optionIndex != widget.optionIndex) {
-      _hiddenOptionIndex = null;
-    }
   }
 
   Color _bubbleColorFor(int optionIndex) {
     return _bubbleColorsByOption.putIfAbsent(
       optionIndex,
-      () => _bubbleColors[math.Random().nextInt(_bubbleColors.length)],
+          () => _bubbleColors[
+      math.Random().nextInt(_bubbleColors.length)
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final itemCount = widget.optionIndices.length;
+    final rowWidth = itemCount == 0
+        ? widget.width
+        : itemCount * widget.elementSize +
+        (itemCount - 1) * widget.spacing;
+    final areaWidth = math.max(widget.width, rowWidth);
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.blue, width: 2),
       ),
       child: SizedBox(
         height: widget.height,
-        width: widget.width,
+        width: areaWidth,
         child: LayoutBuilder(
           builder: (context, constraints) {
             if (!_fallingAreaStarted) {
@@ -95,68 +104,35 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
               child: AnimatedBuilder(
                 animation: widget.animation,
                 builder: (context, child) {
-                  final optionIndex = widget.optionIndex;
-                  final text = widget.text;
-
-                  if (optionIndex == null || text == null) {
-                    return const SizedBox.expand();
-                  }
-
                   final availableHeight =
-                      (constraints.maxHeight - widget.elementSize).clamp(
-                        0.0,
-                        double.infinity,
-                      );
+                  (constraints.maxHeight - widget.elementSize).clamp(
+                    0.0,
+                    double.infinity,
+                  );
 
                   final top = availableHeight * widget.animation.value;
 
                   return Stack(
-                    alignment: Alignment.topLeft,
                     children: [
                       Positioned(
                         top: top,
-                        left: (constraints.maxWidth - widget.elementSize) / 2,
-                        width: widget.elementSize,
-                        height: widget.elementSize,
-                        child: Builder(
-                          builder: (bubbleContext) {
-                            final bubbleColor = _bubbleColorFor(optionIndex);
-
-                            return Visibility(
-                              visible: _hiddenOptionIndex != optionIndex,
-                              maintainSize: true,
-                              maintainAnimation: true,
-                              maintainState: true,
-                              child: FallingOptionBubble(
-                                text: widget.text!,
-                                color: bubbleColor,
-                                size: widget.elementSize,
-                                onTap: () {
-                                  final renderObject = bubbleContext
-                                      .findRenderObject();
-
-                                  if (renderObject is! RenderBox ||
-                                      !renderObject.hasSize) {
-                                    return;
-                                  }
-
-                                  final sourceRect =
-                                      renderObject.localToGlobal(Offset.zero) &
-                                      renderObject.size;
-
-                                  setState(() {
-                                    _hiddenOptionIndex = optionIndex;
-                                  });
-
-                                  widget.onOptionTapped(
-                                    widget.optionIndex!,
-                                    sourceRect,
-                                    bubbleColor,
-                                  );
-                                },
-                              ),
-                            );
-                          },
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              for (var i = 0;
+                              i < widget.optionIndices.length;
+                              i++) ...[
+                                if (i > 0)
+                                  SizedBox(width: widget.spacing),
+                                _buildBubble(
+                                  widget.optionIndices[i],
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -166,6 +142,54 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildBubble(int optionIndex) {
+    final bubbleColor = _bubbleColorFor(optionIndex);
+
+    return SizedBox(
+      width: widget.elementSize,
+      height: widget.elementSize,
+      child: Builder(
+        builder: (bubbleContext) {
+          return Visibility(
+            visible: !widget.hiddenOptionIndices.contains(optionIndex),
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: FallingOptionBubble(
+              text: widget.textForOption(optionIndex),
+              color: bubbleColor,
+              size: widget.elementSize,
+              onTap: () {
+                if (!widget.canStart ||
+                    widget.hiddenOptionIndices.contains(optionIndex)) {
+                  return;
+                }
+
+                final renderObject = bubbleContext.findRenderObject();
+
+                if (renderObject is! RenderBox ||
+                    !renderObject.hasSize ||
+                    !renderObject.attached) {
+                  return;
+                }
+
+                final sourceRect =
+                renderObject.localToGlobal(Offset.zero) &
+                renderObject.size;
+
+                widget.onOptionTapped(
+                  optionIndex,
+                  sourceRect,
+                  bubbleColor,
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }

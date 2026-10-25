@@ -47,6 +47,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   late List<int?> _slotOptionIndices;
 
   final Set<int> _usedOptionIndices = {};
+  final Set<int> _temporarilyHiddenFallingOptions = {};
   final Set<int> _attemptedSlots = {};
   final Set<int> _firstAttemptCorrectSlots = {};
 
@@ -70,7 +71,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
   late final AnimationController _fallController;
   late List<GlobalKey> _slotKeys;
 
-  int? _fallingOptionIndex;
   bool _isFinishing = false;
 
   late List<GlobalKey> _optionKeys;
@@ -129,7 +129,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
           widget.task.fallingElementsEnabled &&
           !_isAnswered &&
           !_isFinishing &&
-          _fallingOptionIndex != null) {
+          !_isFlying &&
+          _nextFallingOptionIndex() != null) {
         widget.onElementReachedEdge?.call();
       }
     });
@@ -218,6 +219,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     _usedOptionIndices.clear();
     _attemptedSlots.clear();
     _firstAttemptCorrectSlots.clear();
+    _temporarilyHiddenFallingOptions.clear();
   }
 
   int? _nextEmptySlot() {
@@ -405,28 +407,19 @@ class _SlotAssemblyTaskWidgetState<TOption>
     );
   }
 
-  void _startFalling([int? optionIndex]) {
+  void _startFalling() {
     if (!mounted ||
         _isAnswered ||
         _isFinishing ||
-        !widget.task.fallingElementsEnabled) {
+        !widget.task.fallingElementsEnabled ||
+        _nextFallingOptionIndex() == null) {
       return;
     }
 
-    final index = optionIndex ?? _nextFallingOptionIndex();
-
-    if (index == null) {
-      return;
-    }
-
-    _fallController.stop();
-    _fallController.value = 0;
-
-    setState(() {
-      _fallingOptionIndex = index;
-    });
-
-    _fallController.forward();
+    _fallController
+      ..stop()
+      ..value = 0
+      ..forward();
   }
 
   Future<void> _onFallingOptionTapped(
@@ -434,32 +427,28 @@ class _SlotAssemblyTaskWidgetState<TOption>
     Rect sourceRect,
     Color bubbleColor,
   ) async {
-    if (!mounted || _isAnswered || _isFinishing || _isFlying) {
+    if (!mounted ||
+        _isAnswered ||
+        _isFinishing ||
+        _isFlying ||
+        _temporarilyHiddenFallingOptions.contains(optionIndex) ||
+        _usedOptionIndices.contains(optionIndex)) {
       return;
     }
 
-    _fallController.stop();
-    _fallingOptionIndex = null;
+    setState(() {
+      _temporarilyHiddenFallingOptions.add(optionIndex);
+    });
 
     final targetSlot = _findTargetSlot(optionIndex);
 
     if (targetSlot == null) {
-      // Неправильна відповідь: зберігаємо попередню поведінку.
+      // Неправильна відповідь: облік спроб залишається незмінним.
       _onOptionSelected(optionIndex);
 
-      if (!mounted || _isAnswered || _isFinishing) {
-        return;
-      }
-
-      final nextIndex = _usedOptionIndices.contains(optionIndex)
-          ? _nextFallingOptionIndex()
-          : optionIndex;
-
-      if (nextIndex != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            _startFalling(nextIndex);
-          }
+      if (mounted) {
+        setState(() {
+          _temporarilyHiddenFallingOptions.remove(optionIndex);
         });
       }
 
@@ -474,38 +463,41 @@ class _SlotAssemblyTaskWidgetState<TOption>
         color: bubbleColor,
       );
 
-      if (!completed || !mounted || _isAnswered || _isFinishing) {
+      if (!mounted || _isAnswered || _isFinishing) {
+        return;
+      }
+
+      if (!completed) {
+        // Якщо анімація не відбулася, не втрачаємо правильну відповідь.
+        _onOptionSelected(optionIndex);
+        setState(() {
+          _temporarilyHiddenFallingOptions.remove(optionIndex);
+        });
         return;
       }
     }
 
-    // Якщо політ вимкнено, фіксуємо відповідь одразу.
+    // За вимкненої анімації слот заповнюється одразу.
     _onOptionSelected(optionIndex);
 
-    if (!mounted || _isAnswered || _isFinishing) {
-      return;
-    }
-
-    final nextIndex = _nextFallingOptionIndex();
-
-    if (nextIndex != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _startFalling(nextIndex);
-        }
+    if (mounted) {
+      setState(() {
+        _temporarilyHiddenFallingOptions.remove(optionIndex);
       });
     }
   }
 
   Widget _buildFallingArea() {
-    final optionIndex = _fallingOptionIndex;
+    final optionIndices = [
+      for (var i = 0; i < widget.task.options.length; i++)
+        if (!_usedOptionIndices.contains(i)) i,
+    ];
 
     return FallingOptionsArea(
       animation: _fallController,
-      optionIndex: optionIndex,
-      text: optionIndex == null
-          ? null
-          : _displayText(widget.task.options[optionIndex]),
+      optionIndices: optionIndices,
+      textForOption: (index) => _displayText(widget.task.options[index]),
+      hiddenOptionIndices: _temporarilyHiddenFallingOptions,
       canStart: !_isAnswered && !_isFinishing,
       onStartFalling: _startFalling,
       onOptionTapped: _onFallingOptionTapped,
