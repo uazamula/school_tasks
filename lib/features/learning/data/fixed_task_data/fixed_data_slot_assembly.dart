@@ -77,7 +77,8 @@ final List<TaskData> slotAssemblyWord = [
     wrongAnswerCount: 1,
     buttonConfig: myButtonConfig,
     fallingElementsEnabled: false,
-    requiresSequentialSelection: true,
+    flightAnimationEnabled: true,
+    requiresSequentialSelection: false,
   ),
   SlotAssemblyTaskData<String>(
     prompt: TaskPrompt(

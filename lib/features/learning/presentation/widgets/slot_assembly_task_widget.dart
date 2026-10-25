@@ -8,8 +8,6 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_content
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
-import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/selection/choice_answer_button.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_option_bubble.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_options_area.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_slots.dart';
@@ -75,6 +73,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
   int? _fallingOptionIndex;
   bool _isFinishing = false;
 
+  late List<GlobalKey> _optionKeys;
+
   static const List<Color> _bubbleColors = [
     Color(0xFF2879C7),
     Color(0xFF159B88),
@@ -113,6 +113,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   void initState() {
     super.initState();
     _resetSlots();
+    _optionKeys = List.generate(widget.task.options.length, (_) => GlobalKey());
     _slotKeys = List.generate(
       widget.task.correctAnswers.length,
       (_) => GlobalKey(),
@@ -151,6 +152,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.task != widget.task) {
+      _optionKeys = List.generate(
+        widget.task.options.length,
+        (_) => GlobalKey(),
+      );
       _slotKeys = List.generate(
         widget.task.correctAnswers.length,
         (_) => GlobalKey(),
@@ -234,21 +239,12 @@ class _SlotAssemblyTaskWidgetState<TOption>
     return null;
   }
 
-  void _onOptionSelected(int optionIndex) {
+  void _onOptionSelected(int optionIndex, {bool playAudio = true}) {
     if (_isAnswered || _usedOptionIndices.contains(optionIndex)) return;
 
-    final option = widget.task.options[optionIndex];
-
-    // Аудіо запускається незалежно від правильності відповіді.
-    setState(() {
-      if (option is AudioLinkedContent) {
-        final playback = _audioControllers[optionIndex]?.playAndWait();
-
-        if (playback != null) {
-          _pendingAudioPlayback = playback;
-        }
-      }
-    });
+    if (playAudio) {
+      _playOptionAudio(optionIndex);
+    }
 
     final nextEmptySlot = _nextEmptySlot();
     if (nextEmptySlot == null) return;
@@ -346,7 +342,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
             key: ValueKey(i),
             visible: !_usedOptionIndices.contains(i),
             maintainState: true,
-            child: _buildOptionButton(i),
+            child: KeyedSubtree(
+              key: _optionKeys[i],
+              child: _buildOptionButton(i),
+            ),
           ),
       ],
     );
@@ -375,7 +374,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
       text: _displayText(option),
       color: _bubbleColorFor(index),
       size: 48,
-      onTap: _isAnswered ? () {} : () => _onOptionSelected(index),
+      onTap: _isAnswered
+          ? () {}
+          : () => unawaited(_onStaticOptionTapped(index)),
     );
 
     if (option is! AudioLinkedContent) {
@@ -465,18 +466,20 @@ class _SlotAssemblyTaskWidgetState<TOption>
       return;
     }
 
-    final completed = await _animateOptionToSlot(
-      optionIndex: optionIndex,
-      targetSlot: targetSlot,
-      sourceRect: sourceRect,
-      color: bubbleColor,
-    );
+    if (widget.task.flightAnimationEnabled) {
+      final completed = await _animateOptionToSlot(
+        optionIndex: optionIndex,
+        targetSlot: targetSlot,
+        sourceRect: sourceRect,
+        color: bubbleColor,
+      );
 
-    if (!completed || !mounted || _isAnswered || _isFinishing) {
-      return;
+      if (!completed || !mounted || _isAnswered || _isFinishing) {
+        return;
+      }
     }
 
-    // Фіксуємо відповідь після завершення польоту.
+    // Якщо політ вимкнено, фіксуємо відповідь одразу.
     _onOptionSelected(optionIndex);
 
     if (!mounted || _isAnswered || _isFinishing) {
@@ -652,5 +655,87 @@ class _SlotAssemblyTaskWidgetState<TOption>
         ],
       ),
     );
+  }
+
+  Rect? _getOptionRect(int optionIndex) {
+    if (optionIndex < 0 || optionIndex >= _optionKeys.length) {
+      return null;
+    }
+
+    final context = _optionKeys[optionIndex].currentContext;
+    final renderObject = context?.findRenderObject();
+
+    if (renderObject is! RenderBox ||
+        !renderObject.hasSize ||
+        !renderObject.attached) {
+      return null;
+    }
+
+    return renderObject.localToGlobal(Offset.zero) & renderObject.size;
+  }
+
+  void _playOptionAudio(int optionIndex) {
+    final option = widget.task.options[optionIndex];
+
+    if (option is! AudioLinkedContent) return;
+
+    setState(() {
+      final playback = _audioControllers[optionIndex]?.playAndWait();
+
+      if (playback != null) {
+        _pendingAudioPlayback = playback;
+      }
+    });
+  }
+
+  Future<void> _onStaticOptionTapped(int optionIndex) async {
+    if (_isAnswered ||
+        _isFinishing ||
+        _usedOptionIndices.contains(optionIndex)) {
+      return;
+    }
+
+    // Аудіо запускається одразу після натискання.
+    _playOptionAudio(optionIndex);
+
+    final targetSlot = _findTargetSlot(optionIndex);
+
+    // Для неправильної відповіді зберігаємо попередню поведінку.
+    if (targetSlot == null) {
+      _onOptionSelected(optionIndex, playAudio: false);
+      return;
+    }
+
+    // Без анімації заповнюємо слот одразу.
+    if (!widget.task.flightAnimationEnabled) {
+      _onOptionSelected(optionIndex, playAudio: false);
+      return;
+    }
+
+    final sourceRect = _getOptionRect(optionIndex);
+
+    // Якщо координати недоступні, не блокуємо відповідь.
+    if (sourceRect == null) {
+      _onOptionSelected(optionIndex, playAudio: false);
+      return;
+    }
+
+    final completed = await _animateOptionToSlot(
+      optionIndex: optionIndex,
+      targetSlot: targetSlot,
+      sourceRect: sourceRect,
+      color: _bubbleColorFor(optionIndex),
+    );
+
+    if (!completed ||
+        !mounted ||
+        _isAnswered ||
+        _isFinishing ||
+        _usedOptionIndices.contains(optionIndex)) {
+      return;
+    }
+
+    // Фіксуємо відповідь лише після завершення польоту.
+    _onOptionSelected(optionIndex, playAudio: false);
   }
 }
