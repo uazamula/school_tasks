@@ -7,6 +7,7 @@ import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 
 final myButtonConfig = SelectionButtonConfig(
   fontSize: 10,
@@ -41,7 +42,6 @@ final List<TaskData> slotAssemblyWord = [
     ],
     wrongAnswerCount: 1,
     buttonConfig: myButtonConfig,
-    fallingElementsEnabled: true,
   ),
   SlotAssemblyTaskData<AudioLinkedContent>(
     prompt: TaskPrompt(
@@ -77,26 +77,22 @@ final List<TaskData> slotAssemblyWord = [
         content: TextContent('ру'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ru.mp3'),
       ),
-      AudioLinkedContent(
-        content: TextContent('ре'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_re.mp3'),
-      ),
-      AudioLinkedContent(
-        content: TextContent('ри'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
-      ),
     ],
-    wrongAnswerCount: 4,
-    buttonConfig: myButtonConfig,
-    fallingElementsEnabled: false,
-    flightAnimationEnabled: true,
+    wrongAnswerCount: 2,
+    interactionMode: const PressForSlotInteractionMode(
+      fallingElementsEnabled: true,
+      flightAnimationEnabled: false,
+    ),
     requiresSequentialSelection: false,
   ),
   SlotAssemblyTaskData<String>(
     prompt: TaskPrompt(
       content: [TextContent('Склади слово')],
       target: TargetContent(
-        target: ImageContent('assets/images/fish.png'),
+        target: AudioLinkedContent(
+          content: ImageContent('assets/images/fish.png'),
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
+        ),
         effect: const TargetEffectConfig(
           type: TargetEffectType.saturation,
           steps: 2,
@@ -107,6 +103,6 @@ final List<TaskData> slotAssemblyWord = [
     wrongAnswers: ['ма', 'ши', 'на'],
     wrongAnswerCount: 3,
     buttonConfig: myButtonConfig,
-    flightAnimationEnabled: true
+    interactionMode: const DragToSlotInteractionMode(),
   ),
 ];

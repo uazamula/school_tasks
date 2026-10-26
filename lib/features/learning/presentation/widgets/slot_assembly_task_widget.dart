@@ -7,6 +7,7 @@ import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_option_bubble.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_options_area.dart';
@@ -106,9 +107,26 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
+  SlotAssemblyInteraction get _interaction =>
+      widget.task.interaction as SlotAssemblyInteraction;
+
+  SlotAssemblyInteractionMode get _interactionMode => _interaction.mode;
+
+  PressForSlotInteractionMode? get _pressMode {
+    final mode = _interactionMode;
+    return mode is PressForSlotInteractionMode ? mode : null;
+  }
+
+  bool get _fallingElementsEnabled =>
+      _pressMode?.fallingElementsEnabled ?? false;
+
+  bool get _flightAnimationEnabled =>
+      _pressMode?.flightAnimationEnabled ?? false;
+
+  bool get _isPressInteraction => _pressMode != null;
+
   bool get _requiresSequentialSelection =>
-      (widget.task.interaction as SlotAssemblyInteraction)
-          .requiresSequentialSelection;
+      _interaction.requiresSequentialSelection;
 
   @override
   void initState() {
@@ -127,7 +145,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     _fallController.addStatusListener((status) {
       if (status == AnimationStatus.completed &&
           mounted &&
-          widget.task.fallingElementsEnabled &&
+          _fallingElementsEnabled &&
           !_isAnswered &&
           !_isFinishing &&
           !_isFlying &&
@@ -170,7 +188,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   @override
   Widget build(BuildContext context) {
-    final fallingEnabled = widget.task.fallingElementsEnabled;
+    final fallingEnabled = _fallingElementsEnabled;
 
     return TaskInteractionLayout(
       scrollable: widget.interactionScrollable,
@@ -420,7 +438,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       text: _displayText(option),
       color: _bubbleColorFor(index),
       size: 48,
-      onTap: _isAnswered
+      onTap: _isAnswered || !_isPressInteraction
           ? () {}
           : () => unawaited(_onStaticOptionTapped(index)),
     );
@@ -455,7 +473,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     if (!mounted ||
         _isAnswered ||
         _isFinishing ||
-        !widget.task.fallingElementsEnabled ||
+        !_fallingElementsEnabled ||
         _nextFallingOptionIndex() == null) {
       return;
     }
@@ -499,7 +517,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       return;
     }
 
-    if (widget.task.flightAnimationEnabled) {
+    if (_flightAnimationEnabled) {
       final completed = await _animateOptionToSlot(
         optionIndex: optionIndex,
         targetSlot: targetSlot,
@@ -727,7 +745,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
   }
 
   Future<void> _onStaticOptionTapped(int optionIndex) async {
-    if (_isAnswered ||
+    if (!_isPressInteraction ||
+        _isAnswered ||
         _isFinishing ||
         _isFlying ||
         _usedOptionIndices.contains(optionIndex)) {
@@ -746,7 +765,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     }
 
     // Без анімації заповнюємо слот одразу.
-    if (!widget.task.flightAnimationEnabled) {
+    if (!_flightAnimationEnabled) {
       _onOptionSelected(optionIndex, playAudio: false);
       return;
     }

@@ -150,7 +150,7 @@ abstract final class Tests {
       interactionFlex: 2,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
-      areaOrder: TopicAreaOrder.interactionFirst,
+      areaOrder: TopicAreaOrder.promptFirst,
     ),
     progressionMode: TopicProgressionMode.automaticWithFeedback,
     feedbackDuration: Duration(milliseconds: 300),

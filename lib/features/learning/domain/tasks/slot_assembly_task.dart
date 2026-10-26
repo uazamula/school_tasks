@@ -1,6 +1,7 @@
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution_evaluator.dart';
@@ -14,11 +15,12 @@ class SlotAssemblyTask<TOption>
     required this.options,
     required bool requiresSequentialSelection,
     this.buttonConfig,
-    this.fallingElementsEnabled = false,
-    this.flightAnimationEnabled = false,
+    SlotAssemblyInteractionMode interactionMode =
+        const PressForSlotInteractionMode(),
   }) : super(
          interaction: SlotAssemblyInteraction(
            requiresSequentialSelection: requiresSequentialSelection,
+           mode: interactionMode,
          ),
          solution: Solution<List<TOption>, List<TOption>>(
            value: List.unmodifiable(correctAnswers),
@@ -35,11 +37,8 @@ class SlotAssemblyTask<TOption>
 
   /// Правильні елементи в порядку слотів.
   List<TOption> get correctAnswers => solution.value;
-  final SelectionButtonConfig? buttonConfig;
 
-  /// Чи відображати варіанти як елементи, що падають.
-  final bool fallingElementsEnabled;
-  final bool flightAnimationEnabled;
+  final SelectionButtonConfig? buttonConfig;
 
   @override
   TaskResult<List<TOption>, List<TOption>> checkAnswer(List<TOption> answer) {

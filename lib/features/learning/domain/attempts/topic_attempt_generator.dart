@@ -243,8 +243,7 @@ class TopicAttemptGenerator {
         options: options,
         requiresSequentialSelection: data.requiresSequentialSelection,
         buttonConfig: data.buttonConfig,
-        fallingElementsEnabled: data.fallingElementsEnabled,
-        flightAnimationEnabled: data.flightAnimationEnabled,
+        interactionMode: data.interactionMode,
       ),
     );
   }
