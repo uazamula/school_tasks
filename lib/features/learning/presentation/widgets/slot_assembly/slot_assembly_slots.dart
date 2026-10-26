@@ -7,10 +7,16 @@ class SlotAssemblySlots extends StatelessWidget {
     super.key,
     required this.slots,
     required this.slotKeys,
+    this.dragEnabled = false,
+    this.occupiedSlots = const [],
+    this.onOptionDropped,
   });
 
   final List<String> slots;
   final List<GlobalKey> slotKeys;
+  final bool dragEnabled;
+  final List<bool> occupiedSlots;
+  final void Function(int optionIndex, int slotIndex)? onOptionDropped;
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +28,31 @@ class SlotAssemblySlots extends StatelessWidget {
       runSpacing: AppSpacing.md,
       children: [
         for (var i = 0; i < slots.length; i++)
-          Container(
-            key: slotKeys[i],
-            constraints: const BoxConstraints(minWidth: 64, minHeight: 56),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.md,
-            ),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(color: theme.colorScheme.outline),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(slots[i], style: theme.textTheme.titleMedium),
+          DragTarget<int>(
+            onWillAcceptWithDetails: (details) {
+              return dragEnabled &&
+                  i < occupiedSlots.length &&
+                  !occupiedSlots[i];
+            },
+            onAcceptWithDetails: (details) {
+              onOptionDropped?.call(details.data, i);
+            },
+            builder: (context, candidateData, rejectedData) {
+              return Container(
+                key: slotKeys[i],
+                constraints: const BoxConstraints(minWidth: 64, minHeight: 56),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
+                ),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.colorScheme.outline),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(slots[i], style: theme.textTheme.titleMedium),
+              );
+            },
           ),
       ],
     );

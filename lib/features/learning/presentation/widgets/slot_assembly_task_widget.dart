@@ -125,18 +125,24 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   bool get _isPressInteraction => _pressMode != null;
 
+  bool get _isDragInteraction => _interactionMode is DragToSlotInteractionMode;
+
   bool get _requiresSequentialSelection =>
       _interaction.requiresSequentialSelection;
 
   @override
   void initState() {
     super.initState();
+
     _resetSlots();
+
     _optionKeys = List.generate(widget.task.options.length, (_) => GlobalKey());
+
     _slotKeys = List.generate(
       widget.task.correctAnswers.length,
       (_) => GlobalKey(),
     );
+
     _fallController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
@@ -153,6 +159,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         widget.onElementReachedEdge?.call();
       }
     });
+
     _flightController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -176,6 +183,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         widget.task.options.length,
         (_) => GlobalKey(),
       );
+
       _slotKeys = List.generate(
         widget.task.correctAnswers.length,
         (_) => GlobalKey(),
@@ -233,8 +241,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
       widget.task.correctAnswers.length,
       null,
     );
+
     _activeAudioOption = null;
     _correctSlotsCount = 0;
+
     _usedOptionIndices.clear();
     _attemptedSlots.clear();
     _firstAttemptCorrectSlots.clear();
@@ -260,8 +270,13 @@ class _SlotAssemblyTaskWidgetState<TOption>
     return null;
   }
 
+  /// Обробляє вибір варіанта в режимі натискання.
   void _onOptionSelected(int optionIndex, {bool playAudio = true}) {
-    if (_isAnswered || _usedOptionIndices.contains(optionIndex)) return;
+    if (_isAnswered ||
+        _isFinishing ||
+        _usedOptionIndices.contains(optionIndex)) {
+      return;
+    }
 
     if (playAudio) {
       _playOptionAudio(optionIndex);
@@ -273,10 +288,35 @@ class _SlotAssemblyTaskWidgetState<TOption>
     final targetSlot = _findTargetSlot(optionIndex);
 
     if (targetSlot == null) {
-      setState(() {
-        _attemptedSlots.add(nextEmptySlot);
-      });
-      widget.onIncorrectAttempt();
+      _recordIncorrectAttempt(nextEmptySlot);
+      return;
+    }
+
+    _fillCorrectSlot(optionIndex, targetSlot);
+  }
+
+  /// Реєструє неправильну спробу для конкретного слота.
+  void _recordIncorrectAttempt(int slotIndex) {
+    if (_isAnswered || _isFinishing) return;
+
+    setState(() {
+      _attemptedSlots.add(slotIndex);
+    });
+
+    widget.onIncorrectAttempt();
+  }
+
+  /// Спільна логіка правильного заповнення слота
+  /// для натискання та перетягування.
+  void _fillCorrectSlot(int optionIndex, int targetSlot) {
+    if (_isAnswered ||
+        _isFinishing ||
+        optionIndex < 0 ||
+        optionIndex >= widget.task.options.length ||
+        targetSlot < 0 ||
+        targetSlot >= _slotOptionIndices.length ||
+        _usedOptionIndices.contains(optionIndex) ||
+        _slotOptionIndices[targetSlot] != null) {
       return;
     }
 
@@ -296,6 +336,42 @@ class _SlotAssemblyTaskWidgetState<TOption>
     if (_slotOptionIndices.every((index) => index != null)) {
       unawaited(_finishTask());
     }
+  }
+
+  /// Обробляє перетягування варіанта в конкретний слот.
+  void _onOptionDropped(int optionIndex, int targetSlot) {
+    if (!_isDragInteraction ||
+        _isAnswered ||
+        _isFinishing ||
+        optionIndex < 0 ||
+        optionIndex >= widget.task.options.length ||
+        targetSlot < 0 ||
+        targetSlot >= _slotOptionIndices.length ||
+        _usedOptionIndices.contains(optionIndex) ||
+        _slotOptionIndices[targetSlot] != null) {
+      return;
+    }
+
+    final nextEmptySlot = _nextEmptySlot();
+    if (nextEmptySlot == null) return;
+
+    // У послідовному режимі можна заповнити лише
+    // наступний порожній слот.
+    if (_requiresSequentialSelection && targetSlot != nextEmptySlot) {
+      _recordIncorrectAttempt(targetSlot);
+      return;
+    }
+
+    final option = widget.task.options[optionIndex];
+    final isCorrect = widget.task.correctAnswers[targetSlot] == option;
+
+    if (!isCorrect) {
+      _recordIncorrectAttempt(targetSlot);
+      return;
+    }
+
+    _playOptionAudio(optionIndex);
+    _fillCorrectSlot(optionIndex, targetSlot);
   }
 
   void _notifyAccuracy() {
@@ -349,6 +425,11 @@ class _SlotAssemblyTaskWidgetState<TOption>
               ? '___'
               : _displayText(widget.task.options[_slotOptionIndices[i]!]),
       ],
+      dragEnabled: _isDragInteraction && !_isAnswered && !_isFinishing,
+      occupiedSlots: [
+        for (final optionIndex in _slotOptionIndices) optionIndex != null,
+      ],
+      onOptionDropped: _onOptionDropped,
     );
   }
 
@@ -443,29 +524,49 @@ class _SlotAssemblyTaskWidgetState<TOption>
           : () => unawaited(_onStaticOptionTapped(index)),
     );
 
-    if (option is! AudioLinkedContent) {
-      return bubble;
+    Widget optionWidget = bubble;
+
+    if (option is AudioLinkedContent) {
+      final controller = _audioControllers.putIfAbsent(
+        index,
+        AudioPlaybackController.new,
+      );
+
+      optionWidget = TaskAudioWidget(
+        content: option.audio,
+        isActive: _activeAudioOption == option,
+        interactive: false,
+        showIcon: false,
+        onCompleted: () {
+          if (!mounted || _activeAudioOption != option) return;
+
+          setState(() {
+            _activeAudioOption = null;
+          });
+        },
+        controller: controller,
+        child: bubble,
+      );
     }
 
-    final controller = _audioControllers.putIfAbsent(
-      index,
-      AudioPlaybackController.new,
-    );
+    if (!_isDragInteraction) {
+      return optionWidget;
+    }
 
-    return TaskAudioWidget(
-      content: option.audio,
-      isActive: _activeAudioOption == option,
-      interactive: false,
-      showIcon: false,
-      onCompleted: () {
-        if (!mounted || _activeAudioOption != option) return;
-
-        setState(() {
-          _activeAudioOption = null;
-        });
-      },
-      controller: controller,
-      child: bubble,
+    return Draggable<int>(
+      data: index,
+      maxSimultaneousDrags: _isAnswered || _isFinishing ? 0 : 1,
+      feedback: Material(
+        color: Colors.transparent,
+        child: FallingOptionBubble(
+          text: _displayText(option),
+          color: _bubbleColorFor(index),
+          size: 48,
+          onTap: () {},
+        ),
+      ),
+      childWhenDragging: const SizedBox(width: 48, height: 48),
+      child: optionWidget,
     );
   }
 
@@ -532,9 +633,11 @@ class _SlotAssemblyTaskWidgetState<TOption>
       if (!completed) {
         // Якщо анімація не відбулася, не втрачаємо правильну відповідь.
         _onOptionSelected(optionIndex);
+
         setState(() {
           _temporarilyHiddenFallingOptions.remove(optionIndex);
         });
+
         return;
       }
     }
@@ -625,7 +728,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
     }
 
     final startTopLeft = overlayObject.globalToLocal(sourceRect.topLeft);
-
     final targetCenter = overlayObject.globalToLocal(targetGlobalRect.center);
 
     _flightStartRect = startTopLeft & sourceRect.size;
@@ -637,7 +739,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
     );
 
     _flightText = _displayText(widget.task.options[optionIndex]);
-
     _flightColor = color;
     _isFlying = true;
 

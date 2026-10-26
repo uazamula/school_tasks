@@ -103,6 +103,7 @@ final List<TaskData> slotAssemblyWord = [
     wrongAnswers: ['ма', 'ши', 'на'],
     wrongAnswerCount: 3,
     buttonConfig: myButtonConfig,
+    requiresSequentialSelection: false,
     interactionMode: const DragToSlotInteractionMode(),
   ),
 ];
