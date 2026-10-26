@@ -17,6 +17,31 @@ final myButtonConfig = SelectionButtonConfig(
   textScaler: TextScaler.noScaling,
 );
 final List<TaskData> slotAssemblyWord = [
+  SlotAssemblyTaskData(
+    prompt: TaskPrompt(
+      content: [TextContent('Склади слово')],
+      target: TargetContent(
+        target:
+        AudioLinkedContent(
+          content: ImageContent('assets/images/fish.png'),
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
+        ),
+        effect: const TargetEffectConfig(
+          type: TargetEffectType.saturation,
+          steps: 2,
+        ),
+      ),
+    ),
+    correctAnswers: [AudioLinkedContent(
+content: TextContent('ри'),
+audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
+), 'ба',],
+    wrongAnswers: [],
+    wrongAnswerCount: 0,
+    buttonConfig: myButtonConfig,
+    // requiresSequentialSelection: false,
+    interactionMode:  DragToSlotInteractionMode(),
+  ),
   SlotAssemblyTaskData<AudioLinkedContent>(
     prompt: TaskPrompt(
       content: [TextContent('Склади слово')],
@@ -81,29 +106,9 @@ final List<TaskData> slotAssemblyWord = [
     wrongAnswerCount: 2,
     interactionMode: const PressForSlotInteractionMode(
       fallingElementsEnabled: true,
-      flightAnimationEnabled: false,
+      flightAnimationEnabled: true,
     ),
     requiresSequentialSelection: false,
   ),
-  SlotAssemblyTaskData<String>(
-    prompt: TaskPrompt(
-      content: [TextContent('Склади слово')],
-      target: TargetContent(
-        target: AudioLinkedContent(
-          content: ImageContent('assets/images/fish.png'),
-          audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
-        ),
-        effect: const TargetEffectConfig(
-          type: TargetEffectType.saturation,
-          steps: 2,
-        ),
-      ),
-    ),
-    correctAnswers: ['ри', 'ба'],
-    wrongAnswers: ['ма', 'ши', 'на'],
-    wrongAnswerCount: 3,
-    buttonConfig: myButtonConfig,
-    requiresSequentialSelection: false,
-    interactionMode: const DragToSlotInteractionMode(),
-  ),
+
 ];

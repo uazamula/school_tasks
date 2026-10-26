@@ -327,7 +327,15 @@ class TaskPromptWidget extends StatelessWidget {
   ) {
     final effect = target.effect;
 
-    if (effect == null || target.target is! ImageContent) {
+    // Знаходимо зображення, навіть якщо воно загорнуте
+    // в AudioLinkedContent.
+    TaskContent imageContent = target.target;
+
+    while (imageContent is AudioLinkedContent) {
+      imageContent = imageContent.content;
+    }
+
+    if (effect == null || imageContent is! ImageContent) {
       return _buildContent(
         context,
         target.target,

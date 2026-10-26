@@ -519,9 +519,20 @@ class _SlotAssemblyTaskWidgetState<TOption>
       text: _displayText(option),
       color: _bubbleColorFor(index),
       size: 48,
-      onTap: _isAnswered || !_isPressInteraction
+      onPointerDown: _isAnswered || _isFinishing
+          ? null
+          : () {
+              if (_isDragInteraction && option is AudioLinkedContent) {
+                _audioControllers[index]?.toggle();
+              }
+            },
+      onTap: _isAnswered
           ? () {}
-          : () => unawaited(_onStaticOptionTapped(index)),
+          : () {
+              if (_isPressInteraction) {
+                unawaited(_onStaticOptionTapped(index));
+              }
+            },
     );
 
     Widget optionWidget = bubble;
@@ -532,7 +543,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         AudioPlaybackController.new,
       );
 
-      optionWidget = TaskAudioWidget(
+      final audioWidget = TaskAudioWidget(
         content: option.audio,
         isActive: _activeAudioOption == option,
         interactive: false,
@@ -545,7 +556,44 @@ class _SlotAssemblyTaskWidgetState<TOption>
           });
         },
         controller: controller,
-        child: bubble,
+        child: _isDragInteraction
+            ? const SizedBox(width: 48, height: 48)
+            : bubble,
+      );
+
+      if (!_isDragInteraction) {
+        return audioWidget;
+      }
+
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          // Аудіовіджет залишається поза піддеревом Draggable.
+          Positioned.fill(child: IgnorePointer(child: audioWidget)),
+          Draggable<int>(
+            data: index,
+            maxSimultaneousDrags: _isAnswered || _isFinishing ? 0 : 1,
+            feedback: Material(
+              color: Colors.transparent,
+              child: FallingOptionBubble(
+                text: _displayText(option),
+                color: _bubbleColorFor(index),
+                size: 48,
+                onTap: () {},
+              ),
+            ),
+            childWhenDragging: const SizedBox(width: 48, height: 48),
+            child: FallingOptionBubble(
+              text: _displayText(option),
+              color: _bubbleColorFor(index),
+              size: 48,
+              onPointerDown: _isAnswered || _isFinishing
+                  ? null
+                  : () => controller.toggle(),
+              onTap: () {},
+            ),
+          ),
+        ],
       );
     }
 
