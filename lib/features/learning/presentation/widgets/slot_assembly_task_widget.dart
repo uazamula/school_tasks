@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
@@ -9,8 +8,11 @@ import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/bubble_color_palette.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_option_bubble.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_options_area.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_flight_animation.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_options.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_slots.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
@@ -53,16 +55,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
   final Set<int> _attemptedSlots = {};
   final Set<int> _firstAttemptCorrectSlots = {};
 
-  late final AnimationController _flightController;
-
-  OverlayEntry? _flightOverlayEntry;
-
-  Rect? _flightStartRect;
-  Rect? _flightEndRect;
-
-  String? _flightText;
-  Color? _flightColor;
-
   bool _isFlying = false;
 
   int _correctSlotsCount = 0;
@@ -77,23 +69,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   late List<GlobalKey> _optionKeys;
 
-  static const List<Color> _bubbleColors = [
-    Color(0xFF2879C7),
-    Color(0xFF159B88),
-    Color(0xFF8054C7),
-    Color(0xFFD66B35),
-    Color(0xFFC74770),
-    Color(0xFF647D35),
-  ];
+  final GlobalKey<SlotAssemblyFlightAnimationState> _flightAnimationKey =
+      GlobalKey<SlotAssemblyFlightAnimationState>();
 
-  final Map<int, Color> _bubbleColorsByOption = {};
-
-  Color _bubbleColorFor(int optionIndex) {
-    return _bubbleColorsByOption.putIfAbsent(
-      optionIndex,
-      () => _bubbleColors[math.Random().nextInt(_bubbleColors.length)],
-    );
-  }
+  final BubbleColorPalette _bubbleColorPalette = BubbleColorPalette();
 
   int? _nextFallingOptionIndex() {
     for (var i = 0; i < widget.task.options.length; i++) {
@@ -159,18 +138,11 @@ class _SlotAssemblyTaskWidgetState<TOption>
         widget.onElementReachedEdge?.call();
       }
     });
-
-    _flightController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
   }
 
   @override
   void dispose() {
     _fallController.dispose();
-    _flightController.dispose();
-    _removeFlightOverlay();
     super.dispose();
   }
 
@@ -206,6 +178,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
           ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                SlotAssemblyFlightAnimation(key: _flightAnimationKey),
                 _buildFallingArea(),
                 _buildAudioControllerHosts(),
                 const SizedBox(height: AppSpacing.md),
@@ -215,6 +188,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
           : SizedBox.expand(
               child: Column(
                 children: [
+                  SlotAssemblyFlightAnimation(key: _flightAnimationKey),
                   Align(alignment: Alignment.topCenter, child: _buildOptions()),
                   const Spacer(),
                   Align(
@@ -228,12 +202,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
               ),
             ),
     );
-  }
-
-  void _removeFlightOverlay() {
-    _flightOverlayEntry?.remove();
-    _flightOverlayEntry?.dispose();
-    _flightOverlayEntry = null;
   }
 
   void _resetSlots() {
@@ -306,8 +274,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     widget.onIncorrectAttempt();
   }
 
-  /// Спільна логіка правильного заповнення слота
-  /// для натискання та перетягування.
+  /// Спільна логіка правильного заповнення слота для натискання та перетягування.
   void _fillCorrectSlot(int optionIndex, int targetSlot) {
     if (_isAnswered ||
         _isFinishing ||
@@ -354,9 +321,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     final nextEmptySlot = _nextEmptySlot();
     if (nextEmptySlot == null) return;
-
-    // У послідовному режимі можна заповнити лише
-    // наступний порожній слот.
+    // У послідовному режимі можна заповнити лише наступний порожній слот.
     if (_requiresSequentialSelection && targetSlot != nextEmptySlot) {
       _recordIncorrectAttempt(targetSlot);
       return;
@@ -433,66 +398,14 @@ class _SlotAssemblyTaskWidgetState<TOption>
     );
   }
 
-  List<List<int>> _buildOptionRows(int itemCount) {
-    if (itemCount == 0) return [];
-
-    const maxColumns = 4;
-
-    final rowCount = (itemCount + maxColumns - 1) ~/ maxColumns;
-    final baseCount = itemCount ~/ rowCount;
-    final extraCount = itemCount % rowCount;
-
-    var index = 0;
-
-    return List.generate(rowCount, (rowIndex) {
-      final count = baseCount + (rowIndex < extraCount ? 1 : 0);
-      final row = List.generate(count, (_) => index++);
-      return row;
-    });
-  }
-
   Widget _buildOptions() {
-    final rows = _buildOptionRows(widget.task.options.length);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) ...[
-          if (rowIndex > 0) const SizedBox(height: AppSpacing.md),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (
-                var columnIndex = 0;
-                columnIndex < rows[rowIndex].length;
-                columnIndex++
-              ) ...[
-                if (columnIndex > 0) const SizedBox(width: AppSpacing.md),
-                _buildOptionSlot(rows[rowIndex][columnIndex]),
-              ],
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildOptionSlot(int index) {
-    final isVisible =
-        !_usedOptionIndices.contains(index) &&
-        !_flyingOptionIndices.contains(index);
-
-    return Visibility(
-      key: ValueKey(index),
-      visible: isVisible,
-      maintainState: true,
-      maintainAnimation: true,
-      maintainSize: true,
-      child: KeyedSubtree(
-        key: _optionKeys[index],
-        child: _buildOptionButton(index),
-      ),
+    return SlotAssemblyOptions(
+      itemCount: _optionKeys.length,
+      isOptionVisible: (index) =>
+          !_usedOptionIndices.contains(index) &&
+          !_flyingOptionIndices.contains(index),
+      optionKey: (index) => _optionKeys[index],
+      optionBuilder: _buildOptionButton,
     );
   }
 
@@ -517,7 +430,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     final bubble = FallingOptionBubble(
       text: _displayText(option),
-      color: _bubbleColorFor(index),
+      color: _bubbleColorPalette.colorFor(index),
       size: 48,
       onPointerDown: _isAnswered || _isFinishing
           ? null
@@ -577,7 +490,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
               color: Colors.transparent,
               child: FallingOptionBubble(
                 text: _displayText(option),
-                color: _bubbleColorFor(index),
+                color: _bubbleColorPalette.colorFor(index),
                 size: 48,
                 onTap: () {},
               ),
@@ -585,7 +498,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
             childWhenDragging: const SizedBox(width: 48, height: 48),
             child: FallingOptionBubble(
               text: _displayText(option),
-              color: _bubbleColorFor(index),
+              color: _bubbleColorPalette.colorFor(index),
               size: 48,
               onPointerDown: _isAnswered || _isFinishing
                   ? null
@@ -608,7 +521,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         color: Colors.transparent,
         child: FallingOptionBubble(
           text: _displayText(option),
-          color: _bubbleColorFor(index),
+          color: _bubbleColorPalette.colorFor(index),
           size: 48,
           onTap: () {},
         ),
@@ -689,7 +602,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
         return;
       }
     }
-
     // За вимкненої анімації слот заповнюється одразу.
     _onOptionSelected(optionIndex);
 
@@ -778,64 +690,34 @@ class _SlotAssemblyTaskWidgetState<TOption>
     final startTopLeft = overlayObject.globalToLocal(sourceRect.topLeft);
     final targetCenter = overlayObject.globalToLocal(targetGlobalRect.center);
 
-    _flightStartRect = startTopLeft & sourceRect.size;
+    final startRect = startTopLeft & sourceRect.size;
 
-    _flightEndRect = Rect.fromCenter(
+    final endRect = Rect.fromCenter(
       center: targetCenter,
       width: sourceRect.width,
       height: sourceRect.height,
     );
 
-    _flightText = _displayText(widget.task.options[optionIndex]);
-    _flightColor = color;
     _isFlying = true;
 
-    _flightController.reset();
-
-    final entry = OverlayEntry(
-      builder: (overlayContext) {
-        return AnimatedBuilder(
-          animation: _flightController,
-          builder: (context, child) {
-            final rect = Rect.lerp(
-              _flightStartRect!,
-              _flightEndRect!,
-              _flightController.value,
-            )!;
-
-            return Positioned.fromRect(
-              rect: rect,
-              child: FallingOptionBubble(
-                text: _flightText!,
-                color: _flightColor!,
-                size: sourceRect.width,
-                onTap: () {},
-              ),
-            );
-          },
-        );
-      },
-    );
-
-    _flightOverlayEntry = entry;
-    overlay.insert(entry);
-
-    var completed = false;
-
     try {
-      await _flightController.forward().orCancel;
-      completed = true;
-    } on TickerCanceled {
-      // Анімацію перервано, наприклад під час знищення віджета.
-    } finally {
-      _removeFlightOverlay();
+      final animation = _flightAnimationKey.currentState;
 
+      if (animation == null) {
+        return false;
+      }
+
+      return await animation.animate(
+        startRect: startRect,
+        endRect: endRect,
+        text: _displayText(widget.task.options[optionIndex]),
+        color: color,
+      );
+    } finally {
       if (mounted) {
         _isFlying = false;
       }
     }
-
-    return completed && mounted;
   }
 
   Widget _buildAudioControllerHosts() {
@@ -901,18 +783,15 @@ class _SlotAssemblyTaskWidgetState<TOption>
         _usedOptionIndices.contains(optionIndex)) {
       return;
     }
-
     // Аудіо запускається одразу після натискання.
     _playOptionAudio(optionIndex);
 
     final targetSlot = _findTargetSlot(optionIndex);
-
     // Для неправильної відповіді зберігаємо попередню поведінку.
     if (targetSlot == null) {
       _onOptionSelected(optionIndex, playAudio: false);
       return;
     }
-
     // Без анімації заповнюємо слот одразу.
     if (!_flightAnimationEnabled) {
       _onOptionSelected(optionIndex, playAudio: false);
@@ -920,7 +799,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
     }
 
     final sourceRect = _getOptionRect(optionIndex);
-
     // Якщо координати недоступні, не блокуємо відповідь.
     if (sourceRect == null) {
       _onOptionSelected(optionIndex, playAudio: false);
@@ -935,7 +813,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       optionIndex: optionIndex,
       targetSlot: targetSlot,
       sourceRect: sourceRect,
-      color: _bubbleColorFor(optionIndex),
+      color: _bubbleColorPalette.colorFor(optionIndex),
     );
 
     if (!mounted) return;
@@ -950,7 +828,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
         _usedOptionIndices.contains(optionIndex)) {
       return;
     }
-
     // Фіксуємо відповідь лише після завершення польоту.
     _onOptionSelected(optionIndex, playAudio: false);
   }

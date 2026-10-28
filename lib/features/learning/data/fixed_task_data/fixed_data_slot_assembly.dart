@@ -21,8 +21,7 @@ final List<TaskData> slotAssemblyWord = [
     prompt: TaskPrompt(
       content: [TextContent('Склади слово')],
       target: TargetContent(
-        target:
-        AudioLinkedContent(
+        target: AudioLinkedContent(
           content: ImageContent('assets/images/fish.png'),
           audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
         ),
@@ -32,15 +31,18 @@ final List<TaskData> slotAssemblyWord = [
         ),
       ),
     ),
-    correctAnswers: [AudioLinkedContent(
-content: TextContent('ри'),
-audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
-), 'ба',],
+    correctAnswers: [
+      AudioLinkedContent(
+        content: TextContent('РИ'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
+      ),
+      'БА',
+    ],
     wrongAnswers: [],
     wrongAnswerCount: 0,
     buttonConfig: myButtonConfig,
     // requiresSequentialSelection: false,
-    interactionMode:  DragToSlotInteractionMode(),
+    interactionMode: DragToSlotInteractionMode(),
   ),
   SlotAssemblyTaskData<AudioLinkedContent>(
     prompt: TaskPrompt(
@@ -105,10 +107,9 @@ audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
     ],
     wrongAnswerCount: 2,
     interactionMode: const PressForSlotInteractionMode(
-      fallingElementsEnabled: true,
+      fallingElementsEnabled: false,
       flightAnimationEnabled: true,
     ),
     requiresSequentialSelection: false,
   ),
-
 ];
