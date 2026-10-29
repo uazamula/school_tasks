@@ -33,10 +33,10 @@ final List<TaskData> slotAssemblyWord = [
     ),
     correctAnswers: [
       AudioLinkedContent(
-        content: TextContent('РИ'),
+        content: TextContent('Б'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
       ),
-      'БА',
+      'РИБА','А'
     ],
     wrongAnswers: [],
     wrongAnswerCount: 0,
@@ -57,13 +57,13 @@ final List<TaskData> slotAssemblyWord = [
     ),
     correctAnswers: [
       AudioLinkedContent(
-        content: TextContent('сир'),
+        content: TextContent('СИР'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_syr.mp3'),
       ),
     ],
     wrongAnswers: [
       AudioLinkedContent(
-        content: TextContent('ршша'),
+        content: TextContent('ра'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
       ),
     ],
@@ -83,15 +83,15 @@ final List<TaskData> slotAssemblyWord = [
     ),
     correctAnswers: [
       AudioLinkedContent(
-        content: TextContent('ко'),
+        content: TextContent('КО'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ko.mp3'),
       ),
       AudioLinkedContent(
-        content: TextContent('ро'),
+        content: TextContent('РО'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ro.mp3'),
       ),
       AudioLinkedContent(
-        content: TextContent('ва'),
+        content: TextContent('ВА'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_va.mp3'),
       ),
     ],

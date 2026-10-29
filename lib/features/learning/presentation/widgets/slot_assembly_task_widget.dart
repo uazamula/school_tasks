@@ -17,6 +17,8 @@ import 'package:school_tasks/features/learning/presentation/widgets/slot_assembl
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
+var nothing = '  ';
+
 class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
   const SlotAssemblyTaskWidget({
     super.key,
@@ -387,7 +389,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       slots: [
         for (var i = 0; i < _slotOptionIndices.length; i++)
           _slotOptionIndices[i] == null
-              ? '___'
+              ? nothing
               : _displayText(widget.task.options[_slotOptionIndices[i]!]),
       ],
       dragEnabled: _isDragInteraction && !_isAnswered && !_isFinishing,

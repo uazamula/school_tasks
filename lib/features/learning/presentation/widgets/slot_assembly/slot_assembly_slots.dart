@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly_task_widget.dart';
 
 class SlotAssemblySlots extends StatelessWidget {
   const SlotAssemblySlots({
@@ -21,11 +22,20 @@ class SlotAssemblySlots extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
+    final slotColor = Color.alphaBlend(
+      theme.brightness == Brightness.light
+          ? Colors.black.withValues(alpha: 0.06)
+          : Colors.white.withValues(alpha: 0.08),
+      colorScheme.surface,
+    );
+
+    const letterWidth = 26.0;
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: AppSpacing.md,
-      runSpacing: AppSpacing.md,
+      spacing: AppSpacing.xs,
+      runSpacing: AppSpacing.xs,
       children: [
         for (var i = 0; i < slots.length; i++)
           DragTarget<int>(
@@ -38,19 +48,26 @@ class SlotAssemblySlots extends StatelessWidget {
               onOptionDropped?.call(details.data, i);
             },
             builder: (context, candidateData, rejectedData) {
+              final length = slots[i].length;
               return Container(
                 key: slotKeys[i],
-                constraints: const BoxConstraints(minWidth: 64, minHeight: 56),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.md,
+                constraints: BoxConstraints(
+                  //todo
+                  minWidth: slots[i] != nothing
+                      ? letterWidth * length
+                      : letterWidth * 2,
+                  minHeight: 56,
                 ),
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  border: Border.all(color: theme.colorScheme.outline),
-                  borderRadius: BorderRadius.circular(8),
+                  color: slotColor,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(slots[i], style: theme.textTheme.titleMedium),
+                child: Text(
+                  slots[i],
+                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 38),
+                ),
               );
             },
           ),
