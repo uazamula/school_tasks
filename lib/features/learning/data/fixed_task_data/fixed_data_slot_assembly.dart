@@ -16,6 +16,16 @@ final myButtonConfig = SelectionButtonConfig(
   spacing: 4,
   textScaler: TextScaler.noScaling,
 );
+const subscriptDigits = '₀₁₂₃₄₅₆₇₈₉';
+
+String toSubscript(int number) {
+  return number
+      .toString()
+      .split('')
+      .map((digit) => subscriptDigits[int.parse(digit)])
+      .join();
+}
+
 final List<TaskData> slotAssemblyWord = [
   SlotAssemblyTaskData(
     prompt: TaskPrompt(
@@ -33,10 +43,10 @@ final List<TaskData> slotAssemblyWord = [
     ),
     correctAnswers: [
       AudioLinkedContent(
-        content: TextContent('Б'),
+        content: TextContent('РИ'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
       ),
-      'РИБА','А'
+      'БА',
     ],
     wrongAnswers: [],
     wrongAnswerCount: 0,
@@ -63,7 +73,7 @@ final List<TaskData> slotAssemblyWord = [
     ],
     wrongAnswers: [
       AudioLinkedContent(
-        content: TextContent('ра'),
+        content: TextContent('강'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
       ),
     ],
@@ -97,19 +107,29 @@ final List<TaskData> slotAssemblyWord = [
     ],
     wrongAnswers: [
       AudioLinkedContent(
-        content: TextContent('ра'),
+        content: TextContent('РА'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
       ),
-      AudioLinkedContent(
-        content: TextContent('ру'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ru.mp3'),
-      ),
+      // AudioLinkedContent(
+      //   content: TextContent('ру'),
+      //   audio: AudioContent.fixed('assets/audio/pronunciation/uk_ru.mp3'),
+      // ),
     ],
-    wrongAnswerCount: 2,
+    wrongAnswerCount: 1,
     interactionMode: const PressForSlotInteractionMode(
-      fallingElementsEnabled: false,
+      fallingElementsEnabled: true,
       flightAnimationEnabled: true,
     ),
     requiresSequentialSelection: false,
+  ),
+  SlotAssemblyTaskData(
+    prompt: TaskPrompt(
+      content: [TextContent('Склади хімічну формулу')],
+      target: TargetContent(target: TextContent('Сірчана кислота')),
+    ),
+    correctAnswers: ['H${toSubscript(2)}', 'SO${toSubscript(4)}'],
+    wrongAnswers: ['SO${toSubscript(3)}'],
+    wrongAnswerCount: 1,
+    buttonConfig: myButtonConfig,
   ),
 ];

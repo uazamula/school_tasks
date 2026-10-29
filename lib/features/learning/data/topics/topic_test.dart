@@ -152,7 +152,7 @@ abstract final class Tests {
       interaction: InteractionLayout(scrollable: false),
       areaOrder: TopicAreaOrder.promptFirst,
     ),
-    progressionMode: TopicProgressionMode.automaticWithFeedback,
+    progressionMode: TopicProgressionMode.manual,
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,

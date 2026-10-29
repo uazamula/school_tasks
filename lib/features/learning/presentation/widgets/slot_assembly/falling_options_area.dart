@@ -14,9 +14,9 @@ class FallingOptionsArea extends StatefulWidget {
     required this.onStartFalling,
     required this.onOptionTapped,
     required this.colorSeed,
-    this.width = 240,
+    this.width = 280,
     this.height = 360,
-    this.elementSize = 48,
+    this.elementSize = 60,
     this.spacing = 8,
   });
 

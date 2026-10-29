@@ -50,6 +50,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     extends State<SlotAssemblyTaskWidget<TOption>>
     with TickerProviderStateMixin {
   late List<int?> _slotOptionIndices;
+  static const double _bubbleSize = 60;
 
   final Set<int> _usedOptionIndices = {};
   final Set<int> _flyingOptionIndices = {};
@@ -176,33 +177,39 @@ class _SlotAssemblyTaskWidgetState<TOption>
       scrollable: widget.interactionScrollable,
       alignment: Alignment.topCenter,
       fillAvailableSpace: !fallingEnabled,
-      content: fallingEnabled
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SlotAssemblyFlightAnimation(key: _flightAnimationKey),
-                _buildFallingArea(),
-                _buildAudioControllerHosts(),
-                const SizedBox(height: AppSpacing.md),
-                _buildSlots(),
-              ],
-            )
-          : SizedBox.expand(
-              child: Column(
+      content: Container(
+        decoration: BoxDecoration(border: Border.all(color: Color(0xFFFF0000))),
+        child: fallingEnabled
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   SlotAssemblyFlightAnimation(key: _flightAnimationKey),
-                  Align(alignment: Alignment.topCenter, child: _buildOptions()),
-                  const Spacer(),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: UnconstrainedBox(
-                      constrainedAxis: Axis.vertical,
-                      child: _buildSlots(),
-                    ),
-                  ),
+                  _buildFallingArea(),
+                  _buildAudioControllerHosts(),
+                  const SizedBox(height: AppSpacing.md),
+                  _buildSlots(),
                 ],
+              )
+            : SizedBox.expand(
+                child: Column(
+                  children: [
+                    SlotAssemblyFlightAnimation(key: _flightAnimationKey),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: _buildOptions(),
+                    ),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: UnconstrainedBox(
+                        constrainedAxis: Axis.vertical,
+                        child: _buildSlots(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 
@@ -433,7 +440,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
     final bubble = FallingOptionBubble(
       text: _displayText(option),
       color: _bubbleColorPalette.colorFor(index),
-      size: 48,
+      size: _bubbleSize,
       onPointerDown: _isAnswered || _isFinishing
           ? null
           : () {
@@ -472,7 +479,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         },
         controller: controller,
         child: _isDragInteraction
-            ? const SizedBox(width: 48, height: 48)
+            ? const SizedBox(width: _bubbleSize, height: _bubbleSize)
             : bubble,
       );
 
@@ -493,15 +500,18 @@ class _SlotAssemblyTaskWidgetState<TOption>
               child: FallingOptionBubble(
                 text: _displayText(option),
                 color: _bubbleColorPalette.colorFor(index),
-                size: 48,
+                size: _bubbleSize,
                 onTap: () {},
               ),
             ),
-            childWhenDragging: const SizedBox(width: 48, height: 48),
+            childWhenDragging: const SizedBox(
+              width: _bubbleSize,
+              height: _bubbleSize,
+            ),
             child: FallingOptionBubble(
               text: _displayText(option),
               color: _bubbleColorPalette.colorFor(index),
-              size: 48,
+              size: _bubbleSize,
               onPointerDown: _isAnswered || _isFinishing
                   ? null
                   : () => controller.toggle(),
@@ -524,11 +534,14 @@ class _SlotAssemblyTaskWidgetState<TOption>
         child: FallingOptionBubble(
           text: _displayText(option),
           color: _bubbleColorPalette.colorFor(index),
-          size: 48,
+          size: _bubbleSize,
           onTap: () {},
         ),
       ),
-      childWhenDragging: const SizedBox(width: 48, height: 48),
+      childWhenDragging: const SizedBox(
+        width: _bubbleSize,
+        height: _bubbleSize,
+      ),
       child: optionWidget,
     );
   }

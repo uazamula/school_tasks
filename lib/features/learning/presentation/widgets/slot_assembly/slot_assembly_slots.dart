@@ -48,7 +48,7 @@ class SlotAssemblySlots extends StatelessWidget {
               onOptionDropped?.call(details.data, i);
             },
             builder: (context, candidateData, rejectedData) {
-              final length = slots[i].length;
+              final length = effectiveTextLength(slots[i]);
               return Container(
                 key: slotKeys[i],
                 constraints: BoxConstraints(
@@ -73,5 +73,12 @@ class SlotAssemblySlots extends StatelessWidget {
           ),
       ],
     );
+  }
+
+  double effectiveTextLength(String text) {
+    return text.runes.fold<double>(0, (length, rune) {
+      final isSubscriptDigit = rune >= 0x2080 && rune <= 0x2089;
+      return length + (isSubscriptDigit ? 0.5 : 1.0);
+    });
   }
 }

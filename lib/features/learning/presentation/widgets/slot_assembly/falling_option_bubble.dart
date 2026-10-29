@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 class FallingOptionBubble extends StatelessWidget {
@@ -45,7 +43,7 @@ class FallingOptionBubble extends StatelessWidget {
             ],
           ),
           alignment: Alignment.center,
-          padding: EdgeInsets.all(size * 0.08),
+          padding: EdgeInsets.all(size * 0.03),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
@@ -53,6 +51,8 @@ class FallingOptionBubble extends StatelessWidget {
               maxLines: 1,
               softWrap: false,
               style: theme.textTheme.titleMedium?.copyWith(
+                //TODO
+                fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * 1.5,
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
