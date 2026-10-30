@@ -1,35 +1,41 @@
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+
 abstract class TaskContent {
   const TaskContent();
 }
 
 class TextContent extends TaskContent {
-  const TextContent(this.text);
+  const TextContent(this.text, {this.audio});
 
   final String text;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is TextContent && other.text == text;
-
-  @override
-  int get hashCode => text.hashCode;
-}
-
-class ImageContent extends TaskContent {
-  const ImageContent(this.imagePath);
-
-  final String imagePath;
+  final AudioContent? audio;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ImageContent && other.imagePath == imagePath;
+      other is TextContent && other.text == text && other.audio == audio;
 
   @override
-  int get hashCode => imagePath.hashCode;
+  int get hashCode => Object.hash(text, audio);
 }
 
-/// Concrete, already-generated grid.
+class ImageContent extends TaskContent {
+  const ImageContent(this.imagePath, {this.audio});
+
+  final String imagePath;
+  final AudioContent? audio;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageContent &&
+          other.imagePath == imagePath &&
+          other.audio == audio;
+
+  @override
+  int get hashCode => Object.hash(imagePath, audio);
+}
+
 class GridContent extends TaskContent {
   const GridContent({
     required this.rows,
@@ -54,14 +60,16 @@ class GridContent extends TaskContent {
 }
 
 class EmojiContent extends TaskContent {
-  const EmojiContent(this.emoji);
+  const EmojiContent(this.emoji, {this.audio});
 
   final String emoji;
+  final AudioContent? audio;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is EmojiContent && other.emoji == emoji;
+      identical(this, other) ||
+      other is EmojiContent && other.emoji == emoji && other.audio == audio;
 
   @override
-  int get hashCode => emoji.hashCode;
+  int get hashCode => Object.hash(emoji, audio);
 }

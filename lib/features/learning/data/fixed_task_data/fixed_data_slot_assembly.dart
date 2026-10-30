@@ -43,96 +43,109 @@ final List<TaskData> slotAssemblyWord = [
       ),
     ),
     correctAnswers: [
-      AudioLinkedContent(
-        content: TextContent('РИ'),
+      TextContent(
+        'РИ',
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ry.mp3'),
       ),
-      'БА',
+      TextContent(
+        'БА',
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
+      ),
     ],
     wrongAnswers: [],
     wrongAnswerCount: 0,
     // requiresSequentialSelection: false,
     interactionMode: DragToSlotInteractionMode(dragScale: 1.33),
   ),
-  SlotAssemblyTaskData<AudioLinkedContent>(
-    prompt: TaskPrompt(
-      content: [TextContent('Склади слово')],
-      target: TargetContent(
-        target: ImageContent('assets/images/cheese.png'),
-        effect: const TargetEffectConfig(
-          type: TargetEffectType.saturation,
-          steps: 1,
-        ),
-      ),
-    ),
-    correctAnswers: [
-      AudioLinkedContent(
-        content: TextContent('강'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_syr.mp3'),
-      ),
-    ],
-    wrongAnswers: [
-      AudioLinkedContent(
-        content: TextContent('강'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
-      ),
-    ],
-    wrongAnswerCount: 1,
-    uiConfig: SlotAssemblyUiConfig(
-      bubbleFontSizeFactor: 2.0,
-      slotWidthPerCharacter: 80,
-      slotHeight: 80,
-    ),
-  ),
-  SlotAssemblyTaskData<AudioLinkedContent>(
-    prompt: TaskPrompt(
-      content: [TextContent('Склади слово')],
-      target: TargetContent(
-        target: ImageContent('assets/images/cow.png'),
-        effect: const TargetEffectConfig(
-          type: TargetEffectType.saturation,
-          steps: 3,
-        ),
-      ),
-    ),
-    correctAnswers: [
-      AudioLinkedContent(
-        content: TextContent('КО'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ko.mp3'),
-      ),
-      AudioLinkedContent(
-        content: TextContent('РО'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ro.mp3'),
-      ),
-      AudioLinkedContent(
-        content: TextContent('ВА'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_va.mp3'),
-      ),
-    ],
-    wrongAnswers: [
-      AudioLinkedContent(
-        content: TextContent('РА'),
-        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
-      ),
-      // AudioLinkedContent(
-      //   content: TextContent('ру'),
-      //   audio: AudioContent.fixed('assets/audio/pronunciation/uk_ru.mp3'),
-      // ),
-    ],
-    wrongAnswerCount: 1,
-    interactionMode: const PressForSlotInteractionMode(
-      fallingElementsEnabled: true,
-      flightAnimationEnabled: true,
-    ),
-    requiresSequentialSelection: false,
-  ),
+  // SlotAssemblyTaskData<AudioLinkedContent>(
+  //   prompt: TaskPrompt(
+  //     content: [TextContent('Склади слово')],
+  //     target: TargetContent(
+  //       target: ImageContent('assets/images/cheese.png'),
+  //       effect: const TargetEffectConfig(
+  //         type: TargetEffectType.saturation,
+  //         steps: 1,
+  //       ),
+  //     ),
+  //   ),
+  //   correctAnswers: [
+  //     AudioLinkedContent(
+  //       content: TextContent('강'),
+  //       audio: AudioContent.fixed('assets/audio/pronunciation/uk_syr.mp3'),
+  //     ),
+  //   ],
+  //   wrongAnswers: [
+  //     AudioLinkedContent(
+  //       content: TextContent('강'),
+  //       audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
+  //     ),
+  //   ],
+  //   wrongAnswerCount: 1,
+  //   uiConfig: SlotAssemblyUiConfig(
+  //     bubbleFontSizeFactor: 2.0,
+  //     slotWidthPerCharacter: 80,
+  //     slotHeight: 80,
+  //   ),
+  // ),
+  // SlotAssemblyTaskData(
+  //   prompt: TaskPrompt(
+  //     content: [TextContent('Склади слово')],
+  //     target: TargetContent(
+  //       target: ImageContent('assets/images/cow.png'),
+  //       effect: const TargetEffectConfig(
+  //         type: TargetEffectType.saturation,
+  //         steps: 3,
+  //       ),
+  //     ),
+  //   ),
+  //   correctAnswers: [
+  //     TextContent(
+  //       'КО',
+  //       audio: AudioContent.fixed('assets/audio/pronunciation/uk_ko.mp3'),
+  //     ),
+  //     AudioLinkedContent(
+  //       content: TextContent('РО'),
+  //       audio: AudioContent.fixed('assets/audio/pronunciation/uk_ro.mp3'),
+  //     ),
+  //     AudioLinkedContent(
+  //       content: TextContent('ВА'),
+  //       audio: AudioContent.fixed('assets/audio/pronunciation/uk_va.mp3'),
+  //     ),
+  //   ],
+  //   wrongAnswers: [
+  //     AudioLinkedContent(
+  //       content: TextContent('РА'),
+  //       audio: AudioContent.fixed('assets/audio/pronunciation/uk_ra.mp3'),
+  //     ),
+  // AudioLinkedContent(
+  //   content: TextContent('ру'),
+  //   audio: AudioContent.fixed('assets/audio/pronunciation/uk_ru.mp3'),
+  // ),
+  //   ],
+  //   wrongAnswerCount: 1,
+  //   interactionMode: const PressForSlotInteractionMode(
+  //     fallingElementsEnabled: true,
+  //     flightAnimationEnabled: true,
+  //   ),
+  //   requiresSequentialSelection: false,
+  // ),
   SlotAssemblyTaskData(
     prompt: TaskPrompt(
       content: [TextContent('Склади хімічну формулу')],
       target: TargetContent(target: TextContent('Сірчана кислота')),
     ),
-    correctAnswers: ['H${toSubscript(2)}', 'SO${toSubscript(4)}'],
+    correctAnswers: [
+      TextContent(
+        'H${toSubscript(2)}',
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_va.mp3'),
+      ),
+      'SO${toSubscript(4)}',
+    ],
     wrongAnswers: ['SO${toSubscript(3)}'],
     wrongAnswerCount: 1,
+    interactionMode: const PressForSlotInteractionMode(
+      fallingElementsEnabled: true,
+      flightAnimationEnabled: true,
+    ),
   ),
 ];

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
@@ -17,7 +18,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/slot_assembl
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 
-var nothing = '  ';
+const nothing = '  ';
 
 class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
   const SlotAssemblyTaskWidget({
@@ -59,7 +60,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   bool _isFlying = false;
 
   int _correctSlotsCount = 0;
-  AudioLinkedContent? _activeAudioOption;
+  TOption? _activeAudioOption;
   final Map<int, AudioPlaybackController> _audioControllers = {};
   Future<void>? _pendingAudioPlayback;
 
@@ -139,8 +140,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     _fallController = AnimationController(
       vsync: this,
-      duration: _pressMode?.fallingDuration ??
-          const Duration(seconds: 10),
+      duration: _pressMode?.fallingDuration ?? const Duration(seconds: 10),
     );
 
     _fallController.addStatusListener((status) {
@@ -198,7 +198,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
                 children: [
                   SlotAssemblyFlightAnimation(
                     key: _flightAnimationKey,
-                    duration: _pressMode?.flightDuration ??
+                    duration:
+                        _pressMode?.flightDuration ??
                         const Duration(milliseconds: 700),
                   ),
                   _buildFallingArea(),
@@ -212,7 +213,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
                   children: [
                     SlotAssemblyFlightAnimation(
                       key: _flightAnimationKey,
-                      duration: _pressMode?.flightDuration ??
+                      duration:
+                          _pressMode?.flightDuration ??
                           const Duration(milliseconds: 700),
                     ),
                     Align(
@@ -403,7 +405,11 @@ class _SlotAssemblyTaskWidgetState<TOption>
     _pendingAudioPlayback = null;
 
     if (playback != null) {
-      await playback;
+      try {
+        await playback;
+      } catch (error) {
+        debugPrint('Audio playback failed: $error');
+      }
     }
 
     if (!mounted) return;
@@ -441,10 +447,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
   }
 
   String _displayText(Object? value) {
-    if (value is AudioLinkedContent) {
-      return _displayText(value.content);
-    }
-
     if (value is TextContent) {
       return value.text;
     }
@@ -456,125 +458,77 @@ class _SlotAssemblyTaskWidgetState<TOption>
     return value.toString();
   }
 
-  Widget _buildOptionButton(int index) {
-    final option = widget.task.options[index];
+  bool get _interactionLocked => _isAnswered || _isFinishing;
 
-    final bubble = FallingOptionBubble(
-      text: _displayText(option),
+  Widget _buildBubble(
+    int index, {
+    VoidCallback? onPointerDown,
+    VoidCallback? onTap,
+  }) {
+    return FallingOptionBubble(
+      text: _displayText(widget.task.options[index]),
       color: _bubbleColorPalette.colorFor(index),
       size: _bubbleSize,
       fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
-      onPointerDown: _isAnswered || _isFinishing
-          ? null
-          : () {
-              if (_isDragInteraction && option is AudioLinkedContent) {
-                _audioControllers[index]?.toggle();
-              }
-            },
-      onTap: _isAnswered
-          ? () {}
-          : () {
-              if (_isPressInteraction) {
-                unawaited(_onStaticOptionTapped(index));
-              }
-            },
+      onPointerDown: onPointerDown,
+      onTap: onTap ?? () {},
     );
+  }
 
-    Widget optionWidget = bubble;
-
-    if (option is AudioLinkedContent) {
-      final controller = _audioControllers.putIfAbsent(
-        index,
-        AudioPlaybackController.new,
-      );
-
-      final audioWidget = TaskAudioWidget(
-        content: option.audio,
-        isActive: _activeAudioOption == option,
-        interactive: false,
-        showIcon: false,
-        onCompleted: () {
-          if (!mounted || _activeAudioOption != option) return;
-
-          setState(() {
-            _activeAudioOption = null;
-          });
-        },
-        controller: controller,
-        child: _isDragInteraction
-            ? SizedBox(width: _bubbleSize, height: _bubbleSize)
-            : bubble,
-      );
-
-      if (!_isDragInteraction) {
-        return audioWidget;
-      }
-
-      return Stack(
-        alignment: Alignment.center,
-        children: [
-          // Аудіовіджет залишається поза піддеревом Draggable.
-          Positioned.fill(child: IgnorePointer(child: audioWidget)),
-          Draggable<int>(
-            data: index,
-            maxSimultaneousDrags: _isAnswered || _isFinishing ? 0 : 1,
-            feedback: Material(
-              color: Colors.transparent,
-              child: Transform.scale(
-                scale: _dragMode?.dragScale ?? 1.0,
-                child: FallingOptionBubble(
-                  text: _displayText(option),
-                  color: _bubbleColorPalette.colorFor(index),
-                  size: _bubbleSize,
-                  fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
-                  onTap: () {},
-                ),
-              ),
-            ),
-            childWhenDragging: SizedBox(
-              width: _bubbleSize,
-              height: _bubbleSize,
-            ),
-            child: FallingOptionBubble(
-              text: _displayText(option),
-              color: _bubbleColorPalette.colorFor(index),
-              size: _bubbleSize,
-              fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
-              onPointerDown: _isAnswered || _isFinishing
-                  ? null
-                  : () => controller.toggle(),
-              onTap: () {},
-            ),
-          ),
-        ],
-      );
-    }
-
-    if (!_isDragInteraction) {
-      return optionWidget;
-    }
-
+  Widget _buildDraggable(int index) {
     return Draggable<int>(
       data: index,
-      maxSimultaneousDrags: _isAnswered || _isFinishing ? 0 : 1,
+      maxSimultaneousDrags: _interactionLocked ? 0 : 1,
       feedback: Material(
         color: Colors.transparent,
         child: Transform.scale(
           scale: _dragMode?.dragScale ?? 1.0,
-          child: FallingOptionBubble(
-            text: _displayText(option),
-            color: _bubbleColorPalette.colorFor(index),
-            size: _bubbleSize,
-            fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
-            onTap: () {},
-          ),
+          child: _buildBubble(index),
         ),
       ),
-      childWhenDragging: SizedBox(
-        width: _bubbleSize,
-        height: _bubbleSize,
+      childWhenDragging: SizedBox(width: _bubbleSize, height: _bubbleSize),
+      child: _buildBubble(
+        index,
+        onPointerDown: _interactionLocked
+            ? null
+            : () => _audioControllers[index]?.toggle(),
       ),
-      child: optionWidget,
+    );
+  }
+
+  Widget _buildOptionButton(int index) {
+    final option = widget.task.options[index];
+    final audio = _audioForOption(option);
+
+    final child = _isDragInteraction
+        ? _buildDraggable(index)
+        : _buildBubble(
+            index,
+            onTap: _isAnswered
+                ? null
+                : () {
+                    if (_isPressInteraction) {
+                      unawaited(_onStaticOptionTapped(index));
+                    }
+                  },
+          );
+
+    if (audio == null) return child;
+
+    return TaskAudioWidget(
+      content: audio,
+      isActive: _activeAudioOption == option,
+      interactive: false,
+      showIcon: false,
+      onCompleted: () {
+        if (!mounted || _activeAudioOption != option) return;
+        setState(() => _activeAudioOption = null);
+      },
+      controller: _audioControllers.putIfAbsent(
+        index,
+        AudioPlaybackController.new,
+      ),
+      child: child,
     );
   }
 
@@ -776,10 +730,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
         mainAxisSize: MainAxisSize.min,
         children: [
           for (var index = 0; index < widget.task.options.length; index++)
-            if (widget.task.options[index] is AudioLinkedContent)
+            if (_audioForOption(widget.task.options[index]) case final audio?)
               TaskAudioWidget(
-                content:
-                    (widget.task.options[index] as AudioLinkedContent).audio,
+                content: audio,
                 interactive: false,
                 showIcon: false,
                 isActive: false,
@@ -813,15 +766,13 @@ class _SlotAssemblyTaskWidgetState<TOption>
   void _playOptionAudio(int optionIndex) {
     final option = widget.task.options[optionIndex];
 
-    if (option is! AudioLinkedContent) return;
+    if (_audioForOption(option) == null) return;
 
-    setState(() {
-      final playback = _audioControllers[optionIndex]?.playAndWait();
+    final playback = _audioControllers[optionIndex]?.playAndWait();
 
-      if (playback != null) {
-        _pendingAudioPlayback = playback;
-      }
-    });
+    if (playback != null) {
+      _pendingAudioPlayback = playback;
+    }
   }
 
   Future<void> _onStaticOptionTapped(int optionIndex) async {
@@ -879,5 +830,30 @@ class _SlotAssemblyTaskWidgetState<TOption>
     }
     // Фіксуємо відповідь лише після завершення польоту.
     _onOptionSelected(optionIndex, playAudio: false);
+  }
+
+  /// Повертає аудіо варіанта: кожен вид контенту може мати власне аудіо.
+  AudioContent? _audioForOption(Object? option) {
+    if (option is AudioContent) {
+      return option;
+    }
+
+    if (option is TextContent) {
+      return option.audio;
+    }
+
+    if (option is ImageContent) {
+      return option.audio;
+    }
+
+    if (option is EmojiContent) {
+      return option.audio;
+    }
+
+    if (option is MathContent) {
+      return option.audio;
+    }
+
+    return null;
   }
 }
