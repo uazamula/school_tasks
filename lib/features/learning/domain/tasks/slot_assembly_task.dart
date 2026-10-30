@@ -1,4 +1,5 @@
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
+import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
@@ -14,7 +15,7 @@ class SlotAssemblyTask<TOption>
     required List<TOption> correctAnswers,
     required this.options,
     required bool requiresSequentialSelection,
-    this.buttonConfig,
+    this.uiConfig = const SlotAssemblyUiConfig(),
     SlotAssemblyInteractionMode interactionMode =
         const PressForSlotInteractionMode(),
   }) : super(
@@ -38,7 +39,7 @@ class SlotAssemblyTask<TOption>
   /// Правильні елементи в порядку слотів.
   List<TOption> get correctAnswers => solution.value;
 
-  final SelectionButtonConfig? buttonConfig;
+  final SlotAssemblyUiConfig uiConfig;
 
   @override
   TaskResult<List<TOption>, List<TOption>> checkAnswer(List<TOption> answer) {

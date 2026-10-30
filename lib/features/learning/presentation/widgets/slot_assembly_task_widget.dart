@@ -50,8 +50,6 @@ class _SlotAssemblyTaskWidgetState<TOption>
     extends State<SlotAssemblyTaskWidget<TOption>>
     with TickerProviderStateMixin {
   late List<int?> _slotOptionIndices;
-  static const double _bubbleSize = 60;
-
   final Set<int> _usedOptionIndices = {};
   final Set<int> _flyingOptionIndices = {};
   final Set<int> _temporarilyHiddenFallingOptions = {};
@@ -87,6 +85,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
     return null;
   }
 
+  double get _bubbleSize => widget.task.uiConfig.bubbleHeight;
+
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
   SlotAssemblyInteraction get _interaction =>
@@ -112,6 +112,18 @@ class _SlotAssemblyTaskWidgetState<TOption>
   bool get _requiresSequentialSelection =>
       _interaction.requiresSequentialSelection;
 
+  DragToSlotInteractionMode? get _dragMode {
+    final interaction = widget.task.interaction;
+
+    if (interaction is! SlotAssemblyInteraction) {
+      return null;
+    }
+
+    final mode = interaction.mode;
+
+    return mode is DragToSlotInteractionMode ? mode : null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -127,7 +139,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
     _fallController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 10),
+      duration: _pressMode?.fallingDuration ??
+          const Duration(seconds: 10),
     );
 
     _fallController.addStatusListener((status) {
@@ -183,7 +196,11 @@ class _SlotAssemblyTaskWidgetState<TOption>
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SlotAssemblyFlightAnimation(key: _flightAnimationKey),
+                  SlotAssemblyFlightAnimation(
+                    key: _flightAnimationKey,
+                    duration: _pressMode?.flightDuration ??
+                        const Duration(milliseconds: 700),
+                  ),
                   _buildFallingArea(),
                   _buildAudioControllerHosts(),
                   const SizedBox(height: AppSpacing.md),
@@ -193,7 +210,11 @@ class _SlotAssemblyTaskWidgetState<TOption>
             : SizedBox.expand(
                 child: Column(
                   children: [
-                    SlotAssemblyFlightAnimation(key: _flightAnimationKey),
+                    SlotAssemblyFlightAnimation(
+                      key: _flightAnimationKey,
+                      duration: _pressMode?.flightDuration ??
+                          const Duration(milliseconds: 700),
+                    ),
                     Align(
                       alignment: Alignment.topCenter,
                       child: _buildOptions(),
@@ -393,6 +414,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   Widget _buildSlots() {
     return SlotAssemblySlots(
       slotKeys: _slotKeys,
+      uiConfig: widget.task.uiConfig,
       slots: [
         for (var i = 0; i < _slotOptionIndices.length; i++)
           _slotOptionIndices[i] == null
@@ -441,6 +463,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       text: _displayText(option),
       color: _bubbleColorPalette.colorFor(index),
       size: _bubbleSize,
+      fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
       onPointerDown: _isAnswered || _isFinishing
           ? null
           : () {
@@ -479,7 +502,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         },
         controller: controller,
         child: _isDragInteraction
-            ? const SizedBox(width: _bubbleSize, height: _bubbleSize)
+            ? SizedBox(width: _bubbleSize, height: _bubbleSize)
             : bubble,
       );
 
@@ -497,14 +520,18 @@ class _SlotAssemblyTaskWidgetState<TOption>
             maxSimultaneousDrags: _isAnswered || _isFinishing ? 0 : 1,
             feedback: Material(
               color: Colors.transparent,
-              child: FallingOptionBubble(
-                text: _displayText(option),
-                color: _bubbleColorPalette.colorFor(index),
-                size: _bubbleSize,
-                onTap: () {},
+              child: Transform.scale(
+                scale: _dragMode?.dragScale ?? 1.0,
+                child: FallingOptionBubble(
+                  text: _displayText(option),
+                  color: _bubbleColorPalette.colorFor(index),
+                  size: _bubbleSize,
+                  fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
+                  onTap: () {},
+                ),
               ),
             ),
-            childWhenDragging: const SizedBox(
+            childWhenDragging: SizedBox(
               width: _bubbleSize,
               height: _bubbleSize,
             ),
@@ -512,6 +539,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
               text: _displayText(option),
               color: _bubbleColorPalette.colorFor(index),
               size: _bubbleSize,
+              fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
               onPointerDown: _isAnswered || _isFinishing
                   ? null
                   : () => controller.toggle(),
@@ -531,14 +559,18 @@ class _SlotAssemblyTaskWidgetState<TOption>
       maxSimultaneousDrags: _isAnswered || _isFinishing ? 0 : 1,
       feedback: Material(
         color: Colors.transparent,
-        child: FallingOptionBubble(
-          text: _displayText(option),
-          color: _bubbleColorPalette.colorFor(index),
-          size: _bubbleSize,
-          onTap: () {},
+        child: Transform.scale(
+          scale: _dragMode?.dragScale ?? 1.0,
+          child: FallingOptionBubble(
+            text: _displayText(option),
+            color: _bubbleColorPalette.colorFor(index),
+            size: _bubbleSize,
+            fontSizeFactor: widget.task.uiConfig.bubbleFontSizeFactor,
+            onTap: () {},
+          ),
         ),
       ),
-      childWhenDragging: const SizedBox(
+      childWhenDragging: SizedBox(
         width: _bubbleSize,
         height: _bubbleSize,
       ),
@@ -636,6 +668,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
       animation: _fallController,
       optionIndices: optionIndices,
       textForOption: (index) => _displayText(widget.task.options[index]),
+      uiConfig: widget.task.uiConfig,
+      elementSize: _bubbleSize,
       hiddenOptionIndices: {
         ..._usedOptionIndices,
         ..._temporarilyHiddenFallingOptions,

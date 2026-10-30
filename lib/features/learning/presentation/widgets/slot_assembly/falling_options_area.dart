@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_option_bubble.dart';
 
 class FallingOptionsArea extends StatefulWidget {
@@ -18,6 +19,7 @@ class FallingOptionsArea extends StatefulWidget {
     this.height = 360,
     this.elementSize = 60,
     this.spacing = 8,
+    required this.uiConfig,
   });
 
   final Animation<double> animation;
@@ -34,6 +36,7 @@ class FallingOptionsArea extends StatefulWidget {
   final double height;
   final double elementSize;
   final double spacing;
+  final SlotAssemblyUiConfig uiConfig;
 
   @override
   State<FallingOptionsArea> createState() => _FallingOptionsAreaState();
@@ -191,6 +194,7 @@ class _FallingOptionsAreaState extends State<FallingOptionsArea> {
               text: widget.textForOption(optionIndex),
               color: bubbleColor,
               size: widget.elementSize,
+              fontSizeFactor: widget.uiConfig.bubbleFontSizeFactor,
               onTap: () {
                 if (!widget.canStart ||
                     widget.hiddenOptionIndices.contains(optionIndex)) {

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
+import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
@@ -50,9 +51,8 @@ final List<TaskData> slotAssemblyWord = [
     ],
     wrongAnswers: [],
     wrongAnswerCount: 0,
-    buttonConfig: myButtonConfig,
     // requiresSequentialSelection: false,
-    interactionMode: DragToSlotInteractionMode(),
+    interactionMode: DragToSlotInteractionMode(dragScale: 1.33),
   ),
   SlotAssemblyTaskData<AudioLinkedContent>(
     prompt: TaskPrompt(
@@ -67,7 +67,7 @@ final List<TaskData> slotAssemblyWord = [
     ),
     correctAnswers: [
       AudioLinkedContent(
-        content: TextContent('СИР'),
+        content: TextContent('강'),
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_syr.mp3'),
       ),
     ],
@@ -78,7 +78,11 @@ final List<TaskData> slotAssemblyWord = [
       ),
     ],
     wrongAnswerCount: 1,
-    buttonConfig: myButtonConfig,
+    uiConfig: SlotAssemblyUiConfig(
+      bubbleFontSizeFactor: 2.0,
+      slotWidthPerCharacter: 80,
+      slotHeight: 80,
+    ),
   ),
   SlotAssemblyTaskData<AudioLinkedContent>(
     prompt: TaskPrompt(
@@ -130,6 +134,5 @@ final List<TaskData> slotAssemblyWord = [
     correctAnswers: ['H${toSubscript(2)}', 'SO${toSubscript(4)}'],
     wrongAnswers: ['SO${toSubscript(3)}'],
     wrongAnswerCount: 1,
-    buttonConfig: myButtonConfig,
   ),
 ];

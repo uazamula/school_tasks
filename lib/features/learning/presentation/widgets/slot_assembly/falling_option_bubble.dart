@@ -8,6 +8,7 @@ class FallingOptionBubble extends StatelessWidget {
     required this.onTap,
     this.onPointerDown,
     this.size = 48,
+    this.fontSizeFactor = 1.5,
   });
 
   final String text;
@@ -15,6 +16,7 @@ class FallingOptionBubble extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onPointerDown;
   final double size;
+  final double fontSizeFactor;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +53,9 @@ class FallingOptionBubble extends StatelessWidget {
               maxLines: 1,
               softWrap: false,
               style: theme.textTheme.titleMedium?.copyWith(
-                //TODO
-                fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * 1.5,
+                fontSize:
+                    (theme.textTheme.titleMedium?.fontSize ?? 16) *
+                    fontSizeFactor,
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),

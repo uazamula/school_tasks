@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
+import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly_task_widget.dart';
 
 class SlotAssemblySlots extends StatelessWidget {
@@ -11,6 +12,7 @@ class SlotAssemblySlots extends StatelessWidget {
     this.dragEnabled = false,
     this.occupiedSlots = const [],
     this.onOptionDropped,
+    required this.uiConfig,
   });
 
   final List<String> slots;
@@ -18,6 +20,7 @@ class SlotAssemblySlots extends StatelessWidget {
   final bool dragEnabled;
   final List<bool> occupiedSlots;
   final void Function(int optionIndex, int slotIndex)? onOptionDropped;
+  final SlotAssemblyUiConfig uiConfig;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,6 @@ class SlotAssemblySlots extends StatelessWidget {
       colorScheme.surface,
     );
 
-    const letterWidth = 26.0;
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: AppSpacing.xs,
@@ -48,15 +50,14 @@ class SlotAssemblySlots extends StatelessWidget {
               onOptionDropped?.call(details.data, i);
             },
             builder: (context, candidateData, rejectedData) {
-              final length = effectiveTextLength(slots[i]);
               return Container(
                 key: slotKeys[i],
                 constraints: BoxConstraints(
-                  //todo
-                  minWidth: slots[i] != nothing
-                      ? letterWidth * length
-                      : letterWidth * 2,
-                  minHeight: 56,
+                  minWidth: uiConfig.slotWidthPerCharacter *
+                      (slots[i] != nothing
+                          ? effectiveTextLength(slots[i])
+                          : 2.0),
+                  minHeight: uiConfig.slotHeight,
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 alignment: Alignment.center,

@@ -242,7 +242,7 @@ class TopicAttemptGenerator {
         correctAnswers: correctAnswers,
         options: options,
         requiresSequentialSelection: data.requiresSequentialSelection,
-        buttonConfig: data.buttonConfig,
+        uiConfig: data.uiConfig,
         interactionMode: data.interactionMode,
       ),
     );

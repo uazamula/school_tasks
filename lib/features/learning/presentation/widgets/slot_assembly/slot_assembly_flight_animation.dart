@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_option_bubble.dart';
 
 class SlotAssemblyFlightAnimation extends StatefulWidget {
-  const SlotAssemblyFlightAnimation({super.key});
+  const SlotAssemblyFlightAnimation({
+    super.key,
+    this.duration = const Duration(milliseconds: 700),
+  });
 
+  final Duration duration;
   @override
   State<SlotAssemblyFlightAnimation> createState() =>
       SlotAssemblyFlightAnimationState();
@@ -27,8 +31,17 @@ class SlotAssemblyFlightAnimationState
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: widget.duration,
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant SlotAssemblyFlightAnimation oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.duration != widget.duration) {
+      _controller.duration = widget.duration;
+    }
   }
 
   Future<bool> animate({
