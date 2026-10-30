@@ -5,6 +5,7 @@ class MathContent extends TaskContent {
   const MathContent(this.expression, {this.audio});
 
   final String expression;
+  @override
   final AudioContent? audio;
 
   @override

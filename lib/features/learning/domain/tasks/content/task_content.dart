@@ -2,12 +2,16 @@ import 'package:school_tasks/features/learning/domain/tasks/content/audio_conten
 
 abstract class TaskContent {
   const TaskContent();
+
+  /// Аудіо, прикріплене до контенту. Для типів без аудіо — null.
+  AudioContent? get audio => null;
 }
 
 class TextContent extends TaskContent {
   const TextContent(this.text, {this.audio});
 
   final String text;
+  @override
   final AudioContent? audio;
 
   @override
@@ -23,6 +27,7 @@ class ImageContent extends TaskContent {
   const ImageContent(this.imagePath, {this.audio});
 
   final String imagePath;
+  @override
   final AudioContent? audio;
 
   @override
@@ -63,6 +68,7 @@ class EmojiContent extends TaskContent {
   const EmojiContent(this.emoji, {this.audio});
 
   final String emoji;
+  @override
   final AudioContent? audio;
 
   @override

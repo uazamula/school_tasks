@@ -114,7 +114,7 @@ abstract final class Tests {
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,
         // ...CodingTasks.codingTasksSel,
-        // ...matchingTasks,
+        ...matchingTasks,
         // ...additionWithSound,
         // ...matchingTasks,
         // ...positionSelectionTasks,

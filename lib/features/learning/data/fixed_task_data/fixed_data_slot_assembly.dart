@@ -32,8 +32,8 @@ final List<TaskData> slotAssemblyWord = [
     prompt: TaskPrompt(
       content: [TextContent('Склади слово')],
       target: TargetContent(
-        target: AudioLinkedContent(
-          content: ImageContent('assets/images/fish.png'),
+        target: ImageContent(
+          'assets/images/fish.png',
           audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
         ),
         effect: const TargetEffectConfig(

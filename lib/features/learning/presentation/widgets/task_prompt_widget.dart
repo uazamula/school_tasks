@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
@@ -137,17 +136,9 @@ class TaskPromptWidget extends StatelessWidget {
   }
 
   bool _isVisual(TaskContent content) {
-    if (content is ImageContent ||
+    return content is ImageContent ||
         content is GridContent ||
-        content is EmojiContent) {
-      return true;
-    }
-
-    if (content is AudioLinkedContent) {
-      return _isVisual(content.content);
-    }
-
-    return false;
+        content is EmojiContent;
   }
 
   Widget _buildNonVisualContent(
@@ -193,6 +184,30 @@ class TaskPromptWidget extends StatelessWidget {
     TextStyle? textStyle, {
     bool fullWidthText = false,
   }) {
+    final built = _buildBaseContent(
+      context,
+      content,
+      textStyle,
+      fullWidthText: fullWidthText,
+    );
+
+    final audio = content.audio;
+    if (audio == null) return built;
+
+    return TaskAudioWidget(
+      content: audio,
+      interactive: true,
+      showIcon: false,
+      child: built,
+    );
+  }
+
+  Widget _buildBaseContent(
+    BuildContext context,
+    TaskContent content,
+    TextStyle? textStyle, {
+    bool fullWidthText = false,
+  }) {
     if (content is TextContent) {
       final text = Text(
         content.text,
@@ -210,20 +225,6 @@ class TaskPromptWidget extends StatelessWidget {
 
     if (content is AudioContent) {
       return TaskAudioWidget(content: content);
-    }
-
-    if (content is AudioLinkedContent) {
-      return TaskAudioWidget(
-        content: content.audio,
-        interactive: true,
-        showIcon: false,
-        child: _buildContent(
-          context,
-          content.content,
-          textStyle,
-          fullWidthText: fullWidthText,
-        ),
-      );
     }
 
     if (content is ImageContent) {
@@ -327,15 +328,7 @@ class TaskPromptWidget extends StatelessWidget {
   ) {
     final effect = target.effect;
 
-    // Знаходимо зображення, навіть якщо воно загорнуте
-    // в AudioLinkedContent.
-    TaskContent imageContent = target.target;
-
-    while (imageContent is AudioLinkedContent) {
-      imageContent = imageContent.content;
-    }
-
-    if (effect == null || imageContent is! ImageContent) {
+    if (effect == null || target.target is! ImageContent) {
       return _buildContent(
         context,
         target.target,
@@ -368,38 +361,16 @@ class TaskPromptWidget extends StatelessWidget {
     }
   }
 
-  List<double> _saturationMatrix(double saturation) {
-    const red = 0.2126;
-    const green = 0.7152;
-    const blue = 0.0722;
-
-    final inverse = 1 - saturation;
-
-    final r = inverse * red;
-    final g = inverse * green;
-    final b = inverse * blue;
+  List<double> _saturationMatrix(double s) {
+    final r = (1 - s) * 0.2126;
+    final g = (1 - s) * 0.7152;
+    final b = (1 - s) * 0.0722;
 
     return [
-      r + saturation,
-      g,
-      b,
-      0,
-      0,
-      r,
-      g + saturation,
-      b,
-      0,
-      0,
-      r,
-      g,
-      b + saturation,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
+      r + s, g, b, 0, 0, //
+      r, g + s, b, 0, 0, //
+      r, g, b + s, 0, 0, //
+      0, 0, 0, 1, 0,
     ];
   }
 }
