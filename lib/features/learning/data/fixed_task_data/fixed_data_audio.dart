@@ -2,7 +2,6 @@ import 'package:school_tasks/features/learning/domain/task_data/selection_task_d
 
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 
@@ -40,17 +39,17 @@ const List<TaskData> additionWithSound = [
   ),
 ];
 
-const List<TaskData> audioLinkedPromptDemo = [
+const List<TaskData> audioPromptDemo = [
   SelectionTaskData(
     prompt: TaskPrompt(
       content: [
         TextContent('Натисни на текст, щоб прослухати аудіо:'),
-        AudioLinkedContent(
-          content: TextContent('Успіх'),
+        TextContent(
+          'Успіх',
           audio: AudioContent.fixed('assets/audio/ding.mp3'),
         ),
-        AudioLinkedContent(
-          content: TextContent('Помилка'),
+        TextContent(
+          'Помилка',
           audio: AudioContent.fixed('assets/audio/failure.mp3'),
         ),
       ],
@@ -66,8 +65,8 @@ const List<TaskData> audioLinkedPromptDemo = [
       content: [
         TextContent('Натисни на об\'єкт, щоб почути його назву.'),
 
-        AudioLinkedContent(
-          content: ImageContent('assets/images/tasks/apple.png'),
+        ImageContent(
+          'assets/images/tasks/apple.png',
           audio: AudioContent.fixed('assets/audio/sim.mp3'),
         ),
       ],
@@ -79,14 +78,14 @@ const List<TaskData> audioLinkedPromptDemo = [
   ),
 ];
 
-const List<TaskData> audioLinkedSelectionDemo = [
+const List<TaskData> audioSelectionDemo = [
   // 1. Emoji + Single Choice
   SelectionTaskData(
     prompt: TaskPrompt(
       content: [
         TextContent('Скільки яблук?'),
-        AudioLinkedContent(
-          content: EmojiContent('🍎🍎🍎'),
+        EmojiContent(
+          '🍎🍎🍎',
           audio: AudioContent.fixed('assets/audio/sim.mp3'),
         ),
       ],
@@ -102,18 +101,12 @@ const List<TaskData> audioLinkedSelectionDemo = [
     prompt: TaskPrompt(
       content: [
         TextContent('Обери всі числа, які можна почути:'),
-        AudioLinkedContent(
-          content: EmojiContent('🔊 2'),
-          audio: AudioContent.fixed('assets/audio/dva.mp3'),
-        ),
-        AudioLinkedContent(
-          content: EmojiContent('🔊 9'),
+        EmojiContent('🔊 2', audio: AudioContent.fixed('assets/audio/dva.mp3')),
+        EmojiContent(
+          '🔊 9',
           audio: AudioContent.fixed('assets/audio/devjat.mp3'),
         ),
-        AudioLinkedContent(
-          content: EmojiContent('🔊 2'),
-          audio: AudioContent.fixed('assets/audio/dva.mp3'),
-        ),
+        EmojiContent('🔊 2', audio: AudioContent.fixed('assets/audio/dva.mp3')),
       ],
     ),
     correctAnswers: ['🔊 2', '🔊 9'],
@@ -128,8 +121,8 @@ const List<TaskData> audioLinkedSelectionDemo = [
       content: [TextContent('Яке зображення відповідає слову «яблуко»?')],
     ),
     correctAnswers: [
-      AudioLinkedContent(
-        content: ImageContent('assets/images/tasks/apple.png'),
+      ImageContent(
+        'assets/images/tasks/apple.png',
         audio: AudioContent.fixed('assets/audio/sim.mp3'),
       ),
     ],
@@ -148,12 +141,12 @@ const List<TaskData> audioLinkedSelectionDemo = [
       content: [TextContent('Обери всі предмети, назви яких можна почути.')],
     ),
     correctAnswers: [
-      AudioLinkedContent(
-        content: ImageContent('assets/images/tasks/apple.png'),
+      ImageContent(
+        'assets/images/tasks/apple.png',
         audio: AudioContent.fixed('assets/audio/sim.mp3'),
       ),
-      AudioLinkedContent(
-        content: ImageContent('assets/images/tasks/triangle.png'),
+      ImageContent(
+        'assets/images/tasks/triangle.png',
         audio: AudioContent.fixed('assets/audio/devjat.mp3'),
       ),
     ],

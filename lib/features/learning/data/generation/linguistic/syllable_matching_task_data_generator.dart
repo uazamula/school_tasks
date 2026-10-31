@@ -7,8 +7,8 @@ import 'package:school_tasks/features/learning/domain/task_data/matching_button_
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
@@ -290,7 +290,19 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       return audioContent;
     }
 
-    return AudioLinkedContent(content: visibleContent, audio: audioContent);
+    return _withAudio(visibleContent, audioContent);
+  }
+
+  TaskContent _withAudio(TaskContent content, AudioContent audio) {
+    return switch (content) {
+      TextContent(:final text) => TextContent(text, audio: audio),
+      ImageContent(:final imagePath) => ImageContent(imagePath, audio: audio),
+      EmojiContent(:final emoji) => EmojiContent(emoji, audio: audio),
+      MathContent(:final expression) => MathContent(expression, audio: audio),
+      _ => throw ArgumentError(
+        'Контент ${content.runtimeType} не підтримує аудіо',
+      ),
+    };
   }
 
   /// Matches a string against a wildcard pattern.

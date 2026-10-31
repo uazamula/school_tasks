@@ -4,7 +4,6 @@ import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
@@ -834,26 +833,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   /// Повертає аудіо варіанта: кожен вид контенту може мати власне аудіо.
   AudioContent? _audioForOption(Object? option) {
-    if (option is AudioContent) {
-      return option;
-    }
-
-    if (option is TextContent) {
-      return option.audio;
-    }
-
-    if (option is ImageContent) {
-      return option.audio;
-    }
-
-    if (option is EmojiContent) {
-      return option.audio;
-    }
-
-    if (option is MathContent) {
-      return option.audio;
-    }
-
+    if (option is AudioContent) return option;
+    if (option is TaskContent) return option.audio;
     return null;
   }
 }

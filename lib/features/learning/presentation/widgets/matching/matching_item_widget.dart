@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/matching/matching_content_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
@@ -42,15 +41,16 @@ class _MatchingItemWidgetState extends State<MatchingItemWidget> {
     super.dispose();
   }
 
+  bool get _hasAttachedAudio => widget.content.audio != null;
+
   void _handleTap() {
     Future<void>? playback;
 
-    if (widget.content is AudioLinkedContent) {
+    if (_hasAttachedAudio) {
       playback = _audioController.playAndWait();
     }
 
     widget.onAudioPlaybackStarted?.call(playback);
-
     widget.onTap();
   }
 
@@ -66,8 +66,6 @@ class _MatchingItemWidgetState extends State<MatchingItemWidget> {
     final backgroundColor = isDark
         ? widget.buttonConfig?.darkBackgroundColor
         : widget.buttonConfig?.lightBackgroundColor;
-
-    final isAudioLinked = widget.content is AudioLinkedContent;
 
     return SizedBox(
       width: width,
@@ -107,7 +105,9 @@ class _MatchingItemWidgetState extends State<MatchingItemWidget> {
                         fontSize: widget.buttonConfig?.fontSize ?? 20,
                       ),
                       textScaler: widget.buttonConfig?.textScaler,
-                      audioController: isAudioLinked ? _audioController : null,
+                      audioController: _hasAttachedAudio
+                          ? _audioController
+                          : null,
                     ),
                   ),
                 ),

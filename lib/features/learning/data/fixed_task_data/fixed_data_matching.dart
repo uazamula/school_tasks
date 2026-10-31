@@ -2,7 +2,6 @@ import 'package:flutter/painting.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
@@ -67,15 +66,15 @@ final matchingTasks = [
         right: TextContent('10'),
       ),
       MatchingPair(
-        left: AudioLinkedContent(
-          content: TextContent('🍎🍎🍎🍎🍎🍎🍎🍎🍎'),
+        left: TextContent(
+          '🍎🍎🍎🍎🍎🍎🍎🍎🍎',
           audio: AudioContent.fixed('assets/audio/devjat.mp3'),
         ),
         right: TextContent('9'),
       ),
       MatchingPair(
-        left: AudioLinkedContent(
-          content: ImageContent('assets/images/tasks/apple.png'),
+        left: ImageContent(
+          'assets/images/tasks/apple.png',
           audio: AudioContent.fixed('assets/audio/ding.mp3'),
         ),
         right: TextContent('яблуко'),

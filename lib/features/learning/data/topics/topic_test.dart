@@ -65,10 +65,10 @@ abstract final class Tests {
         //   taskCount: 1,
         //   pairCount: 4,
         //
-        //   leftColumnElement: MatchingColumnElement.word,
+        //   leftColumnElement: MatchingColumnElement.image,
         //   leftColumnAudio: MatchingColumnAudio.word,
         //
-        //   rightColumnElement: MatchingColumnElement.syllable,
+        //   rightColumnElement: MatchingColumnElement.none,
         //   rightColumnAudio: MatchingColumnAudio.syllable,
         //
         //   swapColumns: false,
@@ -109,19 +109,19 @@ abstract final class Tests {
       // ]),
       FixedTaskDataSource([
         // ...GeometryShapesData.simpleShapes,
-        ...slotAssemblyWord,
+        // ...slotAssemblyWord,
 
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,
         // ...CodingTasks.codingTasksSel,
-        ...matchingTasks,
-        // ...additionWithSound,
+        // ...matchingTasks,
+        ...additionWithSound,
         // ...matchingTasks,
         // ...positionSelectionTasks,
         // ...FractionData.fractions,
-        // ...audioLinkedSelectionDemo,
+        // ...audioSelectionDemo,
         // ...roots,
-        // ...audioLinkedPromptDemo,
+        // ...audioPromptDemo,
         // ...AdditionTaskData.within10,
         // ...rational,
         // ...MultiplicationTaskData.multiplicationTable,
@@ -156,7 +156,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 300),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,
-      countdown: Duration(seconds: 35, milliseconds: 0),
+      countdown: Duration(seconds: 135, milliseconds: 0),
     ),
     dashboard: DashboardConfig(
       showProgress: true,

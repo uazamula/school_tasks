@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
@@ -23,25 +22,22 @@ class MatchingContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (content is AudioLinkedContent) {
-      final linkedContent = content as AudioLinkedContent;
+    final base = _buildBase(context);
+    final audio = content.audio;
 
-      return TaskAudioWidget(
-        content: linkedContent.audio,
-        isActive: false,
-        interactive: false,
-        showIcon: false,
-        controller: audioController,
-        child: MatchingContentWidget(
-          content: linkedContent.content,
-          isActive: isActive,
-          textStyle: textStyle,
-          textScaler: textScaler,
-          audioController: audioController,
-        ),
-      );
-    }
+    if (audio == null) return base;
 
+    return TaskAudioWidget(
+      content: audio,
+      isActive: false,
+      interactive: false,
+      showIcon: false,
+      controller: audioController,
+      child: base,
+    );
+  }
+
+  Widget _buildBase(BuildContext context) {
     if (content is TextContent) {
       return Text(
         (content as TextContent).text,

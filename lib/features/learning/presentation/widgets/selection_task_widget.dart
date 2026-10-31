@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
@@ -65,32 +64,29 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
   void _onOptionSelected(TOption option) {
     if (_isAnswered) return;
 
-    if (option is AudioLinkedContent) {
+    if (_attachedAudio(option) != null) {
       setState(() {
-        if (_activeAudioOption == option) {
-          _activeAudioOption = null;
+        // Повторне натискання на вибраний варіант знімає виділення.
+        if (_selectedOptions.contains(option)) {
           _selectedOptions.remove(option);
+
+          if (_activeAudioOption == option) {
+            _activeAudioOption = null;
+          }
+
           return;
         }
 
-        _activeAudioOption = option;
+        _activeAudioOption = option as TaskContent;
 
         if (!_isMultiple) {
           _selectedOptions
             ..clear()
             ..add(option);
-        } else if (_selectedOptions.contains(option)) {
-          _selectedOptions.remove(option);
         } else {
           _selectedOptions.add(option);
         }
       });
-
-      // Для single choice без підтвердження
-      // відповідь перевіряємо після завершення аудіо.
-      if (!_isMultiple && !_requiresConfirmation) {
-        return;
-      }
 
       return;
     }
@@ -130,7 +126,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     });
   }
 
-  void _onLinkedAudioCompleted(AudioLinkedContent option) {
+  void _onLinkedAudioCompleted(TOption option) {
     if (_isAnswered) return;
 
     if (_activeAudioOption != option) return;
@@ -199,64 +195,36 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     VoidCallback? onPressed, {
     double? imageSize,
   }) {
-    if (option is AudioLinkedContent) {
-      final linkedContent = option.content;
+    final button = _buildOptionButton(
+      option,
+      state,
+      isSelected,
+      onPressed,
+      imageSize: imageSize,
+    );
 
-      Widget answerButton;
+    final audio = _attachedAudio(option);
+    if (audio == null) return button;
 
-      if (linkedContent is ImageContent) {
-        answerButton = VisualAnswerButton(
-          state: state,
-          isSelected: isSelected,
-          onPressed: onPressed,
-          size: imageSize ?? 160,
-          child: Image.asset(linkedContent.imagePath, fit: BoxFit.contain),
-        );
-      } else if (linkedContent is EmojiContent) {
-        answerButton = VisualAnswerButton(
-          state: state,
-          isSelected: isSelected,
-          onPressed: onPressed,
-          size: imageSize ?? 160,
-          child: Text(
-            linkedContent.emoji,
-            style: const TextStyle(fontSize: 300),
-          ),
-        );
-      } else {
-        final answer = linkedContent.toString();
+    return TaskAudioWidget(
+      content: audio,
+      isActive: _activeAudioOption == option,
+      interactive: false,
+      showIcon: false,
+      onCompleted: !_isMultiple && !_requiresConfirmation
+          ? () => _onLinkedAudioCompleted(option)
+          : null,
+      child: button,
+    );
+  }
 
-        if (_isMultiple) {
-          answerButton = MultiChoiceAnswerButton(
-            answer: answer,
-            state: state,
-            isSelected: isSelected,
-            onPressed: onPressed,
-            buttonConfig: widget.task.buttonConfig,
-          );
-        } else {
-          answerButton = ChoiceAnswerButton(
-            answer: answer,
-            state: state,
-            isSelected: isSelected,
-            onPressed: onPressed,
-            buttonConfig: widget.task.buttonConfig,
-          );
-        }
-      }
-
-      return TaskAudioWidget(
-        content: option.audio,
-        isActive: _activeAudioOption == option,
-        interactive: false,
-        showIcon: false,
-        onCompleted: !_isMultiple && !_requiresConfirmation
-            ? () => _onLinkedAudioCompleted(option)
-            : null,
-        child: answerButton,
-      );
-    }
-
+  Widget _buildOptionButton(
+    TOption option,
+    TaskAnswerState state,
+    bool isSelected,
+    VoidCallback? onPressed, {
+    double? imageSize,
+  }) {
     if (option is ImageContent) {
       return VisualAnswerButton(
         state: state,
@@ -287,7 +255,7 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
       );
     }
 
-    final answer = option.toString();
+    final answer = _optionText(option);
 
     if (_isMultiple) {
       return MultiChoiceAnswerButton(
@@ -324,17 +292,8 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
     );
   }
 
-  bool _isVisualOption(TOption option) {
-    if (option is ImageContent || option is EmojiContent) {
-      return true;
-    }
-
-    if (option is AudioLinkedContent) {
-      return option.content is ImageContent || option.content is EmojiContent;
-    }
-
-    return false;
-  }
+  bool _isVisualOption(TOption option) =>
+      option is ImageContent || option is EmojiContent;
 
   Widget _buildOptions() {
     final options = widget.task.options;
@@ -420,4 +379,10 @@ class _SelectionTaskWidgetState<TOption, TAnswer, TSolution>
         ..add(typedOption);
     });
   }
+
+  AudioContent? _attachedAudio(TOption option) =>
+      option is TaskContent ? option.audio : null;
+
+  String _optionText(TOption option) =>
+      option is TextContent ? option.text : option.toString();
 }
