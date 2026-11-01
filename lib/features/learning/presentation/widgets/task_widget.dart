@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/rational.dart';
@@ -19,6 +18,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/matching_tas
 import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_callbacks.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_interaction_layout.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt_widget.dart';
 
@@ -28,33 +28,19 @@ class TaskWidget extends StatelessWidget {
     required this.task,
     required this.result,
     required this.promptScrollable,
-    required this.onTaskAnswered,
-    required this.onProgressStep,
-    required this.onCorrectPair,
-    required this.onIncorrectPair,
+    required this.callbacks,
     required this.feedbackEnabled,
     this.interactionScrollable = false,
-    required this.onIncorrectPairAttempt,
-    required this.onMatchingAccuracyChanged,
     this.targetProgress = 0,
-    this.onCorrectSlotFilled,
-    this.onElementReachedEdge,
   });
 
   final LearningTask<dynamic, dynamic> task;
   final TaskResult<dynamic, dynamic>? result;
   final bool promptScrollable;
   final bool interactionScrollable;
-  final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;
-  final VoidCallback onProgressStep;
-  final VoidCallback onCorrectPair;
-  final VoidCallback onIncorrectPair;
+  final TaskCallbacks callbacks;
   final bool feedbackEnabled;
-  final bool Function() onIncorrectPairAttempt;
-  final ValueChanged<AccuracyResult> onMatchingAccuracyChanged;
   final int targetProgress;
-  final ValueChanged<int>? onCorrectSlotFilled;
-  final VoidCallback? onElementReachedEdge;
 
   Widget buildPrompt() {
     return TaskPromptWidget(
@@ -65,93 +51,105 @@ class TaskWidget extends StatelessWidget {
   }
 
   Widget buildInteraction() {
+    // Matching сам керує розкладкою, тому без обгортки.
+    if (task is MatchingTask) {
+      return _buildMatching();
+    }
+
+    final interaction = _buildScalableInteraction();
+
+    if (interaction == null) {
+      return const SizedBox.shrink();
+    }
+
+    return TaskInteractionScalingBoundary(child: interaction);
+  }
+
+  /// Віджет взаємодії для типів, що вкладаються в TaskInteractionScalingBoundary.
+  Widget? _buildScalableInteraction() {
     if (task is SelectionTask) {
-      return TaskInteractionScalingBoundary(
-        child: SelectionTaskWidget<dynamic, dynamic, dynamic>(
-          task: task as SelectionTask<dynamic, dynamic, dynamic>,
-          result: result,
-          interactionScrollable: interactionScrollable,
-          onTaskAnswered: onTaskAnswered,
-          feedbackEnabled: feedbackEnabled,
-        ),
+      return SelectionTaskWidget<dynamic, dynamic, dynamic>(
+        task: task as SelectionTask<dynamic, dynamic, dynamic>,
+        result: result,
+        interactionScrollable: interactionScrollable,
+        onTaskAnswered: callbacks.onTaskAnswered,
+        feedbackEnabled: feedbackEnabled,
       );
     }
 
     if (task is FractionTask) {
-      return TaskInteractionScalingBoundary(
-        child: FractionTaskWidget(
-          task: task as FractionTask,
-          result: result as TaskResult<Set<int>, int>?,
-          interactionScrollable: interactionScrollable,
-          onTaskAnswered: onTaskAnswered,
-          feedbackEnabled: feedbackEnabled,
-        ),
+      return FractionTaskWidget(
+        task: task as FractionTask,
+        result: result as TaskResult<Set<int>, int>?,
+        interactionScrollable: interactionScrollable,
+        onTaskAnswered: callbacks.onTaskAnswered,
+        feedbackEnabled: feedbackEnabled,
       );
     }
 
     if (task is PositionSelectionTask) {
-      return TaskInteractionScalingBoundary(
-        child: PositionSelectionTaskWidget(
-          task: task as PositionSelectionTask,
-          result: result as TaskResult<List<GridPosition>, List<GridPosition>>?,
-          interactionScrollable: interactionScrollable,
-          onTaskAnswered: onTaskAnswered,
-          feedbackEnabled: feedbackEnabled,
-        ),
-      );
-    }
-
-    if (task is MatchingTask) {
-      return MatchingTaskWidget(
-        key: ObjectKey(task),
-        task: task as MatchingTask,
-        result: result as TaskResult<MatchingAnswer, List<MatchingPair>>?,
-        onTaskAnswered: onTaskAnswered,
-        onProgressStep: onProgressStep,
-        onCorrectPair: onCorrectPair,
-        onIncorrectPair: onIncorrectPair,
+      return PositionSelectionTaskWidget(
+        task: task as PositionSelectionTask,
+        result: result as TaskResult<List<GridPosition>, List<GridPosition>>?,
+        interactionScrollable: interactionScrollable,
+        onTaskAnswered: callbacks.onTaskAnswered,
         feedbackEnabled: feedbackEnabled,
-        onIncorrectPairAttempt: onIncorrectPairAttempt,
-        onAccuracyChanged: onMatchingAccuracyChanged,
       );
     }
 
     if (task is InputTask) {
-      return TaskInteractionScalingBoundary(
-        child: InputTaskWidget(
-          task: task as InputTask,
-          result: result as TaskResult<Rational, Rational>?,
-          interactionScrollable: interactionScrollable,
-          onTaskAnswered: onTaskAnswered,
-          feedbackEnabled: feedbackEnabled,
-        ),
+      return InputTaskWidget(
+        task: task as InputTask,
+        result: result as TaskResult<Rational, Rational>?,
+        interactionScrollable: interactionScrollable,
+        onTaskAnswered: callbacks.onTaskAnswered,
+        feedbackEnabled: feedbackEnabled,
       );
     }
 
     if (task is SlotAssemblyTask) {
-      return TaskInteractionScalingBoundary(
-        child: SlotAssemblyTaskWidget<dynamic>(
-          key: ObjectKey(task),
-          task: task as SlotAssemblyTask<dynamic>,
-          result: result as TaskResult<List<dynamic>, List<dynamic>>?,
-          interactionScrollable: interactionScrollable,
-          onTaskAnswered: onTaskAnswered,
-          onAccuracyChanged: onMatchingAccuracyChanged,
-          onCorrectSlotFilled: (progress) {
-            if (feedbackEnabled) onCorrectPair();
-            onCorrectSlotFilled?.call(progress);
-          },
-          onIncorrectAttempt: () {
-            final shouldFinish = onIncorrectPairAttempt();
-            if (feedbackEnabled) onIncorrectPair();
-            return shouldFinish;
-          },
-          onElementReachedEdge: onElementReachedEdge,
-        ),
-      );
+      return _buildSlotAssembly();
     }
 
-    return const SizedBox.shrink();
+    return null;
+  }
+
+  Widget _buildMatching() {
+    return MatchingTaskWidget(
+      key: ObjectKey(task),
+      task: task as MatchingTask,
+      result: result as TaskResult<MatchingAnswer, List<MatchingPair>>?,
+      onTaskAnswered: callbacks.onTaskAnswered,
+      onProgressStep: callbacks.onProgressStep,
+      onCorrectPair: callbacks.onCorrectPair,
+      onIncorrectPair: callbacks.onIncorrectPair,
+      feedbackEnabled: feedbackEnabled,
+      onIncorrectPairAttempt: callbacks.onIncorrectPairAttempt,
+      onAccuracyChanged: callbacks.onMatchingAccuracyChanged,
+    );
+  }
+
+  Widget _buildSlotAssembly() {
+    return SlotAssemblyTaskWidget<dynamic>(
+      key: ObjectKey(task),
+      task: task as SlotAssemblyTask<dynamic>,
+      result: result as TaskResult<List<dynamic>, List<dynamic>>?,
+      interactionScrollable: interactionScrollable,
+      onTaskAnswered: callbacks.onTaskAnswered,
+      onAccuracyChanged: callbacks.onMatchingAccuracyChanged,
+      // Звук фідбеку після кожної спроби доставки елемента в слот,
+      // за тим самим принципом, що й у Matching.
+      onCorrectSlotFilled: (progress) {
+        if (feedbackEnabled) callbacks.onCorrectPair();
+        callbacks.onCorrectSlotFilled?.call(progress);
+      },
+      onIncorrectAttempt: () {
+        final shouldFinish = callbacks.onIncorrectPairAttempt();
+        if (feedbackEnabled) callbacks.onIncorrectPair();
+        return shouldFinish;
+      },
+      onElementReachedEdge: callbacks.onElementReachedEdge,
+    );
   }
 
   @override

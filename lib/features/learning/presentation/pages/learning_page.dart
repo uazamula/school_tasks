@@ -22,6 +22,7 @@ import 'package:school_tasks/features/learning/domain/topic_progression_mode.dar
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/failure_limit_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_progress_indicator.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_callbacks.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
 import 'package:school_tasks/features/learning/providers/learning_results_controller.dart';
@@ -153,17 +154,19 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       task: currentTask.task,
       promptScrollable: _topic.layout.prompt.scrollable,
       result: result,
-      onTaskAnswered: _onTaskAnswered,
-      onProgressStep: _onProgressStep,
-      onCorrectPair: _onCorrectPair,
-      onIncorrectPair: _onIncorrectPair,
       feedbackEnabled: _feedbackEnabled,
       interactionScrollable: _topic.layout.interaction.scrollable,
-      onIncorrectPairAttempt: _onIncorrectPairAttempt,
-      onMatchingAccuracyChanged: _onMatchingAccuracyChanged,
       targetProgress: _targetProgress,
-      onCorrectSlotFilled: _onCorrectSlotFilled,
-      onElementReachedEdge: _handleElementReachedEdge,
+      callbacks: TaskCallbacks(
+        onTaskAnswered: _onTaskAnswered,
+        onProgressStep: _onProgressStep,
+        onCorrectPair: _onCorrectPair,
+        onIncorrectPair: _onIncorrectPair,
+        onIncorrectPairAttempt: _onIncorrectPairAttempt,
+        onMatchingAccuracyChanged: _onMatchingAccuracyChanged,
+        onCorrectSlotFilled: _onCorrectSlotFilled,
+        onElementReachedEdge: _handleElementReachedEdge,
+      ),
     );
 
     return AppScaffold(
