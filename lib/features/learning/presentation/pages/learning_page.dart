@@ -16,7 +16,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
-import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_progress.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
@@ -137,23 +137,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     super.dispose();
   }
 
-  int get _totalProgressSteps {
-    var total = 0;
-
-    for (final attemptTask in _attempt.tasks) {
-      final task = attemptTask.task;
-
-      if (task is MatchingTask) {
-        total += task.pairs.length;
-      } else if (task is SlotAssemblyTask) {
-        total += task.correctAnswers.length;
-      } else {
-        total += 1;
-      }
-    }
-
-    return total;
-  }
+  int get _totalProgressSteps =>
+      totalProgressSteps(_attempt.tasks.map((attemptTask) => attemptTask.task));
 
   @override
   Widget build(BuildContext context) {
@@ -200,33 +185,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                 Expanded(
                   child: Stack(
                     alignment: Alignment.center,
-                    children: [
-                      if (_topic.dashboard.showProgress)
-                        Align(
-                          alignment: Alignment.center,
-                          child: Opacity(
-                            opacity: isManualAnswered ? 0.15 : 1.0,
-                            child: LearningProgressIndicator(
-                              progress: _completedProgressSteps,
-                              totalSteps: _totalProgressSteps,
-                              elapsed: _stopwatch.elapsed,
-                              maximumTime:
-                                  _topic.automaticTermination?.countdown,
-                              showProgress: true,
-                              showTimer: _topic.dashboard.showTimer,
-                            ),
-                          ),
-                        )
-                      else if (_topic.dashboard.showTimer)
-                        LearningProgressIndicator(
-                          progress: _completedProgressSteps,
-                          totalSteps: _totalProgressSteps,
-                          elapsed: _stopwatch.elapsed,
-                          maximumTime: _topic.automaticTermination?.countdown,
-                          showProgress: false,
-                          showTimer: true,
-                        ),
-                    ],
+                    children: _buildProgressIndicators(isManualAnswered),
                   ),
                 ),
                 if (_topic.dashboard.showRemainingAttempts) ...[
@@ -261,6 +220,39 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     );
   }
 
+  List<Widget> _buildProgressIndicators(bool isManualAnswered) {
+    final dashboard = _topic.dashboard;
+
+    if (dashboard.showProgress) {
+      return [
+        Align(
+          alignment: Alignment.center,
+          child: Opacity(
+            opacity: isManualAnswered ? 0.15 : 1.0,
+            child: _buildProgressIndicator(showProgress: true),
+          ),
+        ),
+      ];
+    }
+
+    if (dashboard.showTimer) {
+      return [_buildProgressIndicator(showProgress: false)];
+    }
+
+    return const [];
+  }
+
+  Widget _buildProgressIndicator({required bool showProgress}) {
+    return LearningProgressIndicator(
+      progress: _completedProgressSteps,
+      totalSteps: _totalProgressSteps,
+      elapsed: _stopwatch.elapsed,
+      maximumTime: _topic.automaticTermination?.countdown,
+      showProgress: showProgress,
+      showTimer: showProgress ? _topic.dashboard.showTimer : true,
+    );
+  }
+
   void _onProgressStep() {
     if (!mounted) {
       return;
@@ -286,19 +278,9 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     }
 
     // Matching і SlotAssembly озвучують кожну спробу окремо
-    // (_onCorrectPair/_onIncorrectPair), тому кінцевий звук їм не потрібен.
-    if (_feedbackEnabled &&
-        currentTask.task is! MatchingTask &&
-        currentTask.task is! SlotAssemblyTask) {
-      if (result.isCorrect) {
-        _audioService.playSuccess();
-      } else {
-        _audioService.playFailure();
-      }
-    }
-
-    if (currentTask.task is! MatchingTask &&
-        currentTask.task is! SlotAssemblyTask) {
+    // (_onCorrectPair/_onIncorrectPair) і самі рахують прогрес.
+    if (!reportsOwnProgress(currentTask.task)) {
+      _playFeedback(isCorrect: result.isCorrect);
       _completedProgressSteps++;
     }
 
@@ -319,14 +301,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   void _moveAutomatically() {
     if (_attempt.isFinished) {
-      _isFinishing = true;
-
-      _timer?.cancel();
-      _timer = null;
-
-      _stopwatch.stop();
-
-      _autoAdvanceTimer?.cancel();
+      _markFinishing();
 
       _autoAdvanceTimer = Timer(
         LearningProgressIndicator.animationDuration,
@@ -390,6 +365,26 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
+    _markFinishing();
+
+    if (!mounted) {
+      return;
+    }
+
+    await _showTimeExpiredDialog();
+
+    if (!mounted) {
+      return;
+    }
+
+    await _finishAttempt(
+      countdownExpired: true,
+      completionReason: TopicCompletionReason.timeExpired,
+    );
+  }
+
+  /// Позначає завершення: зупиняє таймери та секундомір.
+  void _markFinishing() {
     _isFinishing = true;
 
     _timer?.cancel();
@@ -399,12 +394,21 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     _autoAdvanceTimer = null;
 
     _stopwatch.stop();
+  }
 
-    if (!mounted) {
-      return;
+  /// Витрачений час, не більший за countdown теми.
+  Duration get _effectiveElapsed {
+    final countdown = _topic.automaticTermination?.countdown;
+
+    if (countdown != null && _stopwatch.elapsed >= countdown) {
+      return countdown;
     }
 
-    await showDialog<void>(
+    return _stopwatch.elapsed;
+  }
+
+  Future<void> _showTimeExpiredDialog() {
+    return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
@@ -421,15 +425,6 @@ class _LearningPageState extends ConsumerState<LearningPage> {
           ],
         );
       },
-    );
-
-    if (!mounted) {
-      return;
-    }
-
-    await _finishAttempt(
-      countdownExpired: true,
-      completionReason: TopicCompletionReason.timeExpired,
     );
   }
 
@@ -448,11 +443,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     _stopwatch.stop();
 
-    final elapsedTime =
-        _topic.automaticTermination?.countdown != null &&
-            _stopwatch.elapsed >= _topic.automaticTermination!.countdown!
-        ? _topic.automaticTermination!.countdown!
-        : _stopwatch.elapsed;
+    final elapsedTime = _effectiveElapsed;
 
     final topicResult = _attempt.getResult(duration: elapsedTime);
 
@@ -518,20 +509,21 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     });
   }
 
-  void _onCorrectPair() {
+  void _onCorrectPair() => _playFeedback(isCorrect: true);
+
+  void _onIncorrectPair() => _playFeedback(isCorrect: false);
+
+  /// Звук вдачі/невдачі, якщо режим теми передбачає фідбек.
+  void _playFeedback({required bool isCorrect}) {
     if (!_feedbackEnabled) {
       return;
     }
 
-    _audioService.playSuccess();
-  }
-
-  void _onIncorrectPair() {
-    if (!_feedbackEnabled) {
-      return;
+    if (isCorrect) {
+      _audioService.playSuccess();
+    } else {
+      _audioService.playFailure();
     }
-
-    _audioService.playFailure();
   }
 
   bool _onIncorrectPairAttempt() {
@@ -552,15 +544,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    _isFinishing = true;
-
-    _timer?.cancel();
-    _timer = null;
-
-    _autoAdvanceTimer?.cancel();
-    _autoAdvanceTimer = null;
-
-    _stopwatch.stop();
+    _markFinishing();
 
     if (!mounted) {
       return;
@@ -588,15 +572,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   void _handleElementReachedEdge() {
     if (!mounted || _isFinishing) return;
 
-    _isFinishing = true;
-
-    _timer?.cancel();
-    _timer = null;
-
-    _autoAdvanceTimer?.cancel();
-    _autoAdvanceTimer = null;
-
-    _stopwatch.stop();
+    _markFinishing();
 
     unawaited(
       _finishAttempt(
