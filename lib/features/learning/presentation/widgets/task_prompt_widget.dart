@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/math_content_widget.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_content_builder.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_target_view.dart';
 
+/// Умова завдання: розкладка контенту й цілі.
+/// Побудову самих елементів виконують [PromptContentBuilder]
+/// та [PromptTargetView].
 class TaskPromptWidget extends StatelessWidget {
   const TaskPromptWidget({
     super.key,
@@ -15,6 +15,11 @@ class TaskPromptWidget extends StatelessWidget {
     this.scrollable = false,
     this.targetProgress = 0,
   });
+
+  static const PromptContentBuilder _content = PromptContentBuilder();
+
+  /// Висота цілі в нескролованій розкладці.
+  static const double _targetHeight = 120;
 
   final TaskPrompt prompt;
   final bool scrollable;
@@ -31,60 +36,49 @@ class TaskPromptWidget extends StatelessWidget {
       fontWeight: FontWeight.normal,
       color: colorScheme.onSurfaceVariant,
     );
+
     if (scrollable) {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildScrollableContent(context, prompt.content, textStyle),
+          _content.buildColumn(context, prompt.content, textStyle),
           if (prompt.target != null) ...[
             const SizedBox(height: AppSpacing.md),
-            _buildTargetContent(context, prompt.target!, textStyle),
+            _buildTarget(prompt.target!, textStyle),
           ],
         ],
       );
     }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.hasBoundedWidth
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
 
-        final firstVisualIndex = prompt.content.indexWhere(_isVisual);
+        final firstVisualIndex = prompt.content.indexWhere(
+          PromptContentBuilder.isVisual,
+        );
+
         // Увесь prompt є невізуальним.
         if (firstVisualIndex == -1) {
           return SizedBox(
             width: maxWidth,
-            child: LayoutBuilder(
-              builder: (context, targetConstraints) {
-                return FittedBox(
-                  fit: BoxFit.contain,
-                  child: SizedBox(
-                    width: maxWidth,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildNonVisualContent(
-                          context,
-                          prompt.content,
-                          textStyle,
-                        ),
-                        if (prompt.target != null) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          SizedBox(
-                            width: maxWidth,
-                            height: 120,
-                            child: _buildTargetContent(
-                              context,
-                              prompt.target!,
-                              textStyle,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                );
-              },
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: SizedBox(
+                width: maxWidth,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _content.buildColumn(context, prompt.content, textStyle),
+                    if (prompt.target != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      _buildSizedTarget(prompt.target!, textStyle, maxWidth),
+                    ],
+                  ],
+                ),
+              ),
             ),
           );
         }
@@ -96,34 +90,23 @@ class TaskPromptWidget extends StatelessWidget {
           width: maxWidth,
           child: Column(
             children: [
-              if (nonVisualContent.isNotEmpty)
-                _buildNonVisualContent(context, nonVisualContent, textStyle),
-
-              if (nonVisualContent.isNotEmpty)
+              if (nonVisualContent.isNotEmpty) ...[
+                _content.buildColumn(context, nonVisualContent, textStyle),
                 const SizedBox(height: AppSpacing.md),
-
+              ],
               Expanded(
                 child: Column(
                   children: [
                     Expanded(
-                      child: _buildScalableContent(
+                      child: _content.buildScalable(
                         context,
                         scalableContent,
                         textStyle,
                       ),
                     ),
-
                     if (prompt.target != null) ...[
                       const SizedBox(height: AppSpacing.md),
-                      SizedBox(
-                        height: 120,
-                        width: maxWidth,
-                        child: _buildTargetContent(
-                          context,
-                          prompt.target!,
-                          textStyle,
-                        ),
-                      ),
+                      _buildSizedTarget(prompt.target!, textStyle, maxWidth),
                     ],
                   ],
                 ),
@@ -135,242 +118,24 @@ class TaskPromptWidget extends StatelessWidget {
     );
   }
 
-  bool _isVisual(TaskContent content) {
-    return content is ImageContent ||
-        content is GridContent ||
-        content is EmojiContent;
-  }
-
-  Widget _buildNonVisualContent(
-    BuildContext context,
-    List<TaskContent> content,
-    TextStyle? textStyle,
-  ) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final item in content) ...[
-          _buildContent(context, item, textStyle, fullWidthText: true),
-          const SizedBox(height: AppSpacing.md),
-        ],
-      ],
+  Widget _buildTarget(TargetContent target, TextStyle? textStyle) {
+    return PromptTargetView(
+      target: target,
+      targetProgress: targetProgress,
+      contentBuilder: _content,
+      textStyle: textStyle,
     );
   }
 
-  Widget _buildScalableContent(
-    BuildContext context,
-    List<TaskContent> content,
-    TextStyle? textStyle,
-  ) {
-    return Center(
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final item in content) ...[
-              _buildContent(context, item, textStyle, fullWidthText: false),
-              const SizedBox(height: AppSpacing.md),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContent(
-    BuildContext context,
-    TaskContent content,
-    TextStyle? textStyle, {
-    bool fullWidthText = false,
-  }) {
-    final built = _buildBaseContent(
-      context,
-      content,
-      textStyle,
-      fullWidthText: fullWidthText,
-    );
-
-    final audio = content.audio;
-    if (audio == null) return built;
-
-    return TaskAudioWidget(
-      content: audio,
-      interactive: true,
-      showIcon: false,
-      child: built,
-    );
-  }
-
-  Widget _buildBaseContent(
-    BuildContext context,
-    TaskContent content,
-    TextStyle? textStyle, {
-    bool fullWidthText = false,
-  }) {
-    if (content is TextContent) {
-      final text = Text(
-        content.text,
-        style: textStyle,
-        textAlign: TextAlign.center,
-        softWrap: true,
-      );
-
-      if (fullWidthText) {
-        return SizedBox(width: double.infinity, child: text);
-      }
-
-      return text;
-    }
-
-    if (content is AudioContent) {
-      return TaskAudioWidget(content: content);
-    }
-
-    if (content is ImageContent) {
-      return ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: double.infinity),
-        child: Image.asset(content.imagePath, fit: BoxFit.contain),
-      );
-    }
-
-    if (content is MathContent) {
-      return MathContentWidget(
-        expression: content.expression,
-        style: textStyle,
-      );
-    }
-
-    if (content is GridContent) {
-      return _buildGrid(content);
-    }
-
-    if (content is EmojiContent) {
-      return Text(
-        content.emoji,
-        textAlign: TextAlign.center,
-        style: textStyle?.copyWith(fontSize: 64),
-      );
-    }
-
-    return const SizedBox.shrink();
-  }
-
-  Widget _buildGrid(GridContent content) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxWidth = constraints.hasBoundedWidth
-            ? constraints.maxWidth
-            : MediaQuery.sizeOf(context).width;
-
-        const spacing = AppSpacing.md;
-
-        final horizontalSpacing = spacing * (content.columns - 1);
-
-        final availableWidth = maxWidth - horizontalSpacing;
-
-        if (availableWidth <= 0) {
-          return const SizedBox.shrink();
-        }
-
-        final cellSize = availableWidth / content.columns;
-
-        final width = cellSize * content.columns + horizontalSpacing;
-
-        final height = cellSize * content.rows + spacing * (content.rows - 1);
-
-        return SizedBox(
-          width: width,
-          height: height,
-          child: GridView.builder(
-            padding: EdgeInsets.zero,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: content.columns,
-              crossAxisSpacing: spacing,
-              mainAxisSpacing: spacing,
-              childAspectRatio: 1,
-            ),
-            itemCount: content.rows * content.columns,
-            itemBuilder: (context, index) {
-              return SizedBox(
-                width: cellSize,
-                height: cellSize,
-                child: _buildContent(context, content.item, null),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildScrollableContent(
-    BuildContext context,
-    List<TaskContent> content,
-    TextStyle? textStyle,
-  ) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final item in content) ...[
-          _buildContent(context, item, textStyle, fullWidthText: true),
-          const SizedBox(height: AppSpacing.md),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildTargetContent(
-    BuildContext context,
+  Widget _buildSizedTarget(
     TargetContent target,
     TextStyle? textStyle,
+    double maxWidth,
   ) {
-    final effect = target.effect;
-
-    if (effect == null || target.target is! ImageContent) {
-      return _buildContent(
-        context,
-        target.target,
-        textStyle,
-        fullWidthText: true,
-      );
-    }
-
-    switch (effect.type) {
-      case TargetEffectType.saturation:
-        final progress = (targetProgress / effect.steps)
-            .clamp(0.0, 1.0)
-            .toDouble();
-
-        final image = _buildContent(
-          context,
-          target.target,
-          textStyle,
-          fullWidthText: true,
-        );
-
-        if (progress >= 1.0) {
-          return image;
-        }
-
-        return ColorFiltered(
-          colorFilter: ColorFilter.matrix(_saturationMatrix(progress)),
-          child: image,
-        );
-    }
-  }
-
-  List<double> _saturationMatrix(double s) {
-    final r = (1 - s) * 0.2126;
-    final g = (1 - s) * 0.7152;
-    final b = (1 - s) * 0.0722;
-
-    return [
-      r + s, g, b, 0, 0, //
-      r, g + s, b, 0, 0, //
-      r, g, b + s, 0, 0, //
-      0, 0, 0, 1, 0,
-    ];
+    return SizedBox(
+      width: maxWidth,
+      height: _targetHeight,
+      child: _buildTarget(target, textStyle),
+    );
   }
 }
