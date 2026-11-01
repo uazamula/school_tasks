@@ -15,8 +15,8 @@ import 'package:school_tasks/features/learning/data/generation/arithmetic/arithm
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/slot_assembly_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
-import 'package:school_tasks/features/learning/data/generation/linguistic/word_matching_task_data_generation.dart';
 import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_demo_data.dart';
@@ -32,6 +32,7 @@ import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dar
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
@@ -56,6 +57,21 @@ abstract final class Tests {
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([
       GeneratedTaskDataSource([
+        SlotAssemblyTaskDataGenerator(
+          words: syllableDemoWords,
+          concepts: syllableDemoConcepts,
+          taskCount: 2,
+          wrongAnswerCount: 3,
+          syllablePattern: 'р?',
+          targetType: SlotAssemblyTargetType.imageWithAudio,
+          language: Language.uk,
+          position: SyllableSearchPosition.first,
+          textCase: MatchingTextCase.uppercase,
+          syllableAudio: syllableAudioUk,
+          syllableHasSound: false,
+          requiresSequentialSelection: true,
+          interactionMode: DragToSlotInteractionMode(dragScale: 1.2)
+        ),
         // SyllableMatchingTaskDataGenerator(
         //   words: syllableDemoWords,
         //   concepts: syllableDemoConcepts,
@@ -114,7 +130,7 @@ abstract final class Tests {
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,
         // ...CodingTasks.codingTasksSel,
-        // ...matchingTasks,
+        ...matchingTasks,
         ...additionWithSound,
         // ...matchingTasks,
         // ...positionSelectionTasks,
