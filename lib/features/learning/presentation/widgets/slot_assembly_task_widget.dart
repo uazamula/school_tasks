@@ -30,6 +30,7 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
     this.onCorrectSlotFilled,
     required this.onIncorrectAttempt,
     this.onElementReachedEdge,
+    this.showSlotHints,
   });
 
   final SlotAssemblyTask<TOption> task;
@@ -40,6 +41,10 @@ class SlotAssemblyTaskWidget<TOption> extends StatefulWidget {
   final ValueChanged<int>? onCorrectSlotFilled;
   final bool Function() onIncorrectAttempt;
   final VoidCallback? onElementReachedEdge;
+
+  /// Ручне перемикання підказок у слотах (бліді/яскраві елементи).
+  /// null — береться значення з task.uiConfig.showSlotHints.
+  final bool? showSlotHints;
 
   @override
   State<SlotAssemblyTaskWidget<TOption>> createState() =>
@@ -86,6 +91,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
   }
 
   double get _bubbleSize => widget.task.uiConfig.bubbleHeight;
+
+  bool get _showSlotHints =>
+      widget.showSlotHints ?? widget.task.uiConfig.showSlotHints;
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
@@ -431,6 +439,10 @@ class _SlotAssemblyTaskWidgetState<TOption>
         for (final optionIndex in _slotOptionIndices) optionIndex != null,
       ],
       onOptionDropped: _onOptionDropped,
+      showHints: _showSlotHints,
+      hints: [
+        for (final answer in widget.task.correctAnswers) _displayText(answer),
+      ],
     );
   }
 

@@ -1,4 +1,3 @@
-
 class SlotAssemblyUiConfig {
   const SlotAssemblyUiConfig({
     this.bubbleFontSizeFactor = 1.5,
@@ -6,6 +5,7 @@ class SlotAssemblyUiConfig {
     this.bubbleHeight = 60.0,
     this.slotHeight = 56.0,
     this.bubbleExpandsHorizontally = false,
+    this.showSlotHints = false,
   });
 
   /// Множник розміру шрифту titleMedium для тексту в бульбашці.
@@ -24,4 +24,9 @@ class SlotAssemblyUiConfig {
   /// Чи може бульбашка розширюватися горизонтально.
   /// Поки підтримується лише false.
   final bool bubbleExpandsHorizontally;
+
+  /// Чи показувати в порожніх слотах правильний елемент блідим кольором.
+  /// Після доставки елемент стає яскравим. Корисно для вивчення нових
+  /// символів: ієрогліфів, хангилю, графічних знаків.
+  final bool showSlotHints;
 }

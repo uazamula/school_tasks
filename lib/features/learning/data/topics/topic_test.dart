@@ -32,6 +32,7 @@ import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dar
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
+import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
@@ -65,12 +66,16 @@ abstract final class Tests {
           syllablePattern: 'р?',
           targetType: SlotAssemblyTargetType.imageWithAudio,
           language: Language.uk,
-          position: SyllableSearchPosition.first,
+          position: SyllableSearchPosition.any,
           textCase: MatchingTextCase.uppercase,
           syllableAudio: syllableAudioUk,
           syllableHasSound: true,
           requiresSequentialSelection: true,
-          interactionMode: DragToSlotInteractionMode(dragScale: 1.2),
+          interactionMode: PressForSlotInteractionMode(
+            flightAnimationEnabled: true,
+            fallingElementsEnabled: true,
+          ),
+          uiConfig: SlotAssemblyUiConfig(showSlotHints: true),
         ),
         // SyllableMatchingTaskDataGenerator(
         //   words: syllableDemoWords,
