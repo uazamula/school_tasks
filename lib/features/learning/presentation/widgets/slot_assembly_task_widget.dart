@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:school_tasks/core/theme/app_spacing.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
@@ -11,7 +10,9 @@ import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.d
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/bubble_color_palette.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_option_bubble.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/falling_options_area.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_audio.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_flight_animation.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_geometry.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_options.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_slots.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly/slot_assembly_state.dart';
@@ -62,8 +63,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
   bool _isFlying = false;
 
   TOption? _activeAudioOption;
-  final Map<int, AudioPlaybackController> _audioControllers = {};
-  Future<void>? _pendingAudioPlayback;
+  final SlotAssemblyAudio _audio = SlotAssemblyAudio();
 
   late final AnimationController _fallController;
   late List<GlobalKey> _slotKeys;
@@ -151,6 +151,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
 
   @override
   void dispose() {
+    _audio.dispose();
     _fallController.dispose();
     super.dispose();
   }
@@ -183,49 +184,40 @@ class _SlotAssemblyTaskWidgetState<TOption>
       scrollable: widget.interactionScrollable,
       alignment: Alignment.topCenter,
       fillAvailableSpace: !fallingEnabled,
-      content: Container(
-        decoration: BoxDecoration(border: Border.all(color: Color(0xFFFF0000))),
-        child: fallingEnabled
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
+      content: fallingEnabled
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildFlightAnimation(),
+                _buildFallingArea(),
+                _buildAudioControllerHosts(),
+                const SizedBox(height: AppSpacing.md),
+                _buildSlots(),
+              ],
+            )
+          : SizedBox.expand(
+              child: Column(
                 children: [
-                  SlotAssemblyFlightAnimation(
-                    key: _flightAnimationKey,
-                    duration:
-                        _pressMode?.flightDuration ??
-                        const Duration(milliseconds: 700),
+                  _buildFlightAnimation(),
+                  Align(alignment: Alignment.topCenter, child: _buildOptions()),
+                  const Spacer(),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: UnconstrainedBox(
+                      constrainedAxis: Axis.vertical,
+                      child: _buildSlots(),
+                    ),
                   ),
-                  _buildFallingArea(),
-                  _buildAudioControllerHosts(),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildSlots(),
                 ],
-              )
-            : SizedBox.expand(
-                child: Column(
-                  children: [
-                    SlotAssemblyFlightAnimation(
-                      key: _flightAnimationKey,
-                      duration:
-                          _pressMode?.flightDuration ??
-                          const Duration(milliseconds: 700),
-                    ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: _buildOptions(),
-                    ),
-                    const Spacer(),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: UnconstrainedBox(
-                        constrainedAxis: Axis.vertical,
-                        child: _buildSlots(),
-                      ),
-                    ),
-                  ],
-                ),
               ),
-      ),
+            ),
+    );
+  }
+
+  Widget _buildFlightAnimation() {
+    return SlotAssemblyFlightAnimation(
+      key: _flightAnimationKey,
+      duration: _pressMode?.flightDuration ?? const Duration(milliseconds: 700),
     );
   }
 
@@ -325,8 +317,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
       accuracy: _state.accuracy,
     );
 
-    final playback = _pendingAudioPlayback;
-    _pendingAudioPlayback = null;
+    final playback = _audio.takePendingPlayback();
 
     if (playback != null) {
       try {
@@ -416,16 +407,14 @@ class _SlotAssemblyTaskWidgetState<TOption>
       childWhenDragging: SizedBox(width: _bubbleSize, height: _bubbleSize),
       child: _buildBubble(
         index,
-        onPointerDown: _interactionLocked
-            ? null
-            : () => _audioControllers[index]?.toggle(),
+        onPointerDown: _interactionLocked ? null : () => _audio.toggle(index),
       ),
     );
   }
 
   Widget _buildOptionButton(int index) {
     final option = widget.task.options[index];
-    final audio = _audioForOption(option);
+    final audio = SlotAssemblyAudio.audioFor(option);
 
     final child = _isDragInteraction
         ? _buildDraggable(index)
@@ -451,10 +440,7 @@ class _SlotAssemblyTaskWidgetState<TOption>
         if (!mounted || _activeAudioOption != option) return;
         setState(() => _activeAudioOption = null);
       },
-      controller: _audioControllers.putIfAbsent(
-        index,
-        AudioPlaybackController.new,
-      ),
+      controller: _audio.controllerFor(index),
       child: child,
     );
   }
@@ -563,20 +549,9 @@ class _SlotAssemblyTaskWidgetState<TOption>
   }
 
   Rect? _getSlotRect(int slotIndex) {
-    if (slotIndex < 0 || slotIndex >= _slotKeys.length) {
-      return null;
-    }
+    if (slotIndex < 0 || slotIndex >= _slotKeys.length) return null;
 
-    final context = _slotKeys[slotIndex].currentContext;
-    final renderObject = context?.findRenderObject();
-
-    if (renderObject is! RenderBox ||
-        !renderObject.hasSize ||
-        !renderObject.attached) {
-      return null;
-    }
-
-    return renderObject.localToGlobal(Offset.zero) & renderObject.size;
+    return globalRectOfKey(_slotKeys[slotIndex]);
   }
 
   Future<bool> _animateOptionToSlot({
@@ -591,25 +566,15 @@ class _SlotAssemblyTaskWidgetState<TOption>
       return false;
     }
 
-    final overlay = Overlay.of(context, rootOverlay: true);
-    final overlayObject = overlay.context.findRenderObject();
+    final rects = computeFlightRects(
+      context,
+      sourceRect: sourceRect,
+      targetRect: targetGlobalRect,
+    );
 
-    if (overlayObject is! RenderBox ||
-        !overlayObject.hasSize ||
-        !overlayObject.attached) {
+    if (rects == null) {
       return false;
     }
-
-    final startTopLeft = overlayObject.globalToLocal(sourceRect.topLeft);
-    final targetCenter = overlayObject.globalToLocal(targetGlobalRect.center);
-
-    final startRect = startTopLeft & sourceRect.size;
-
-    final endRect = Rect.fromCenter(
-      center: targetCenter,
-      width: sourceRect.width,
-      height: sourceRect.height,
-    );
 
     _isFlying = true;
 
@@ -621,8 +586,8 @@ class _SlotAssemblyTaskWidgetState<TOption>
       }
 
       return await animation.animate(
-        startRect: startRect,
-        endRect: endRect,
+        startRect: rects.start,
+        endRect: rects.end,
         text: _displayText(widget.task.options[optionIndex]),
         color: color,
       );
@@ -640,16 +605,14 @@ class _SlotAssemblyTaskWidgetState<TOption>
         mainAxisSize: MainAxisSize.min,
         children: [
           for (var index = 0; index < widget.task.options.length; index++)
-            if (_audioForOption(widget.task.options[index]) case final audio?)
+            if (SlotAssemblyAudio.audioFor(widget.task.options[index])
+                case final audio?)
               TaskAudioWidget(
                 content: audio,
                 interactive: false,
                 showIcon: false,
                 isActive: false,
-                controller: _audioControllers.putIfAbsent(
-                  index,
-                  AudioPlaybackController.new,
-                ),
+                controller: _audio.controllerFor(index),
               ),
         ],
       ),
@@ -657,32 +620,13 @@ class _SlotAssemblyTaskWidgetState<TOption>
   }
 
   Rect? _getOptionRect(int optionIndex) {
-    if (optionIndex < 0 || optionIndex >= _optionKeys.length) {
-      return null;
-    }
+    if (optionIndex < 0 || optionIndex >= _optionKeys.length) return null;
 
-    final context = _optionKeys[optionIndex].currentContext;
-    final renderObject = context?.findRenderObject();
-
-    if (renderObject is! RenderBox ||
-        !renderObject.hasSize ||
-        !renderObject.attached) {
-      return null;
-    }
-
-    return renderObject.localToGlobal(Offset.zero) & renderObject.size;
+    return globalRectOfKey(_optionKeys[optionIndex]);
   }
 
   void _playOptionAudio(int optionIndex) {
-    final option = widget.task.options[optionIndex];
-
-    if (_audioForOption(option) == null) return;
-
-    final playback = _audioControllers[optionIndex]?.playAndWait();
-
-    if (playback != null) {
-      _pendingAudioPlayback = playback;
-    }
+    _audio.play(optionIndex, widget.task.options[optionIndex]);
   }
 
   Future<void> _onStaticOptionTapped(int optionIndex) async {
@@ -740,12 +684,5 @@ class _SlotAssemblyTaskWidgetState<TOption>
     }
     // Фіксуємо відповідь лише після завершення польоту.
     _onOptionSelected(optionIndex, playAudio: false);
-  }
-
-  /// Повертає аудіо варіанта: кожен вид контенту може мати власне аудіо.
-  AudioContent? _audioForOption(Object? option) {
-    if (option is AudioContent) return option;
-    if (option is TaskContent) return option.audio;
-    return null;
   }
 }
