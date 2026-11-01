@@ -137,8 +137,15 @@ class TaskWidget extends StatelessWidget {
           interactionScrollable: interactionScrollable,
           onTaskAnswered: onTaskAnswered,
           onAccuracyChanged: onMatchingAccuracyChanged,
-          onCorrectSlotFilled: onCorrectSlotFilled,
-          onIncorrectAttempt: onIncorrectPairAttempt,
+          onCorrectSlotFilled: (progress) {
+            if (feedbackEnabled) onCorrectPair();
+            onCorrectSlotFilled?.call(progress);
+          },
+          onIncorrectAttempt: () {
+            final shouldFinish = onIncorrectPairAttempt();
+            if (feedbackEnabled) onIncorrectPair();
+            return shouldFinish;
+          },
           onElementReachedEdge: onElementReachedEdge,
         ),
       );

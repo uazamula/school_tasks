@@ -285,7 +285,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    if (_feedbackEnabled && currentTask.task is! MatchingTask) {
+    // Matching і SlotAssembly озвучують кожну спробу окремо
+    // (_onCorrectPair/_onIncorrectPair), тому кінцевий звук їм не потрібен.
+    if (_feedbackEnabled &&
+        currentTask.task is! MatchingTask &&
+        currentTask.task is! SlotAssemblyTask) {
       if (result.isCorrect) {
         _audioService.playSuccess();
       } else {

@@ -56,6 +56,7 @@ class TaskAudioWidget extends StatefulWidget {
     this.showIcon = true,
     this.onCompleted,
     this.controller,
+    this.stopOnDeactivate = true,
   });
 
   final AudioContent content;
@@ -72,6 +73,10 @@ class TaskAudioWidget extends StatefulWidget {
   final Widget? child;
   final bool showIcon;
   final AudioPlaybackController? controller;
+
+  /// true — коли isActive змінюється на false, відтворення зупиняється.
+  /// false — аудіо, що вже грає, дограє до кінця.
+  final bool stopOnDeactivate;
 
   @override
   State<TaskAudioWidget> createState() => _TaskAudioWidgetState();
@@ -158,7 +163,7 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     if (oldWidget.isActive != widget.isActive) {
       if (widget.isActive) {
         unawaited(_play());
-      } else {
+      } else if (widget.stopOnDeactivate) {
         unawaited(_stop());
       }
     }

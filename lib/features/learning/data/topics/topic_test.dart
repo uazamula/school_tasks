@@ -68,9 +68,9 @@ abstract final class Tests {
           position: SyllableSearchPosition.first,
           textCase: MatchingTextCase.uppercase,
           syllableAudio: syllableAudioUk,
-          syllableHasSound: false,
+          syllableHasSound: true,
           requiresSequentialSelection: true,
-          interactionMode: DragToSlotInteractionMode(dragScale: 1.2)
+          interactionMode: DragToSlotInteractionMode(dragScale: 1.2),
         ),
         // SyllableMatchingTaskDataGenerator(
         //   words: syllableDemoWords,
@@ -135,7 +135,7 @@ abstract final class Tests {
         // ...matchingTasks,
         // ...positionSelectionTasks,
         // ...FractionData.fractions,
-        // ...audioSelectionDemo,
+        ...audioSelectionDemo,
         // ...roots,
         // ...audioPromptDemo,
         // ...AdditionTaskData.within10,

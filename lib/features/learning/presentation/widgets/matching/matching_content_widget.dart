@@ -72,6 +72,9 @@ class MatchingContentWidget extends StatelessWidget {
         content: content as AudioContent,
         isActive: isActive,
         interactive: false,
+        // Зняття виділення (зокрема після зарахування пари) не повинно
+        // обривати аудіо: воно дограє до кінця, як і привʼязане до контенту.
+        stopOnDeactivate: false,
         controller: audioController,
       );
     }
