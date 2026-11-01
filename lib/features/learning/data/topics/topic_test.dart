@@ -50,10 +50,11 @@ abstract final class Tests {
     id: 'shapes',
     taskTypeCounts: {
       LearningTaskType.matching: 1,
-      LearningTaskType.positionSelection: 1,
+      LearningTaskType.positionSelection: 0,
       LearningTaskType.input: 0,
       LearningTaskType.selection: 0,
       LearningTaskType.fraction: 0,
+      LearningTaskType.slotAssembly: 1,
     },
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([

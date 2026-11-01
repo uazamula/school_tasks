@@ -41,14 +41,65 @@ class TopicAttemptGenerator {
   final Random _random;
   final PredefinedAnswerSelector _answerSelector;
 
+  // Реєстр типів завдань: один рядок на тип замість окремого пулу,
+  // гілки switch і гілки if.
+  late final _TaskFactory _selection =
+      _TypedTaskFactory<SelectionTaskData<dynamic>>(_createSelectionTask);
+
+  late final _TaskFactory _input = _TypedTaskFactory<InputTaskData>(
+    (data) => AttemptTask<Rational, Rational>(task: _createInputTask(data)),
+  );
+
+  late final _TaskFactory _fraction = _TypedTaskFactory<FractionTaskData>(
+    _createFractionTask,
+  );
+
+  late final _TaskFactory _positionSelection =
+      _TypedTaskFactory<PositionSelectionTaskData>(
+        _createPositionSelectionTask,
+      );
+
+  late final _TaskFactory _matching = _TypedTaskFactory<MatchingTaskData>(
+    _createMatchingTask,
+  );
+
+  late final _TaskFactory _slotAssembly =
+      _TypedTaskFactory<SlotAssemblyTaskData<dynamic>>(_createSlotAssemblyTask);
+
+  /// Усі фабрики — для режиму, де тип завдання визначають самі дані.
+  late final List<_TaskFactory> _allFactories = [
+    _selection,
+    _input,
+    _fraction,
+    _positionSelection,
+    _matching,
+    _slotAssembly,
+  ];
+
+  _TaskFactory _factoryFor(LearningTaskType type) {
+    switch (type) {
+      case LearningTaskType.selection:
+        return _selection;
+      case LearningTaskType.input:
+        return _input;
+      case LearningTaskType.fraction:
+        return _fraction;
+      case LearningTaskType.positionSelection:
+        return _positionSelection;
+      case LearningTaskType.matching:
+        return _matching;
+      case LearningTaskType.slotAssembly:
+        return _slotAssembly;
+    }
+  }
+
   TopicAttempt generate(Topic topic) {
     if (topic.taskOrderMode == TaskOrderMode.deterministic) {
       final data = topic.dataSource.getData();
 
-      final tasks = data.map(_createTaskFromData).toList();
-
-      return TopicAttempt(tasks: tasks);
+      return TopicAttempt(tasks: data.map(_createTaskFromData).toList());
     }
+
     final taskTypes = <LearningTaskType>[];
 
     for (final entry in topic.taskTypeCounts.entries) {
@@ -59,60 +110,18 @@ class TopicAttemptGenerator {
 
     final data = topic.dataSource.getData();
 
-    final selectionDataPool = TaskDataPool<SelectionTaskData<dynamic>>(
-      items: data.whereType<SelectionTaskData<dynamic>>().toList(),
-      random: _random,
-    );
-
-    final inputDataPool = TaskDataPool<InputTaskData>(
-      items: data.whereType<InputTaskData>().toList(),
-      random: _random,
-    );
-
-    final fractionDataPool = TaskDataPool<FractionTaskData>(
-      items: data.whereType<FractionTaskData>().toList(),
-      random: _random,
-    );
-
-    final positionSelectionDataPool = TaskDataPool<PositionSelectionTaskData>(
-      items: data.whereType<PositionSelectionTaskData>().toList(),
-      random: _random,
-    );
-
-    final matchingDataPool = TaskDataPool<MatchingTaskData>(
-      items: data.whereType<MatchingTaskData>().toList(),
-      random: _random,
-    );
-
-    final slotAssemblyDataPool = TaskDataPool<SlotAssemblyTaskData<dynamic>>(
-      items: data.whereType<SlotAssemblyTaskData<dynamic>>().toList(),
-      random: _random,
-    );
+    // Пул даних створюється один раз на тип, щоб завдання одного типу
+    // не повторювали дані, доки пул не вичерпається.
+    final suppliers =
+        <LearningTaskType, AttemptTask<dynamic, dynamic> Function()>{};
 
     final tasks = taskTypes.map((type) {
-      switch (type) {
-        case LearningTaskType.selection:
-          return _createSelectionTask(selectionDataPool.takeRandom());
+      final supplier = suppliers.putIfAbsent(
+        type,
+        () => _factoryFor(type).randomSupplier(data, _random),
+      );
 
-        case LearningTaskType.input:
-          return AttemptTask<Rational, Rational>(
-            task: _createInputTask(inputDataPool.takeRandom()),
-          );
-
-        case LearningTaskType.fraction:
-          return _createFractionTask(fractionDataPool.takeRandom());
-
-        case LearningTaskType.positionSelection:
-          return _createPositionSelectionTask(
-            positionSelectionDataPool.takeRandom(),
-          );
-
-        case LearningTaskType.matching:
-          return _createMatchingTask(matchingDataPool.takeRandom());
-
-        case LearningTaskType.slotAssembly:
-          return _createSlotAssemblyTask(slotAssemblyDataPool.takeRandom());
-      }
+      return supplier();
     }).toList();
 
     return TopicAttempt(tasks: tasks);
@@ -268,30 +277,50 @@ class TopicAttemptGenerator {
   }
 
   AttemptTask<dynamic, dynamic> _createTaskFromData(TaskData data) {
-    if (data is SelectionTaskData<dynamic>) {
-      return _createSelectionTask(data);
-    }
-
-    if (data is InputTaskData) {
-      return AttemptTask<Rational, Rational>(task: _createInputTask(data));
-    }
-
-    if (data is FractionTaskData) {
-      return _createFractionTask(data);
-    }
-
-    if (data is PositionSelectionTaskData) {
-      return _createPositionSelectionTask(data);
-    }
-
-    if (data is MatchingTaskData) {
-      return _createMatchingTask(data);
-    }
-
-    if (data is SlotAssemblyTaskData<dynamic>) {
-      return _createSlotAssemblyTask(data);
+    for (final factory in _allFactories) {
+      if (factory.accepts(data)) {
+        return factory.create(data);
+      }
     }
 
     throw StateError('Unsupported task data type: ${data.runtimeType}');
+  }
+}
+
+/// Створює завдання певного типу з даних цього типу.
+abstract class _TaskFactory {
+  bool accepts(TaskData data);
+
+  AttemptTask<dynamic, dynamic> create(TaskData data);
+
+  /// Повертає функцію, що щоразу бере випадкові дані з пулу й створює завдання.
+  AttemptTask<dynamic, dynamic> Function() randomSupplier(
+    List<TaskData> data,
+    Random random,
+  );
+}
+
+class _TypedTaskFactory<T extends TaskData> implements _TaskFactory {
+  const _TypedTaskFactory(this._build);
+
+  final AttemptTask<dynamic, dynamic> Function(T data) _build;
+
+  @override
+  bool accepts(TaskData data) => data is T;
+
+  @override
+  AttemptTask<dynamic, dynamic> create(TaskData data) => _build(data as T);
+
+  @override
+  AttemptTask<dynamic, dynamic> Function() randomSupplier(
+    List<TaskData> data,
+    Random random,
+  ) {
+    final pool = TaskDataPool<T>(
+      items: data.whereType<T>().toList(),
+      random: random,
+    );
+
+    return () => _build(pool.takeRandom());
   }
 }
