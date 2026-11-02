@@ -60,16 +60,25 @@ class PromptTargetView extends StatelessWidget {
             );
           },
         );
-      case TargetEffectType.colorDepth:
+      case TargetEffectType.retroColorDepth:
+      case TargetEffectType.adaptiveColorDepth:
         if (item is! ImageContent) return _buildContent(context, style);
+
+        final mode = effect.type == TargetEffectType.retroColorDepth
+            ? ColorDepthMode.retro
+            : ColorDepthMode.adaptive;
         final bits = effect.bitsForProgress(targetProgress, steps);
+
         return contentBuilder.build(
           context,
           item,
           style,
           fullWidthText: true,
-          imageBuilder: (image) =>
-              ColorDepthImage(assetPath: image.imagePath, bits: bits),
+          imageBuilder: (image) => ColorDepthImage(
+            assetPath: image.imagePath,
+            bits: bits,
+            mode: mode,
+          ),
         );
     }
   }

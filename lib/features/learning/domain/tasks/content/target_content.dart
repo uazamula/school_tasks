@@ -1,14 +1,16 @@
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 
 enum TargetEffectType {
-  /// Для зображень: чорно-біле → кольорове.
   saturation,
-
-  /// Для тексту: поступово зростаюче світіння.
   glow,
 
-  /// Для зображень: глибина кольору зростає з прогресом.
-  colorDepth,
+  /// Для зображень: глибина кольору зростає, фіксовані ретро-палітри
+  /// (чорно-біла, CGA, EGA, VGA) з дизерингом.
+  retroColorDepth,
+
+  /// Для зображень: глибина кольору зростає, палітра добирається
+  /// під саме зображення (median cut).
+  adaptiveColorDepth,
 }
 
 class TargetEffectConfig {
@@ -29,7 +31,7 @@ class TargetEffectConfig {
     return 1;
   }
 
-  /// Біт на канал для [TargetEffectType.colorDepth]
+  /// Біт на канал для [TargetEffectType.retroColorDepth]
   /// за поточного [progress]; null — оригінал.
   int? bitsForProgress(int progress, int steps) {
     if (progress >= steps) return null;
@@ -53,11 +55,10 @@ class TargetEffectConfig {
     }
 
     const base = [1, 2, 4, 8];
-    return [
-      for (var k = 0; k < steps; k++) base[(k * base.length) ~/ steps],
-    ];
+    return [for (var k = 0; k < steps; k++) base[(k * base.length) ~/ steps]];
   }
 }
+
 class TargetContent {
   const TargetContent({required this.target, this.effect, this.fontSize})
     : assert(fontSize == null || fontSize > 0);

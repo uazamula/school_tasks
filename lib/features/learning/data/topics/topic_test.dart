@@ -73,7 +73,7 @@ abstract final class Tests {
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
           targetEffect: const TargetEffectConfig(
-            type: TargetEffectType.colorDepth,
+            type: TargetEffectType.adaptiveColorDepth,
           ),
           targetFontSize: 42,
 
@@ -141,17 +141,17 @@ abstract final class Tests {
       // ]),
       FixedTaskDataSource([
         // ...GeometryShapesData.simpleShapes,
-        ...slotAssemblyWord,
+        // ...slotAssemblyWord,
 
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,
         // ...CodingTasks.codingTasksSel,
-        ...matchingTasks,
-        ...additionWithSound,
+        // ...matchingTasks,
+        // ...additionWithSound,
         // ...matchingTasks,
         // ...positionSelectionTasks,
         // ...FractionData.fractions,
-        ...audioSelectionDemo,
+        // ...audioSelectionDemo,
         // ...roots,
         // ...audioPromptDemo,
         // ...AdditionTaskData.within10,
