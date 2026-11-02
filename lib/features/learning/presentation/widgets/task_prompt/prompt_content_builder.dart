@@ -6,6 +6,8 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_content
 import 'package:school_tasks/features/learning/presentation/widgets/math_content_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
+typedef ImageContentBuilder = Widget Function(ImageContent content);
+
 /// Перетворює [TaskContent] умови завдання на віджети.
 class PromptContentBuilder {
   const PromptContentBuilder();
@@ -20,10 +22,10 @@ class PromptContentBuilder {
   /// Контент один під одним на всю ширину (для нескролованого
   /// невізуального та скролованого вмісту).
   Widget buildColumn(
-      BuildContext context,
-      List<TaskContent> content,
-      TextStyle? textStyle,
-      ) {
+    BuildContext context,
+    List<TaskContent> content,
+    TextStyle? textStyle,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -37,10 +39,10 @@ class PromptContentBuilder {
 
   /// Контент, що масштабується під доступний простір.
   Widget buildScalable(
-      BuildContext context,
-      List<TaskContent> content,
-      TextStyle? textStyle,
-      ) {
+    BuildContext context,
+    List<TaskContent> content,
+    TextStyle? textStyle,
+  ) {
     return Center(
       child: FittedBox(
         fit: BoxFit.contain,
@@ -60,16 +62,18 @@ class PromptContentBuilder {
   /// Один елемент контенту; якщо до нього привʼязане аудіо — натискання
   /// на елемент відтворює його.
   Widget build(
-      BuildContext context,
-      TaskContent content,
-      TextStyle? textStyle, {
-        bool fullWidthText = false,
-      }) {
+    BuildContext context,
+    TaskContent content,
+    TextStyle? textStyle, {
+    bool fullWidthText = false,
+    ImageContentBuilder? imageBuilder,
+  }) {
     final built = _buildBase(
       context,
       content,
       textStyle,
       fullWidthText: fullWidthText,
+      imageBuilder: imageBuilder,
     );
 
     final audio = content.audio;
@@ -84,11 +88,12 @@ class PromptContentBuilder {
   }
 
   Widget _buildBase(
-      BuildContext context,
-      TaskContent content,
-      TextStyle? textStyle, {
-        bool fullWidthText = false,
-      }) {
+    BuildContext context,
+    TaskContent content,
+    TextStyle? textStyle, {
+    ImageContentBuilder? imageBuilder,
+    bool fullWidthText = false,
+  }) {
     if (content is TextContent) {
       final text = Text(
         content.text,
@@ -109,6 +114,7 @@ class PromptContentBuilder {
     }
 
     if (content is ImageContent) {
+      if (imageBuilder != null) return imageBuilder(content);
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: double.infinity),
         child: Image.asset(content.imagePath, fit: BoxFit.contain),

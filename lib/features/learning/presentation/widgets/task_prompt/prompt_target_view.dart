@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/color_depth_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_content_builder.dart';
 
 class PromptTargetView extends StatelessWidget {
@@ -58,6 +59,17 @@ class PromptTargetView extends StatelessWidget {
               child: _buildContent(context, _glowStyle(context, style, i)),
             );
           },
+        );
+      case TargetEffectType.colorDepth:
+        if (item is! ImageContent) return _buildContent(context, style);
+        final bits = effect.bitsForProgress(targetProgress, steps);
+        return contentBuilder.build(
+          context,
+          item,
+          style,
+          fullWidthText: true,
+          imageBuilder: (image) =>
+              ColorDepthImage(assetPath: image.imagePath, bits: bits),
         );
     }
   }

@@ -73,7 +73,7 @@ abstract final class Tests {
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
           targetEffect: const TargetEffectConfig(
-            type: TargetEffectType.saturation,
+            type: TargetEffectType.colorDepth,
           ),
           targetFontSize: 42,
 
