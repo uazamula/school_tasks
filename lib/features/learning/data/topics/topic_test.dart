@@ -33,6 +33,9 @@ import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
@@ -59,25 +62,25 @@ abstract final class Tests {
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([
       GeneratedTaskDataSource([
-        SlotAssemblyTaskDataGenerator(
-          words: syllableDemoWords,
-          concepts: syllableDemoConcepts,
-          taskCount: 2,
-          wrongAnswerCount: 3,
-          syllablePattern: 'р?',
-          targetType: SlotAssemblyTargetType.imageWithAudio,
-          language: Language.uk,
-          position: SyllableSearchPosition.any,
-          textCase: MatchingTextCase.uppercase,
-          syllableAudio: syllableAudioUk,
-          syllableHasSound: true,
-          requiresSequentialSelection: true,
-          interactionMode: PressForSlotInteractionMode(
-            flightAnimationEnabled: true,
-            fallingElementsEnabled: true,
-          ),
-          uiConfig: SlotAssemblyUiConfig(showSlotHints: true),
-        ),
+        // SlotAssemblyTaskDataGenerator(
+        //   words: syllableDemoWords,
+        //   concepts: syllableDemoConcepts,
+        //   taskCount: 2,
+        //   wrongAnswerCount: 3,
+        //   syllablePattern: 'р?',
+        //   targetType: SlotAssemblyTargetType.imageWithAudio,
+        //   language: Language.uk,
+        //   position: SyllableSearchPosition.any,
+        //   textCase: MatchingTextCase.uppercase,
+        //   syllableAudio: syllableAudioUk,
+        //   syllableHasSound: true,
+        //   requiresSequentialSelection: true,
+        //   interactionMode: PressForSlotInteractionMode(
+        //     flightAnimationEnabled: true,
+        //     fallingElementsEnabled: true,
+        //   ),
+        //   uiConfig: SlotAssemblyUiConfig(showSlotHints: true),
+        // ),
         // SyllableMatchingTaskDataGenerator(
         //   words: syllableDemoWords,
         //   concepts: syllableDemoConcepts,
@@ -131,7 +134,7 @@ abstract final class Tests {
       // ]),
       FixedTaskDataSource([
         // ...GeometryShapesData.simpleShapes,
-        // ...slotAssemblyWord,
+        ...slotAssemblyWord,
 
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,

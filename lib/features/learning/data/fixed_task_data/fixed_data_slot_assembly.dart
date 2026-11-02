@@ -36,10 +36,7 @@ final List<TaskData> slotAssemblyWord = [
           'assets/images/fish.png',
           audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
         ),
-        effect: const TargetEffectConfig(
-          type: TargetEffectType.saturation,
-          steps: 2,
-        ),
+        effect: const TargetEffectConfig(type: TargetEffectType.saturation),
       ),
     ),
     correctAnswers: [
@@ -51,6 +48,8 @@ final List<TaskData> slotAssemblyWord = [
         'БА',
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
       ),
+      'КА',
+      'ТА',
     ],
     wrongAnswers: [],
     wrongAnswerCount: 0,
@@ -132,16 +131,43 @@ final List<TaskData> slotAssemblyWord = [
   SlotAssemblyTaskData(
     prompt: TaskPrompt(
       content: [TextContent('Склади хімічну формулу')],
-      target: TargetContent(target: TextContent('Сірчана кислота')),
+      target: TargetContent(
+        target: TextContent('Сірчана кислота'),
+        effect: TargetEffectConfig(type: TargetEffectType.glow),
+      ),
     ),
     correctAnswers: [
       TextContent(
         'H${toSubscript(2)}',
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_va.mp3'),
       ),
-      'SO${toSubscript(4)}',
+      'S',
+      'O${toSubscript(4)}',
     ],
-    wrongAnswers: ['SO${toSubscript(3)}'],
+    wrongAnswers: ['O${toSubscript(3)}'],
+    wrongAnswerCount: 1,
+    interactionMode: const PressForSlotInteractionMode(
+      fallingElementsEnabled: true,
+      flightAnimationEnabled: true,
+    ),
+  ),
+  SlotAssemblyTaskData(
+    prompt: TaskPrompt(
+      content: [TextContent('Склади хімічну формулу')],
+      target: TargetContent(
+        target: TextContent('Сірчана кислота'),
+        effect: TargetEffectConfig(type: TargetEffectType.glow, steps: 2),
+      ),
+    ),
+    correctAnswers: [
+      TextContent(
+        'H${toSubscript(2)}',
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_va.mp3'),
+      ),
+      'S',
+      'O${toSubscript(4)}',
+    ],
+    wrongAnswers: ['O${toSubscript(3)}'],
     wrongAnswerCount: 1,
     interactionMode: const PressForSlotInteractionMode(
       fallingElementsEnabled: true,

@@ -14,8 +14,12 @@ class TaskPromptWidget extends StatelessWidget {
     required this.prompt,
     this.scrollable = false,
     this.targetProgress = 0,
+    this.targetTotal,
   });
 
+  /// Загальна кількість слотів для складання. null — невідома наперед
+  /// (тоді для ефекту без явних steps використовується 1 крок).
+  final int? targetTotal;
   static const PromptContentBuilder _content = PromptContentBuilder();
 
   /// Висота цілі в нескролованій розкладці.
@@ -121,6 +125,7 @@ class TaskPromptWidget extends StatelessWidget {
   Widget _buildTarget(TargetContent target, TextStyle? textStyle) {
     return PromptTargetView(
       target: target,
+      totalSlots: targetTotal,
       targetProgress: targetProgress,
       contentBuilder: _content,
       textStyle: textStyle,

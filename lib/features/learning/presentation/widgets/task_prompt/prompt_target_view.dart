@@ -1,17 +1,17 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_content_builder.dart';
 
-/// Ціль завдання з необовʼязковим ефектом, що залежить від прогресу
-/// (наприклад, картинка стає кольоровою в міру заповнення слотів).
 class PromptTargetView extends StatelessWidget {
   const PromptTargetView({
     super.key,
     required this.target,
     required this.targetProgress,
     required this.contentBuilder,
+    this.totalSlots,
     this.textStyle,
   });
 
@@ -19,39 +19,105 @@ class PromptTargetView extends StatelessWidget {
 
   /// Кількість правильно заповнених слотів.
   final int targetProgress;
+
+  /// Загальна кількість слотів. null — невідома наперед.
+  final int? totalSlots;
+
   final PromptContentBuilder contentBuilder;
   final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
     final effect = target.effect;
+    final item = target.target;
 
-    final content = contentBuilder.build(
-      context,
-      target.target,
-      textStyle,
-      fullWidthText: true,
-    );
+    if (effect == null) return _buildContent(context, textStyle);
 
-    if (effect == null || target.target is! ImageContent) {
-      return content;
-    }
+    final steps = effect.resolveSteps(totalSlots);
 
     switch (effect.type) {
       case TargetEffectType.saturation:
-        final progress = (targetProgress / effect.steps)
-            .clamp(0.0, 1.0)
-            .toDouble();
-
-        if (progress >= 1.0) {
-          return content;
+        final progress = (targetProgress / steps).clamp(0.0, 1.0).toDouble();
+        if (item is! ImageContent || progress >= 1.0) {
+          return _buildContent(context, textStyle);
         }
-
         return ColorFiltered(
           colorFilter: ColorFilter.matrix(_saturationMatrix(progress)),
-          child: content,
+          child: _buildContent(context, textStyle),
+        );
+
+      case TargetEffectType.glow:
+        if (item is! TextContent) return _buildContent(context, textStyle);
+        return TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: _glowIntensity(targetProgress, steps)),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOutBack,
+          // невеликий «пружний» підскок на кожному кроці
+          builder: (context, intensity, _) {
+            final i = intensity.clamp(0.0, 1.0).toDouble();
+            return Transform.scale(
+              scale: 1 + 0.12 * i,
+              child: _buildContent(context, _glowStyle(context, i)),
+            );
+          },
         );
     }
+  }
+
+  Widget _buildContent(BuildContext context, TextStyle? style) {
+    return contentBuilder.build(
+      context,
+      target.target,
+      style,
+      fullWidthText: true,
+    );
+  }
+
+  /// 0 — ефекту немає; після першого кроку вже помітно (0.3);
+  /// далі лінійно до 1, щоб кожен крок був видимою різницею.
+  static double _glowIntensity(int step, int steps) {
+    if (step <= 0) return 0;
+    final t = (step / steps).clamp(0.0, 1.0).toDouble();
+    return 0.3 + 0.7 * t;
+  }
+
+  TextStyle? _glowStyle(BuildContext context, double i) {
+    if (i <= 0) return textStyle;
+
+    final scheme = Theme.of(context).colorScheme;
+    final base = textStyle ?? const TextStyle();
+    final glow = Color.lerp(scheme.primary, scheme.tertiary, i)!;
+
+    return base.copyWith(
+      color: Color.lerp(
+        base.color ?? scheme.onSurfaceVariant,
+        scheme.primary,
+        i,
+      ),
+      fontWeight: FontWeight.lerp(
+        base.fontWeight ?? FontWeight.normal,
+        FontWeight.w800,
+        i,
+      ),
+      shadows: [
+        Shadow(
+          color: glow.withValues(alpha: (0.5 + 0.5 * i)),
+          blurRadius: 4 + 10 * i,
+        ),
+        Shadow(
+          color: glow.withValues(alpha: 0.9 * i),
+          blurRadius: 12 + 24 * i,
+        ),
+        Shadow(
+          color: glow.withValues(alpha: 0.7 * i),
+          blurRadius: 24 + 40 * i,
+        ),
+        Shadow(
+          color: glow.withValues(alpha: 0.5 * i),
+          blurRadius: 48 * i,
+        ),
+      ],
+    );
   }
 
   /// Матриця насиченості: 0 — чорно-біле, 1 — оригінал.

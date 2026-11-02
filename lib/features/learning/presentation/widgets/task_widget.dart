@@ -42,11 +42,21 @@ class TaskWidget extends StatelessWidget {
   final bool feedbackEnabled;
   final int targetProgress;
 
+  /// Кількість елементів, які треба скласти.
+  /// null — невідома (тоді ефект без явних steps має 1 крок).
+  int? get _targetTotal {
+    final t = task;
+    if (t is SlotAssemblyTask) return t.correctAnswers.length;
+    return null;
+  }
+
   Widget buildPrompt() {
     return TaskPromptWidget(
+      key: ObjectKey(task),
       prompt: task.prompt,
       scrollable: promptScrollable,
       targetProgress: targetProgress,
+      targetTotal: _targetTotal,
     );
   }
 
