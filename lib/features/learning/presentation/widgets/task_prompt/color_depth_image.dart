@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/retro_palettes.dart';
 
 /// Зображення з обмеженою глибиною кольору ([bits] біт на канал).
 /// [bits] == null — оригінал. Кожен рівень рахується один раз і кешується.
@@ -12,7 +13,9 @@ class ColorDepthImage extends StatefulWidget {
     super.key,
     required this.assetPath,
     required this.bits,
-  }) : assert(bits == null || (bits >= 1 && bits <= 8));
+  }) : assert(
+  bits == null || bits == 1 || bits == 2 || bits == 4 || bits == 8,
+  );
 
   final String assetPath;
   final int? bits;
@@ -145,18 +148,11 @@ class _ColorDepthImageState extends State<ColorDepthImage> {
   }
 }
 class _QuantizeJob {
-  const _QuantizeJob(this.pixels, this.colors);
+  const _QuantizeJob(this.pixels, this.width, this.bits);
 
   final Uint8List pixels; // RGBA
-  final int colors;
-}
-
-class _Box {
-  const _Box(this.start, this.end, this.count);
-
-  final int start; // діапазон у списку унікальних кольорів
-  final int end;
-  final int count; // кількість пікселів
+  final int width;
+  final int bits;
 }
 
 Future<ui.Image> _quantize(
@@ -165,8 +161,8 @@ Future<ui.Image> _quantize(
     int height,
     int bits,
     ) async {
-  // Важкий розрахунок виконується в окремому ізоляті.
-  final out = await compute(_medianCut, _QuantizeJob(src, 1 << bits));
+  // Розрахунок виконується в окремому ізоляті.
+  final out = await compute(_ditherToPalette, _QuantizeJob(src, width, bits));
 
   final completer = Completer<ui.Image>();
   ui.decodeImageFromPixels(
@@ -179,111 +175,29 @@ Future<ui.Image> _quantize(
   return completer.future;
 }
 
-/// Median cut: пікселі групуються в гістограму 32×32×32, яка ділиться
-/// на `job.colors` областей; колір області — середнє зважене.
-Uint8List _medianCut(_QuantizeJob job) {
+const _bayer4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+/// Амплітуда дизерингу: приблизно крок між сусідніми рівнями палітри.
+double _spreadFor(int bits) => switch (bits) {
+  1 => 255,
+  2 => 200,
+  4 => 85,
+  _ => 51,
+};
+
+Uint8List _ditherToPalette(_QuantizeJob job) {
+  final palette = RetroPalettes.forBits(job.bits)!;
+  final spread = _spreadFor(job.bits);
   final src = job.pixels;
-
-  final counts = Int32List(32768);
-  final sumR = Float64List(32768);
-  final sumG = Float64List(32768);
-  final sumB = Float64List(32768);
-  var total = 0;
-
-  for (var i = 0; i < src.length; i += 4) {
-    if (src[i + 3] == 0) continue; // повністю прозорі пікселі пропускаємо
-    final key =
-    ((src[i] >> 3) << 10) | ((src[i + 1] >> 3) << 5) | (src[i + 2] >> 3);
-    counts[key]++;
-    sumR[key] += src[i];
-    sumG[key] += src[i + 1];
-    sumB[key] += src[i + 2];
-    total++;
-  }
-
-  final entries = <int>[
-    for (var k = 0; k < 32768; k++)
-      if (counts[k] > 0) k,
-  ];
-
-  if (entries.isEmpty) return Uint8List.fromList(src);
-
-  final boxes = <_Box>[_Box(0, entries.length, total)];
-
-  while (boxes.length < job.colors) {
-    // Ділимо область з найбільшою кількістю пікселів.
-    var pick = -1;
-    var best = 0;
-    for (var i = 0; i < boxes.length; i++) {
-      final box = boxes[i];
-      if (box.end - box.start > 1 && box.count > best) {
-        best = box.count;
-        pick = i;
-      }
-    }
-    if (pick == -1) break;
-
-    final box = boxes[pick];
-
-    // Канал з найбільшим розкидом значень.
-    var minR = 31, maxR = 0, minG = 31, maxG = 0, minB = 31, maxB = 0;
-    for (var e = box.start; e < box.end; e++) {
-      final k = entries[e];
-      final r = k >> 10, g = (k >> 5) & 31, b = k & 31;
-      if (r < minR) minR = r;
-      if (r > maxR) maxR = r;
-      if (g < minG) minG = g;
-      if (g > maxG) maxG = g;
-      if (b < minB) minB = b;
-      if (b > maxB) maxB = b;
-    }
-    final rangeR = maxR - minR, rangeG = maxG - minG, rangeB = maxB - minB;
-    final channel = rangeR >= rangeG && rangeR >= rangeB
-        ? 0
-        : (rangeG >= rangeB ? 1 : 2);
-
-    int chan(int k) =>
-        channel == 0 ? k >> 10 : (channel == 1 ? (k >> 5) & 31 : k & 31);
-
-    final sorted = entries.sublist(box.start, box.end)
-      ..sort((a, b) => chan(a).compareTo(chan(b)));
-    entries.setRange(box.start, box.end, sorted);
-
-    // Розділення за медіаною по кількості пікселів.
-    final half = box.count / 2;
-    var acc = 0;
-    var split = box.start + 1;
-    for (var e = box.start; e < box.end - 1; e++) {
-      acc += counts[entries[e]];
-      split = e + 1;
-      if (acc >= half) break;
-    }
-
-    boxes[pick] = _Box(box.start, split, acc);
-    boxes.add(_Box(split, box.end, box.count - acc));
-  }
-
-  // Колір кожної області та таблиця «комірка гістограми → колір».
-  final lut = Int32List(32768);
-  for (final box in boxes) {
-    var r = 0.0, g = 0.0, b = 0.0;
-    for (var e = box.start; e < box.end; e++) {
-      final k = entries[e];
-      r += sumR[k];
-      g += sumG[k];
-      b += sumB[k];
-    }
-    final n = box.count;
-    final packed =
-    ((r / n).round() << 16) | ((g / n).round() << 8) | (b / n).round();
-    for (var e = box.start; e < box.end; e++) {
-      lut[entries[e]] = packed;
-    }
-  }
-
+  final width = job.width;
   final out = Uint8List(src.length);
-  for (var i = 0; i < src.length; i += 4) {
+
+  // Кеш «комірка 5×5×5 біт → індекс найближчого кольору палітри».
+  final lut = Int32List(32768)..fillRange(0, 32768, -1);
+
+  for (var i = 0, p = 0; i < src.length; i += 4, p++) {
     final a = src[i + 3];
+
     if (a == 0) {
       out[i] = src[i];
       out[i + 1] = src[i + 1];
@@ -291,14 +205,66 @@ Uint8List _medianCut(_QuantizeJob job) {
       out[i + 3] = 0;
       continue;
     }
-    final key =
-    ((src[i] >> 3) << 10) | ((src[i + 1] >> 3) << 5) | (src[i + 2] >> 3);
-    final packed = lut[key];
-    out[i] = (packed >> 16) & 255;
-    out[i + 1] = (packed >> 8) & 255;
-    out[i + 2] = packed & 255;
+
+    final x = p % width;
+    final y = p ~/ width;
+    final threshold = (_bayer4[(y & 3) * 4 + (x & 3)] + 0.5) / 16 - 0.5;
+    final offset = threshold * spread;
+
+    final r = (src[i] + offset).round().clamp(0, 255).toInt();
+    final g = (src[i + 1] + offset).round().clamp(0, 255).toInt();
+    final b = (src[i + 2] + offset).round().clamp(0, 255).toInt();
+
+    final key = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+    var index = lut[key];
+
+    if (index < 0) {
+      // Центр комірки гістограми.
+      index = _nearest(
+        palette,
+        ((r >> 3) << 3) | 4,
+        ((g >> 3) << 3) | 4,
+        ((b >> 3) << 3) | 4,
+      );
+      lut[key] = index;
+    }
+
+    final color = palette[index];
+    out[i] = (color >> 16) & 255;
+    out[i + 1] = (color >> 8) & 255;
+    out[i + 2] = color & 255;
     out[i + 3] = a;
   }
 
   return out;
+}
+
+/// Найближчий колір палітри за відстанню «redmean».
+int _nearest(List<int> palette, int r, int g, int b) {
+  var best = 0;
+  var bestDistance = double.infinity;
+
+  for (var k = 0; k < palette.length; k++) {
+    final c = palette[k];
+    final pr = (c >> 16) & 255;
+    final pg = (c >> 8) & 255;
+    final pb = c & 255;
+
+    final rMean = (r + pr) / 2;
+    final dr = r - pr;
+    final dg = g - pg;
+    final db = b - pb;
+
+    final distance =
+        (2 + rMean / 256) * dr * dr +
+            4 * dg * dg +
+            (2 + (255 - rMean) / 256) * db * db;
+
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = k;
+    }
+  }
+
+  return best;
 }

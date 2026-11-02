@@ -37,24 +37,24 @@ class TargetEffectConfig {
     return _colorDepthLevels(steps)[index];
   }
 
-  /// Рівні до оригіналу: 1, 2, 4, а далі рівномірно між 4 і 8 бітами
-  /// (5…7), по одному рівню на кожен додатковий крок.
-  /// Рівні в бітах на піксель (палітра з 2^біт кольорів):
-  /// 1, 2, 4, а далі між 4 і 8 бітами (5…8), далі — оригінал.
+  /// Рівні в бітах на піксель, далі — оригінал.
+  /// 1 крок: 1; 2 кроки: 1, 4; 3 кроки: 1, 4, 8; 4 кроки: 1, 2, 4, 8;
+  /// 5+ кроків: рівні 1, 2, 4, 8 рівномірно повторюються.
   static List<int> _colorDepthLevels(int steps) {
-    const base = [1, 2, 4];
-    if (steps <= base.length) return base.sublist(0, steps);
+    switch (steps) {
+      case 1:
+        return const [1];
+      case 2:
+        return const [1, 4];
+      case 3:
+        return const [1, 4, 8];
+      case 4:
+        return const [1, 2, 4, 8];
+    }
 
-    const extraLevels = [5, 6, 7, 8];
-    final extra = steps - base.length;
-
+    const base = [1, 2, 4, 8];
     return [
-      ...base,
-      if (extra == 1)
-        8
-      else
-        for (var j = 0; j < extra; j++)
-          extraLevels[(j * (extraLevels.length - 1) / (extra - 1)).round()],
+      for (var k = 0; k < steps; k++) base[(k * base.length) ~/ steps],
     ];
   }
 }
