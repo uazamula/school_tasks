@@ -31,7 +31,8 @@ class TargetEffectConfig {
 }
 
 class TargetContent {
-  const TargetContent({required this.target, this.effect});
+  const TargetContent({required this.target, this.effect, this.fontSize})
+    : assert(fontSize == null || fontSize > 0);
 
   /// Основний ресурс, наприклад кольорове зображення корови.
   final TaskContent target;
@@ -39,4 +40,8 @@ class TargetContent {
   /// Конфігурація візуального ефекту.
   /// Якщо null — ціль відображається без ефекту.
   final TargetEffectConfig? effect;
+
+  /// Розмір шрифта, якщо ціль — текст ([TextContent]).
+  /// null — береться розмір зі стилю умови завдання.
+  final double? fontSize;
 }

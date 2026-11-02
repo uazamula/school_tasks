@@ -62,25 +62,32 @@ abstract final class Tests {
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([
       GeneratedTaskDataSource([
-        // SlotAssemblyTaskDataGenerator(
-        //   words: syllableDemoWords,
-        //   concepts: syllableDemoConcepts,
-        //   taskCount: 2,
-        //   wrongAnswerCount: 3,
-        //   syllablePattern: 'р?',
-        //   targetType: SlotAssemblyTargetType.imageWithAudio,
-        //   language: Language.uk,
-        //   position: SyllableSearchPosition.any,
-        //   textCase: MatchingTextCase.uppercase,
-        //   syllableAudio: syllableAudioUk,
-        //   syllableHasSound: true,
-        //   requiresSequentialSelection: true,
-        //   interactionMode: PressForSlotInteractionMode(
-        //     flightAnimationEnabled: true,
-        //     fallingElementsEnabled: true,
-        //   ),
-        //   uiConfig: SlotAssemblyUiConfig(showSlotHints: true),
-        // ),
+        SlotAssemblyTaskDataGenerator(
+          words: syllableDemoWords,
+          concepts: syllableDemoConcepts,
+          taskCount: 2,
+          wrongAnswerCount: 3,
+          syllablePattern: 'р?',
+          targetType: SlotAssemblyTargetType.imageWithAudio,
+          language: Language.uk,
+
+          promptContent: [TextContent('Склади слово, натискаючи на склади')],
+          targetEffect: const TargetEffectConfig(
+            type: TargetEffectType.saturation,
+          ),
+          targetFontSize: 42,
+
+          position: SyllableSearchPosition.any,
+          textCase: MatchingTextCase.uppercase,
+          syllableAudio: syllableAudioUk,
+          syllableHasSound: true,
+          requiresSequentialSelection: true,
+          interactionMode: PressForSlotInteractionMode(
+            flightAnimationEnabled: true,
+            fallingElementsEnabled: true,
+          ),
+          uiConfig: SlotAssemblyUiConfig(showSlotHints: true),
+        ),
         // SyllableMatchingTaskDataGenerator(
         //   words: syllableDemoWords,
         //   concepts: syllableDemoConcepts,

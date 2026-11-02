@@ -33,7 +33,11 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     required this.targetType,
     this.language = Language.uk,
     this.position = SyllableSearchPosition.any,
-    this.prompt = const TaskPrompt(content: [TextContent('Склади слово')]),
+
+    this.targetEffect,
+    this.targetFontSize,
+    this.promptContent = const [TextContent('Склади слово')],
+
     this.textCase = MatchingTextCase.unchanged,
     Map<String, String> syllableAudio = const {},
     this.syllableHasSound = true,
@@ -61,8 +65,19 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
   final Language language;
   final SyllableSearchPosition position;
 
-  final TaskPrompt prompt;
+  /// Ефект цілі (saturation — для зображень, glow — для тексту).
+  /// null — без ефекту. Кількість кроків за замовчуванням
+  /// дорівнює кількості складів слова.
+  final TargetEffectConfig? targetEffect;
+
+  /// Розмір шрифта цілі, якщо вона текстова. null — стандартний.
+  final double? targetFontSize;
   final MatchingTextCase textCase;
+
+  /// Контент умови завдання (текст, аудіо тощо). Ціль (target)
+  /// сюди не входить: вона визначається [targetType], [targetEffect]
+  /// і [targetFontSize].
+  final List<TaskContent> promptContent;
 
   final Map<String, String> syllableAudio;
   final bool syllableHasSound;
@@ -188,8 +203,12 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
 
       return SlotAssemblyTaskData<TaskContent>(
         prompt: TaskPrompt(
-          content: prompt.content,
-          target: TargetContent(target: candidate.target),
+          content: promptContent,
+          target: TargetContent(
+            target: candidate.target,
+            effect: targetEffect,
+            fontSize: targetFontSize,
+          ),
         ),
         correctAnswers: List.unmodifiable(candidate.correctAnswers),
         wrongAnswers: List.unmodifiable(candidate.wrongAnswers),

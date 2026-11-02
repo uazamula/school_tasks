@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
@@ -30,8 +28,9 @@ class PromptTargetView extends StatelessWidget {
   Widget build(BuildContext context) {
     final effect = target.effect;
     final item = target.target;
+    final style = _targetTextStyle(item);
 
-    if (effect == null) return _buildContent(context, textStyle);
+    if (effect == null) return _buildContent(context, style);
 
     final steps = effect.resolveSteps(totalSlots);
 
@@ -39,29 +38,35 @@ class PromptTargetView extends StatelessWidget {
       case TargetEffectType.saturation:
         final progress = (targetProgress / steps).clamp(0.0, 1.0).toDouble();
         if (item is! ImageContent || progress >= 1.0) {
-          return _buildContent(context, textStyle);
+          return _buildContent(context, style);
         }
         return ColorFiltered(
           colorFilter: ColorFilter.matrix(_saturationMatrix(progress)),
-          child: _buildContent(context, textStyle),
+          child: _buildContent(context, style),
         );
 
       case TargetEffectType.glow:
-        if (item is! TextContent) return _buildContent(context, textStyle);
+        if (item is! TextContent) return _buildContent(context, style);
         return TweenAnimationBuilder<double>(
           tween: Tween<double>(end: _glowIntensity(targetProgress, steps)),
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeOutBack,
-          // невеликий «пружний» підскок на кожному кроці
           builder: (context, intensity, _) {
             final i = intensity.clamp(0.0, 1.0).toDouble();
             return Transform.scale(
               scale: 1 + 0.12 * i,
-              child: _buildContent(context, _glowStyle(context, i)),
+              child: _buildContent(context, _glowStyle(context, style, i)),
             );
           },
         );
     }
+  }
+
+  /// Базовий стиль цілі: для тексту застосовує [TargetContent.fontSize].
+  TextStyle? _targetTextStyle(TaskContent item) {
+    final size = target.fontSize;
+    if (item is! TextContent || size == null) return textStyle;
+    return (textStyle ?? const TextStyle()).copyWith(fontSize: size);
   }
 
   Widget _buildContent(BuildContext context, TextStyle? style) {
@@ -73,19 +78,17 @@ class PromptTargetView extends StatelessWidget {
     );
   }
 
-  /// 0 — ефекту немає; після першого кроку вже помітно (0.3);
-  /// далі лінійно до 1, щоб кожен крок був видимою різницею.
   static double _glowIntensity(int step, int steps) {
     if (step <= 0) return 0;
     final t = (step / steps).clamp(0.0, 1.0).toDouble();
     return 0.3 + 0.7 * t;
   }
 
-  TextStyle? _glowStyle(BuildContext context, double i) {
-    if (i <= 0) return textStyle;
+  TextStyle? _glowStyle(BuildContext context, TextStyle? baseStyle, double i) {
+    if (i <= 0) return baseStyle;
 
     final scheme = Theme.of(context).colorScheme;
-    final base = textStyle ?? const TextStyle();
+    final base = baseStyle ?? const TextStyle();
     final glow = Color.lerp(scheme.primary, scheme.tertiary, i)!;
 
     return base.copyWith(
@@ -101,7 +104,7 @@ class PromptTargetView extends StatelessWidget {
       ),
       shadows: [
         Shadow(
-          color: glow.withValues(alpha: (0.5 + 0.5 * i)),
+          color: glow.withValues(alpha: 0.5 + 0.5 * i),
           blurRadius: 4 + 10 * i,
         ),
         Shadow(
