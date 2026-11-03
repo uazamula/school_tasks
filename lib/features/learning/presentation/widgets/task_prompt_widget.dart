@@ -15,7 +15,10 @@ class TaskPromptWidget extends StatelessWidget {
     this.scrollable = false,
     this.targetProgress = 0,
     this.targetTotal,
+    this.feedbackDuration,
   });
+
+  final Duration? feedbackDuration;
 
   /// Загальна кількість слотів для складання. null — невідома наперед
   /// (тоді для ефекту без явних steps використовується 1 крок).
@@ -125,8 +128,9 @@ class TaskPromptWidget extends StatelessWidget {
   Widget _buildTarget(TargetContent target, TextStyle? textStyle) {
     return PromptTargetView(
       target: target,
-      totalSlots: targetTotal,
       targetProgress: targetProgress,
+      totalSlots: targetTotal,
+      feedbackDuration: feedbackDuration,
       contentBuilder: _content,
       textStyle: textStyle,
     );

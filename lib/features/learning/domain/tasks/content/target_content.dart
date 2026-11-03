@@ -3,21 +3,72 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_content
 enum TargetEffectType {
   saturation,
   glow,
-
-  /// Для зображень: глибина кольору зростає, фіксовані ретро-палітри
-  /// (чорно-біла, CGA, EGA, VGA) з дизерингом.
   retroColorDepth,
-
-  /// Для зображень: глибина кольору зростає, палітра добирається
-  /// під саме зображення (median cut).
   adaptiveColorDepth,
+
+  /// Для зображень: відкривається колом від центру.
+  circleReveal,
+}
+
+/// Що видно поза колом.
+enum CircleRevealCover { blur, mosaic }
+
+class CircleRevealConfig {
+  const CircleRevealConfig({
+    this.cover = CircleRevealCover.blur,
+    this.blurStrength = 0.025,
+    this.mosaicCells = 16,
+    this.coverDim = 0.2,
+    this.edgeSoftness = 0.12,
+    this.stepDuration = const Duration(milliseconds: 400),
+    this.finalDurationFactor = 0.8,
+  }) : assert(blurStrength >= 0),
+       assert(mosaicCells >= 1),
+       assert(coverDim >= 0 && coverDim <= 1),
+       assert(edgeSoftness >= 0 && edgeSoftness <= 1),
+       assert(finalDurationFactor >= 0);
+
+  // Параметр	            Що змінює	                            Початкове	Що пробувати
+  // cover	              розмиття чи мозаїка	                    blur	  mosaic
+  // blurStrength	        сила розмиття (частка меншої сторони)	  0.05	  0.03–0.10
+  // mosaicCells	        клітинок по меншій стороні;
+  //                      менше — грубіше	                        12	    6–20
+  // coverDim	            затемнення прихованої частини	          0.35	  0 — без затемнення, 0.6 — майже силует
+  // edgeSoftness	        м'якість краю	                          0.12	  0 — різкий, 0.4 — дуже м'який
+  // stepDuration	        тривалість проміжних кроків	            400 мс	250–600 мс
+  // finalDurationFactor	частка feedbackDuration для фіналу	    0.8	    0.5–1.0
+  /// Розмиття чи мозаїка поза колом.
+  final CircleRevealCover cover;
+
+  /// Сила розмиття як частка меншої сторони картинки
+  /// (0.05 ≈ 5 %; не залежить від роздільності файлу).
+  final double blurStrength;
+
+  /// Скільки клітинок мозаїки вміщується по меншій стороні.
+  final int mosaicCells;
+
+  /// Затемнення прихованої частини: 0 — без змін, 1 — чорна.
+  final double coverDim;
+
+  /// М'якість краю кола: 0 — різкий, 1 — дуже м'який.
+  final double edgeSoftness;
+
+  /// Тривалість проміжних кроків.
+  final Duration stepDuration;
+
+  /// Частка від feedbackDuration, за яку відбувається фінальне розкриття.
+  final double finalDurationFactor;
 }
 
 class TargetEffectConfig {
   const TargetEffectConfig({
     this.type = TargetEffectType.saturation,
     this.steps,
+    this.reveal = const CircleRevealConfig(),
   }) : assert(steps == null || steps > 0);
+
+  /// Параметри для [TargetEffectType.circleReveal].
+  final CircleRevealConfig reveal;
 
   final TargetEffectType type;
 

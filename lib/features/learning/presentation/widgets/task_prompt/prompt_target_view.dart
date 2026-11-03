@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/circle_reveal_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/color_depth_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_content_builder.dart';
 
@@ -11,8 +12,12 @@ class PromptTargetView extends StatelessWidget {
     required this.targetProgress,
     required this.contentBuilder,
     this.totalSlots,
+    this.feedbackDuration,
     this.textStyle,
   });
+
+  /// Тривалість фідбеку теми; від неї залежить фінальне розкриття.
+  final Duration? feedbackDuration;
 
   final TargetContent target;
 
@@ -80,7 +85,46 @@ class PromptTargetView extends StatelessWidget {
             mode: mode,
           ),
         );
+      case TargetEffectType.circleReveal:
+        if (item is! ImageContent) return _buildContent(context, style);
+
+        final reveal = effect.reveal;
+        final isFinal = targetProgress >= steps;
+
+        return contentBuilder.build(
+          context,
+          item,
+          style,
+          fullWidthText: true,
+          imageBuilder: (image) => CircleRevealImage(
+            assetPath: image.imagePath,
+            stage: _revealStage(targetProgress, steps),
+            config: reveal,
+            duration: isFinal
+                ? _finalRevealDuration(reveal)
+                : reveal.stepDuration,
+          ),
+        );
     }
+  }
+
+  /// 0 — приховано; 0.5…1 — діаметр кола; 2 — відкрито повністю.
+  static double _revealStage(int progress, int steps) {
+    if (progress <= 0) return 0;
+    if (progress >= steps) return 2;
+    if (steps == 2) return 1; // перший крок двоскладового = діаметр 1.0
+    return 0.5 + 0.5 * (progress - 1) / (steps - 2);
+  }
+
+  Duration _finalRevealDuration(CircleRevealConfig reveal) {
+    final feedback = feedbackDuration;
+    if (feedback == null) return reveal.stepDuration;
+
+    final duration = feedback * reveal.finalDurationFactor;
+    // Дуже короткий фідбек: розкриваємо миттєво.
+    return duration < const Duration(milliseconds: 80)
+        ? Duration.zero
+        : duration;
   }
 
   /// Базовий стиль цілі: для тексту застосовує [TargetContent.fontSize].

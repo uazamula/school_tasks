@@ -32,7 +32,10 @@ class TaskWidget extends StatelessWidget {
     required this.feedbackEnabled,
     this.interactionScrollable = false,
     this.targetProgress = 0,
+    this.feedbackDuration,
   });
+
+  final Duration? feedbackDuration;
 
   final LearningTask<dynamic, dynamic> task;
   final TaskResult<dynamic, dynamic>? result;
@@ -57,6 +60,7 @@ class TaskWidget extends StatelessWidget {
       scrollable: promptScrollable,
       targetProgress: targetProgress,
       targetTotal: _targetTotal,
+      feedbackDuration: feedbackDuration,
     );
   }
 

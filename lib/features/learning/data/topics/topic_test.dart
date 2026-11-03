@@ -73,7 +73,15 @@ abstract final class Tests {
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
           targetEffect: const TargetEffectConfig(
-            type: TargetEffectType.adaptiveColorDepth,
+            type: TargetEffectType.circleReveal,
+            // за потреби:
+            reveal: CircleRevealConfig(
+              cover: CircleRevealCover.blur,
+              blurStrength: 0.0025,
+              mosaicCells: 16,
+              coverDim: 0.2,
+              edgeSoftness: 0.35, // різкий край
+            ),
           ),
           targetFontSize: 42,
 
@@ -178,17 +186,17 @@ abstract final class Tests {
       // maximumFailures: 1,
     ),
     layout: TopicLayout(
-      promptFlex: 1,
-      interactionFlex: 2,
+      promptFlex: 2,
+      interactionFlex: 3,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
       areaOrder: TopicAreaOrder.promptFirst,
     ),
-    progressionMode: TopicProgressionMode.manual,
-    feedbackDuration: Duration(milliseconds: 300),
+    progressionMode: TopicProgressionMode.automaticWithFeedback,
+    feedbackDuration: Duration(milliseconds: 500),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,
-      countdown: Duration(seconds: 135, milliseconds: 0),
+      countdown: Duration(seconds: 35, milliseconds: 0),
     ),
     dashboard: DashboardConfig(
       showProgress: true,
