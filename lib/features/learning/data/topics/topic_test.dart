@@ -73,14 +73,12 @@ abstract final class Tests {
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
           targetEffect: const TargetEffectConfig(
-            type: TargetEffectType.circleReveal,
-            // за потреби:
-            reveal: CircleRevealConfig(
-              cover: CircleRevealCover.blur,
-              blurStrength: 0.0025,
-              mosaicCells: 16,
+            type: TargetEffectType.adaptiveColorDepth,
+            sharpen: SharpenConfig(
+              blurStrength: 0.05,
+              mosaicCells: 20,
+              mosaicMaxFactor: 4,
               coverDim: 0.2,
-              edgeSoftness: 0.35, // різкий край
             ),
           ),
           targetFontSize: 42,

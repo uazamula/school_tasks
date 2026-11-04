@@ -8,6 +8,41 @@ enum TargetEffectType {
 
   /// Для зображень: відкривається колом від центру.
   circleReveal,
+
+  /// Для зображень: розмиття зменшується з прогресом.
+  blurSharpen,
+
+  /// Для зображень: мозаїка дрібнішає з прогресом.
+  mosaicSharpen,
+}
+
+class SharpenConfig {
+  const SharpenConfig({
+    this.blurStrength = 0.06,
+    this.mosaicCells = 8,
+    this.mosaicMaxFactor = 8,
+    this.coverDim = 0.35,
+    this.stepDuration = const Duration(milliseconds: 400),
+  }) : assert(blurStrength >= 0),
+        assert(mosaicCells >= 1),
+        assert(mosaicMaxFactor >= 1),
+        assert(coverDim >= 0 && coverDim <= 1);
+
+  /// Початкова сила розмиття як частка меншої сторони картинки.
+  final double blurStrength;
+
+  /// Початкова кількість клітинок мозаїки по меншій стороні.
+  final int mosaicCells;
+
+  /// У скільки разів зростає кількість клітинок від початку до оригіналу.
+  final double mosaicMaxFactor;
+
+  /// Початкове затемнення (спільне для обох ефектів): 0 — без змін,
+  /// 1 — чорна. Зменшується разом з розмиттям.
+  final double coverDim;
+
+  /// Тривалість переходу між кроками.
+  final Duration stepDuration;
 }
 
 /// Що видно поза колом.
@@ -65,8 +100,13 @@ class TargetEffectConfig {
     this.type = TargetEffectType.saturation,
     this.steps,
     this.reveal = const CircleRevealConfig(),
+    this.sharpen = const SharpenConfig(),
   }) : assert(steps == null || steps > 0);
 
+  /// Параметри для [TargetEffectType.blurSharpen] і
+  /// [TargetEffectType.mosaicSharpen].
+  final SharpenConfig sharpen;
+  
   /// Параметри для [TargetEffectType.circleReveal].
   final CircleRevealConfig reveal;
 

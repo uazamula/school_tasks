@@ -1,9 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/circle_reveal_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/color_depth_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_content_builder.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/sharpen_image.dart';
 
 class PromptTargetView extends StatelessWidget {
   const PromptTargetView({
@@ -105,7 +108,46 @@ class PromptTargetView extends StatelessWidget {
                 : reveal.stepDuration,
           ),
         );
+      case TargetEffectType.blurSharpen:
+      case TargetEffectType.mosaicSharpen:
+        if (item is! ImageContent) return _buildContent(context, style);
+
+        final sharpen = effect.sharpen;
+        final mode = effect.type == TargetEffectType.blurSharpen
+            ? SharpenMode.blur
+            : SharpenMode.mosaic;
+
+        return contentBuilder.build(
+          context,
+          item,
+          style,
+          fullWidthText: true,
+          imageBuilder: (image) => SharpenImage(
+            assetPath: image.imagePath,
+            progress: math.min(math.max(targetProgress, 0), steps),
+            steps: steps,
+            mode: mode,
+            config: sharpen,
+            duration: _sharpenDuration(sharpen),
+          ),
+        );
     }
+  }
+
+  Duration _sharpenDuration(SharpenConfig sharpen) {
+    var duration = sharpen.stepDuration;
+
+    // Не довше 80 % від feedbackDuration.
+    final feedback = feedbackDuration;
+    if (feedback != null) {
+      final cap = feedback * 0.8;
+      if (cap < duration) duration = cap;
+    }
+
+    // Дуже короткий перехід — миттєво.
+    return duration < const Duration(milliseconds: 80)
+        ? Duration.zero
+        : duration;
   }
 
   /// 0 — приховано; 0.5…1 — діаметр кола; 2 — відкрито повністю.
