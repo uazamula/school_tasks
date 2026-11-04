@@ -8,18 +8,24 @@ import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/
 
 enum ColorDepthMode { retro, adaptive }
 
-/// Зображення з обмеженою глибиною кольору ([bits] біт на канал).
-/// [bits] == null — оригінал. Кожен рівень рахується один раз і кешується.
 class ColorDepthImage extends StatefulWidget {
   const ColorDepthImage({
     super.key,
     required this.assetPath,
-    required this.bits,
+    required this.level,
     this.mode = ColorDepthMode.retro,
-  }) : assert(bits == null || bits == 1 || bits == 2 || bits == 4 || bits == 8);
+  }) : assert(
+         level == null ||
+             (mode == ColorDepthMode.adaptive
+                 ? level >= 2
+                 : (level == 1 || level == 2 || level == 4 || level == 8)),
+       );
 
   final String assetPath;
-  final int? bits;
+
+  /// Retro: біти на піксель (1, 2, 4, 8). Adaptive: кількість кольорів.
+  /// null — оригінал.
+  final int? level;
   final ColorDepthMode mode;
 
   @override
@@ -48,7 +54,7 @@ class _ColorDepthImageState extends State<ColorDepthImage> {
         oldWidget.assetPath != widget.assetPath ||
         oldWidget.mode != widget.mode;
     if (resetNeeded) _releaseImages();
-    if (resetNeeded || oldWidget.bits != widget.bits) {
+    if (resetNeeded || oldWidget.level != widget.level) {
       unawaited(_update());
     }
   }
@@ -74,7 +80,7 @@ class _ColorDepthImageState extends State<ColorDepthImage> {
 
   Future<void> _update() async {
     final token = ++_token;
-    final bits = widget.bits;
+    final level = widget.level;
 
     try {
       if (_pixels == null) {
@@ -104,17 +110,17 @@ class _ColorDepthImageState extends State<ColorDepthImage> {
 
       ui.Image? target;
 
-      if (bits == null) {
+      if (level == null) {
         target = _original;
       } else {
-        target = _cache[bits];
+        target = _cache[level];
 
         if (target == null) {
           final created = await _quantize(
             _pixels!,
             _original!.width,
             _original!.height,
-            bits,
+            level,
             widget.mode,
           );
 
@@ -123,7 +129,7 @@ class _ColorDepthImageState extends State<ColorDepthImage> {
             return;
           }
 
-          _cache[bits] = created;
+          _cache[level] = created;
           target = created;
         }
       }
@@ -166,17 +172,17 @@ Future<ui.Image> _quantize(
   Uint8List src,
   int width,
   int height,
-  int bits,
+  int level,
   ColorDepthMode mode,
 ) async {
   final Uint8List out = switch (mode) {
     ColorDepthMode.retro => await compute(
       _ditherToPalette,
-      _DitherJob(src, width, bits),
+      _DitherJob(src, width, level),
     ),
     ColorDepthMode.adaptive => await compute(
       _medianCut,
-      _MedianCutJob(src, 1 << bits),
+      _MedianCutJob(src, level), // було 1 << bits
     ),
   };
 

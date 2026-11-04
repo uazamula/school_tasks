@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 
 enum TargetEffectType {
@@ -24,9 +26,9 @@ class SharpenConfig {
     this.coverDim = 0.35,
     this.stepDuration = const Duration(milliseconds: 400),
   }) : assert(blurStrength >= 0),
-        assert(mosaicCells >= 1),
-        assert(mosaicMaxFactor >= 1),
-        assert(coverDim >= 0 && coverDim <= 1);
+       assert(mosaicCells >= 1),
+       assert(mosaicMaxFactor >= 1),
+       assert(coverDim >= 0 && coverDim <= 1);
 
   /// Початкова сила розмиття як частка меншої сторони картинки.
   final double blurStrength;
@@ -101,12 +103,31 @@ class TargetEffectConfig {
     this.steps,
     this.reveal = const CircleRevealConfig(),
     this.sharpen = const SharpenConfig(),
-  }) : assert(steps == null || steps > 0);
+    this.maxColors = 32,
+  }) : assert(steps == null || steps > 0),
+       assert(maxColors >= 2);
+
+  /// Для [TargetEffectType.adaptiveColorDepth]: кількість кольорів
+  /// на останньому проміжному кроці (далі — оригінал).
+  final int maxColors;
+
+  /// Кількість кольорів палітри для adaptiveColorDepth; null — оригінал.
+  /// Зростає геометрично від 2 до [maxColors].
+  int? colorsForProgress(int progress, int steps) {
+    if (progress >= steps) return null;
+    if (steps == 1) return 2;
+
+    final index = progress < 0 ? 0 : progress;
+    final ratio = maxColors / 2;
+    final colors = 2 * math.pow(ratio, index / (steps - 1));
+
+    return colors.round().clamp(2, maxColors).toInt();
+  }
 
   /// Параметри для [TargetEffectType.blurSharpen] і
   /// [TargetEffectType.mosaicSharpen].
   final SharpenConfig sharpen;
-  
+
   /// Параметри для [TargetEffectType.circleReveal].
   final CircleRevealConfig reveal;
 

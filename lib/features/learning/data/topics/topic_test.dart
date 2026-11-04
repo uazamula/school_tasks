@@ -65,21 +65,16 @@ abstract final class Tests {
         SlotAssemblyTaskDataGenerator(
           words: syllableDemoWords,
           concepts: syllableDemoConcepts,
-          taskCount: 2,
+          taskCount: 6,
           wrongAnswerCount: 3,
-          syllablePattern: 'р?',
+          syllablePattern: '*р*',
           targetType: SlotAssemblyTargetType.imageWithAudio,
           language: Language.uk,
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
           targetEffect: const TargetEffectConfig(
             type: TargetEffectType.adaptiveColorDepth,
-            sharpen: SharpenConfig(
-              blurStrength: 0.05,
-              mosaicCells: 20,
-              mosaicMaxFactor: 4,
-              coverDim: 0.2,
-            ),
+            maxColors: 8, // підберіть під свої картинки
           ),
           targetFontSize: 42,
 

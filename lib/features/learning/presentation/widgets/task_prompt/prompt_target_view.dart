@@ -72,10 +72,10 @@ class PromptTargetView extends StatelessWidget {
       case TargetEffectType.adaptiveColorDepth:
         if (item is! ImageContent) return _buildContent(context, style);
 
-        final mode = effect.type == TargetEffectType.retroColorDepth
-            ? ColorDepthMode.retro
-            : ColorDepthMode.adaptive;
-        final bits = effect.bitsForProgress(targetProgress, steps);
+        final adaptive = effect.type == TargetEffectType.adaptiveColorDepth;
+        final level = adaptive
+            ? effect.colorsForProgress(targetProgress, steps)
+            : effect.bitsForProgress(targetProgress, steps);
 
         return contentBuilder.build(
           context,
@@ -84,8 +84,8 @@ class PromptTargetView extends StatelessWidget {
           fullWidthText: true,
           imageBuilder: (image) => ColorDepthImage(
             assetPath: image.imagePath,
-            bits: bits,
-            mode: mode,
+            level: level,
+            mode: adaptive ? ColorDepthMode.adaptive : ColorDepthMode.retro,
           ),
         );
       case TargetEffectType.circleReveal:
