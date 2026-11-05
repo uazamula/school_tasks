@@ -16,6 +16,43 @@ enum TargetEffectType {
 
   /// Для зображень: мозаїка дрібнішає з прогресом.
   mosaicSharpen,
+
+  /// Для зображень: картинка-накривка поступово відкриває ціль.
+  wipeReveal,
+}
+
+/// Як накривка відкриває ціль.
+enum WipeRevealStyle {
+  /// Накривка нерухома, відкрита частина росте («шторка»).
+  curtain,
+
+  /// Накривка їде разом із межею відкриття й виїжджає за край.
+  slide,
+}
+
+class WipeRevealConfig {
+  const WipeRevealConfig({
+    required this.coverAsset,
+    this.style = WipeRevealStyle.curtain,
+    this.edgeSoftness = 0.08,
+    this.stepDuration = const Duration(milliseconds: 400),
+  }) : assert(coverAsset != ''),
+       assert(edgeSoftness >= 0 && edgeSoftness <= 1);
+
+  /// Шлях до картинки-накривки, наприклад 'assets/images/cover.png'.
+  /// Масштабується під розмір цілі без зміни пропорцій (за потреби
+  /// збільшується й обрізається по центру).
+  final String coverAsset;
+
+  final WipeRevealStyle style;
+
+  /// М'якість краю як частка довжини цілі: 0 — різкий.
+  /// Діє лише в режимі [WipeRevealStyle.curtain]; у режимі ковзання
+  /// край накривки завжди різкий.
+  final double edgeSoftness;
+
+  /// Тривалість переходу між кроками.
+  final Duration stepDuration;
 }
 
 class SharpenConfig {
@@ -104,8 +141,17 @@ class TargetEffectConfig {
     this.reveal = const CircleRevealConfig(),
     this.sharpen = const SharpenConfig(),
     this.maxColors = 32,
+    this.wipe,
   }) : assert(steps == null || steps > 0),
-       assert(maxColors >= 2);
+       assert(maxColors >= 2),
+       assert(
+         type != TargetEffectType.wipeReveal || wipe != null,
+         'Для wipeReveal потрібно задати wipe (з coverAsset).',
+       );
+
+  /// Параметри для [TargetEffectType.wipeReveal].
+  /// Значення за замовчуванням немає: coverAsset задається явно.
+  final WipeRevealConfig? wipe;
 
   /// Для [TargetEffectType.adaptiveColorDepth]: кількість кольорів
   /// на останньому проміжному кроці (далі — оригінал).

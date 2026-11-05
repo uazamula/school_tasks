@@ -7,6 +7,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/color_depth_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_content_builder.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/sharpen_image.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/wipe_reveal_image.dart';
 
 class PromptTargetView extends StatelessWidget {
   const PromptTargetView({
@@ -131,7 +132,42 @@ class PromptTargetView extends StatelessWidget {
             duration: _sharpenDuration(sharpen),
           ),
         );
+      case TargetEffectType.wipeReveal:
+        final wipe = effect.wipe;
+        if (item is! ImageContent || wipe == null) {
+          return _buildContent(context, style);
+        }
+
+        return contentBuilder.build(
+          context,
+          item,
+          style,
+          fullWidthText: true,
+          imageBuilder: (image) => WipeRevealImage(
+            assetPath: image.imagePath,
+            progress: targetProgress,
+            steps: steps,
+            config: wipe,
+            duration: _wipeDuration(wipe),
+          ),
+        );
     }
+  }
+
+  Duration _wipeDuration(WipeRevealConfig wipe) {
+    var duration = wipe.stepDuration;
+
+    // Не довше 80 % від feedbackDuration.
+    final feedback = feedbackDuration;
+    if (feedback != null) {
+      final cap = feedback * 0.8;
+      if (cap < duration) duration = cap;
+    }
+
+    // Дуже короткий перехід — миттєво.
+    return duration < const Duration(milliseconds: 80)
+        ? Duration.zero
+        : duration;
   }
 
   Duration _sharpenDuration(SharpenConfig sharpen) {

@@ -73,8 +73,12 @@ abstract final class Tests {
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
           targetEffect: const TargetEffectConfig(
-            type: TargetEffectType.adaptiveColorDepth,
-            maxColors: 8, // підберіть під свої картинки
+            type: TargetEffectType.wipeReveal,
+            wipe: WipeRevealConfig(
+              coverAsset: 'assets/images/tasks/cover.png',
+              style: WipeRevealStyle.curtain, // або curtain (за замовчуванням)
+              edgeSoftness: 0.02,
+            ),
           ),
           targetFontSize: 42,
 
@@ -189,7 +193,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 500),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,
-      countdown: Duration(seconds: 35, milliseconds: 0),
+      countdown: Duration(seconds: 60, milliseconds: 0),
     ),
     dashboard: DashboardConfig(
       showProgress: true,
