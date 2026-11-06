@@ -7,6 +7,8 @@ import 'package:school_tasks/features/learning/presentation/widgets/math_content
 import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 
 typedef ImageContentBuilder = Widget Function(ImageContent content);
+typedef TextContentBuilder =
+    Widget Function(TextContent content, TextStyle? textStyle);
 
 /// Перетворює [TaskContent] умови завдання на віджети.
 class PromptContentBuilder {
@@ -67,6 +69,7 @@ class PromptContentBuilder {
     TextStyle? textStyle, {
     bool fullWidthText = false,
     ImageContentBuilder? imageBuilder,
+    TextContentBuilder? textBuilder,
   }) {
     final built = _buildBase(
       context,
@@ -74,6 +77,7 @@ class PromptContentBuilder {
       textStyle,
       fullWidthText: fullWidthText,
       imageBuilder: imageBuilder,
+      textBuilder: textBuilder,
     );
 
     final audio = content.audio;
@@ -93,8 +97,10 @@ class PromptContentBuilder {
     TextStyle? textStyle, {
     ImageContentBuilder? imageBuilder,
     bool fullWidthText = false,
+    TextContentBuilder? textBuilder,
   }) {
     if (content is TextContent) {
+      if (textBuilder != null) return textBuilder(content, textStyle);
       final text = Text(
         content.text,
         style: textStyle,

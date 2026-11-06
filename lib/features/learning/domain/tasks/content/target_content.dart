@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/animation.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 
 enum TargetEffectType {
@@ -19,6 +20,53 @@ enum TargetEffectType {
 
   /// Для зображень: картинка-накривка поступово відкриває ціль.
   wipeReveal,
+
+  /// Для тексту: контур → заливка літер.
+  outlineFill,
+}
+
+enum OutlineFillMode {
+  /// Літери заливаються по черзі зліва направо.
+  letters,
+
+  /// Усі літери заливаються одночасно.
+  all,
+}
+
+class OutlineFillConfig {
+  const OutlineFillConfig({
+    this.mode = OutlineFillMode.letters,
+    this.strokeFactor = 0.07,
+    this.minStrokeWidth = 1.5,
+    this.unfilledAlpha = 0.12,
+    this.outlineColor,
+    this.fillColor,
+    this.stepDuration = const Duration(milliseconds: 400),
+  }) : assert(strokeFactor >= 0),
+       assert(minStrokeWidth >= 0),
+       assert(unfilledAlpha >= 0 && unfilledAlpha <= 1);
+
+  final OutlineFillMode mode;
+
+  /// Товщина контуру як частка розміру шрифта.
+  final double strokeFactor;
+
+  /// Мінімальна товщина контуру в пікселях (щоб на дрібному
+  /// шрифті контур не був занадто тонким).
+  final double minStrokeWidth;
+
+  /// Прозорість легкої підзаливки ще не заповнених літер:
+  /// 0 — порожній контур, 0.12 — ледь помітна підзаливка.
+  final double unfilledAlpha;
+
+  /// Колір контуру до заливки. null — колір тексту зі стилю умови.
+  final Color? outlineColor;
+
+  /// Колір заливки. null — основний колір теми (primary).
+  final Color? fillColor;
+
+  /// Тривалість переходу між кроками.
+  final Duration stepDuration;
 }
 
 /// Як накривка відкриває ціль.
@@ -142,12 +190,16 @@ class TargetEffectConfig {
     this.sharpen = const SharpenConfig(),
     this.maxColors = 32,
     this.wipe,
+    this.outline = const OutlineFillConfig(),
   }) : assert(steps == null || steps > 0),
        assert(maxColors >= 2),
        assert(
          type != TargetEffectType.wipeReveal || wipe != null,
          'Для wipeReveal потрібно задати wipe (з coverAsset).',
        );
+
+  /// Параметри для [TargetEffectType.outlineFill].
+  final OutlineFillConfig outline;
 
   /// Параметри для [TargetEffectType.wipeReveal].
   /// Значення за замовчуванням немає: coverAsset задається явно.

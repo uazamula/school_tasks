@@ -68,19 +68,19 @@ abstract final class Tests {
           taskCount: 6,
           wrongAnswerCount: 3,
           syllablePattern: '*р*',
-          targetType: SlotAssemblyTargetType.imageWithAudio,
+          targetType: SlotAssemblyTargetType.wordWithAudio,
           language: Language.uk,
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
+          targetFontSize: 42,
           targetEffect: const TargetEffectConfig(
-            type: TargetEffectType.wipeReveal,
-            wipe: WipeRevealConfig(
-              coverAsset: 'assets/images/tasks/cover.png',
-              style: WipeRevealStyle.curtain, // або curtain (за замовчуванням)
-              edgeSoftness: 0.02,
+            type: TargetEffectType.outlineFill,
+            // за потреби:
+            outline: OutlineFillConfig(
+              unfilledAlpha: 0.15,
+              mode: OutlineFillMode.all,
             ),
           ),
-          targetFontSize: 42,
 
           position: SyllableSearchPosition.any,
           textCase: MatchingTextCase.uppercase,
@@ -183,8 +183,8 @@ abstract final class Tests {
       // maximumFailures: 1,
     ),
     layout: TopicLayout(
-      promptFlex: 2,
-      interactionFlex: 3,
+      promptFlex: 1,
+      interactionFlex: 4,
       prompt: PromptLayout(scrollable: false),
       interaction: InteractionLayout(scrollable: false),
       areaOrder: TopicAreaOrder.promptFirst,

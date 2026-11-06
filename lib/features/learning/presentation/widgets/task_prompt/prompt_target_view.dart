@@ -5,6 +5,7 @@ import 'package:school_tasks/features/learning/domain/tasks/content/target_conte
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/circle_reveal_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/color_depth_image.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/outline_fill_text.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/prompt_content_builder.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/sharpen_image.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_prompt/wipe_reveal_image.dart';
@@ -151,7 +152,45 @@ class PromptTargetView extends StatelessWidget {
             duration: _wipeDuration(wipe),
           ),
         );
+      case TargetEffectType.outlineFill:
+        if (item is! TextContent) return _buildContent(context, style);
+
+        final outline = effect.outline;
+
+        return contentBuilder.build(
+          context,
+          item,
+          style,
+          fullWidthText: true,
+          textBuilder: (content, textStyle) => SizedBox(
+            width: double.infinity,
+            child: OutlineFillText(
+              text: content.text,
+              style: textStyle,
+              progress: targetProgress,
+              steps: steps,
+              config: outline,
+              duration: _outlineDuration(outline),
+            ),
+          ),
+        );
     }
+  }
+
+  Duration _outlineDuration(OutlineFillConfig outline) {
+    var duration = outline.stepDuration;
+
+    // Не довше 80 % від feedbackDuration.
+    final feedback = feedbackDuration;
+    if (feedback != null) {
+      final cap = feedback * 0.8;
+      if (cap < duration) duration = cap;
+    }
+
+    // Дуже короткий перехід — миттєво.
+    return duration < const Duration(milliseconds: 80)
+        ? Duration.zero
+        : duration;
   }
 
   Duration _wipeDuration(WipeRevealConfig wipe) {
