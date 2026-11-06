@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_addition.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
@@ -75,10 +76,14 @@ abstract final class Tests {
           targetFontSize: 42,
           targetEffect: const TargetEffectConfig(
             type: TargetEffectType.outlineFill,
-            // за потреби:
             outline: OutlineFillConfig(
-              unfilledAlpha: 0.15,
               mode: OutlineFillMode.all,
+              finalFlash: true,
+              // null — колір заливки
+              flashColor: Colors.amber,
+              flashDuration: Duration(milliseconds: 700),
+              flashStrength: 1.3,
+              flashScale: 0.08,
             ),
           ),
 
@@ -190,7 +195,7 @@ abstract final class Tests {
       areaOrder: TopicAreaOrder.promptFirst,
     ),
     progressionMode: TopicProgressionMode.automaticWithFeedback,
-    feedbackDuration: Duration(milliseconds: 500),
+    feedbackDuration: Duration(milliseconds: 1000),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,
       countdown: Duration(seconds: 60, milliseconds: 0),

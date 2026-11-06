@@ -42,9 +42,16 @@ class OutlineFillConfig {
     this.outlineColor,
     this.fillColor,
     this.stepDuration = const Duration(milliseconds: 400),
+    this.finalFlash = true,
+    this.flashColor,
+    this.flashDuration = const Duration(milliseconds: 600),
+    this.flashStrength = 1.0,
+    this.flashScale = 0.06,
   }) : assert(strokeFactor >= 0),
        assert(minStrokeWidth >= 0),
-       assert(unfilledAlpha >= 0 && unfilledAlpha <= 1);
+       assert(unfilledAlpha >= 0 && unfilledAlpha <= 1),
+       assert(flashStrength >= 0),
+       assert(flashScale >= 0);
 
   final OutlineFillMode mode;
 
@@ -67,6 +74,21 @@ class OutlineFillConfig {
 
   /// Тривалість переходу між кроками.
   final Duration stepDuration;
+
+  /// Чи робити спалах після того, як усі літери залито.
+  final bool finalFlash;
+
+  /// Колір світіння спалаху. null — колір заливки.
+  final Color? flashColor;
+
+  /// Тривалість спалаху (він починається після завершення заливки).
+  final Duration flashDuration;
+
+  /// Сила світіння: 0 — без світіння, 1 — стандартне, 2 — дуже яскраве.
+  final double flashStrength;
+
+  /// Наскільки текст збільшується на піку спалаху (0.06 = 6 %).
+  final double flashScale;
 }
 
 /// Як накривка відкриває ціль.
