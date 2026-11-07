@@ -36,8 +36,4 @@ class Topic {
   final AutomaticTerminationConfig? automaticTermination;
   final TaskOrderMode taskOrderMode;
   final DashboardConfig dashboard;
-
-  // int get totalTasks {
-  //   return taskTypeCounts.values.fold(0, (sum, count) => sum + count);
-  // }
 }

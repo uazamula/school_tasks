@@ -66,7 +66,7 @@ abstract final class Tests {
         SlotAssemblyTaskDataGenerator(
           words: syllableDemoWords,
           concepts: syllableDemoConcepts,
-          taskCount: 6,
+          taskCount: 1,
           wrongAnswerCount: 3,
           syllablePattern: '*р*',
           targetType: SlotAssemblyTargetType.wordWithAudio,

@@ -4,6 +4,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/task_progress.dart';
 
 class TopicAttempt {
   TopicAttempt({required List<AttemptTask<dynamic, dynamic>> tasks})
@@ -76,18 +77,12 @@ class TopicAttempt {
           }
         }
       } else {
-        final task = taskAttempt.task;
         final accuracy = _taskAccuracy[index];
-
         if (accuracy != null) {
           correct += accuracy.correct;
           total += accuracy.total;
-        } else if (task is MatchingTask) {
-          total += task.pairs.length;
-        } else if (task is SlotAssemblyTask) {
-          total += task.correctAnswers.length;
         } else {
-          total += 1;
+          total += progressStepsOf(taskAttempt.task);
         }
       }
     }

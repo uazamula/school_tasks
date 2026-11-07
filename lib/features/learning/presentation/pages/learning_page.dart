@@ -163,7 +163,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         onCorrectPair: _onCorrectPair,
         onIncorrectPair: _onIncorrectPair,
         onIncorrectPairAttempt: _onIncorrectPairAttempt,
-        onMatchingAccuracyChanged: _onMatchingAccuracyChanged,
+        onAccuracyChanged: _onAccuracyChanged,
         onCorrectSlotFilled: _onCorrectSlotFilled,
         onElementReachedEdge: _handleElementReachedEdge,
       ),
@@ -558,16 +558,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     );
   }
 
-  void _onMatchingAccuracyChanged(AccuracyResult accuracy) {
-    if (_isFinishing) {
-      return;
-    }
+  void _onAccuracyChanged(AccuracyResult accuracy) {
+    if (_isFinishing) return;
 
     final currentTask = _attempt.currentTask;
-
-    if (currentTask.task is! MatchingTask || currentTask.isAnswered) {
-      return;
-    }
+    if (currentTask.isAnswered || !reportsOwnProgress(currentTask.task)) return;
 
     _attempt.updateTaskAccuracy(_attempt.currentTaskIndex, accuracy);
   }

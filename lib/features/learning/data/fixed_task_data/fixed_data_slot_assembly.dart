@@ -48,8 +48,6 @@ final List<TaskData> slotAssemblyWord = [
         'БА',
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
       ),
-      'КА',
-      'ТА',
     ],
     wrongAnswers: [],
     wrongAnswerCount: 0,

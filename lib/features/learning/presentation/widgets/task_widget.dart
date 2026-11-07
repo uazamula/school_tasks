@@ -139,7 +139,7 @@ class TaskWidget extends StatelessWidget {
       onIncorrectPair: callbacks.onIncorrectPair,
       feedbackEnabled: feedbackEnabled,
       onIncorrectPairAttempt: callbacks.onIncorrectPairAttempt,
-      onAccuracyChanged: callbacks.onMatchingAccuracyChanged,
+      onAccuracyChanged: callbacks.onAccuracyChanged,
     );
   }
 
@@ -150,7 +150,7 @@ class TaskWidget extends StatelessWidget {
       result: result as TaskResult<List<dynamic>, List<dynamic>>?,
       interactionScrollable: interactionScrollable,
       onTaskAnswered: callbacks.onTaskAnswered,
-      onAccuracyChanged: callbacks.onMatchingAccuracyChanged,
+      onAccuracyChanged: callbacks.onAccuracyChanged,
       // Звук фідбеку після кожної спроби доставки елемента в слот,
       // за тим самим принципом, що й у Matching.
       onCorrectSlotFilled: (progress) {

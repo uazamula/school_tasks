@@ -3,12 +3,14 @@ import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/progress_reporting_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
 class SlotAssemblyTask<TOption>
-    extends LearningTask<List<TOption>, List<TOption>> {
+    extends LearningTask<List<TOption>, List<TOption>>
+    with ProgressReportingTask {
   SlotAssemblyTask({
     required super.prompt,
     required List<TOption> correctAnswers,
@@ -31,6 +33,9 @@ class SlotAssemblyTask<TOption>
       throw ArgumentError('correctAnswers must not be empty.');
     }
   }
+
+  @override
+  int get progressSteps => correctAnswers.length;
 
   /// Варіанти, доступні для вибору.
   final List<TOption> options;

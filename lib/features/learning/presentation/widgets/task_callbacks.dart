@@ -10,7 +10,7 @@ class TaskCallbacks {
     required this.onCorrectPair,
     required this.onIncorrectPair,
     required this.onIncorrectPairAttempt,
-    required this.onMatchingAccuracyChanged,
+    required this.onAccuracyChanged,
     this.onCorrectSlotFilled,
     this.onElementReachedEdge,
   });
@@ -31,7 +31,7 @@ class TaskCallbacks {
   final bool Function() onIncorrectPairAttempt;
 
   /// Змінилася точність Matching/SlotAssembly.
-  final ValueChanged<AccuracyResult> onMatchingAccuracyChanged;
+  final ValueChanged<AccuracyResult> onAccuracyChanged;
 
   /// Правильно заповнено слот; аргумент — кількість заповнених слотів.
   final ValueChanged<int>? onCorrectSlotFilled;

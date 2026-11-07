@@ -3,12 +3,14 @@ import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_answer.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/matching_pair.dart';
+import 'package:school_tasks/features/learning/domain/tasks/progress_reporting_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/matching_evaluator.dart';
 import 'package:school_tasks/features/learning/domain/tasks/solutions/solution.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/matching_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_answer_state.dart';
 
-class MatchingTask extends LearningTask<MatchingAnswer, List<MatchingPair>> {
+class MatchingTask extends LearningTask<MatchingAnswer, List<MatchingPair>>
+    with ProgressReportingTask {
   MatchingTask({required super.prompt, required this.pairs, this.buttonConfig})
     : super(
         interaction: const MatchingInteraction(),
@@ -18,6 +20,8 @@ class MatchingTask extends LearningTask<MatchingAnswer, List<MatchingPair>> {
         ),
       );
 
+  @override
+  int get progressSteps => pairs.length;
   final MatchingButtonConfig? buttonConfig;
 
   /// Пари, відібрані для конкретного завдання.
