@@ -5,4 +5,5 @@ enum LearningTaskType {
   positionSelection,
   matching,
   slotAssembly,
+  memory,
 }
