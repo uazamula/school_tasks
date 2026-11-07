@@ -16,7 +16,12 @@ class TopicAttemptSnapshot {
     required this.completionReason,
     this.failureCount = 0,
     this.evaluation,
+    this.streak,
+    this.pairsCompleted,
   });
+
+  final int? streak;
+  final int? pairsCompleted;
 
   final DateTime completedAt;
   final Duration duration;
@@ -46,6 +51,8 @@ class TopicAttemptSnapshot {
       'completionReason': completionReason.name,
       'evaluation': _evaluationToJson(evaluation),
       'failureCount': failureCount,
+      'streak': streak,
+      'pairsCompleted': pairsCompleted,
     };
   }
 
@@ -68,6 +75,8 @@ class TopicAttemptSnapshot {
       ),
       evaluation: _evaluationFromJson(json['evaluation']),
       failureCount: (json['failureCount'] as num?)?.toInt() ?? 0,
+      streak: (json['streak'] as num?)?.toInt(),
+      pairsCompleted: (json['pairsCompleted'] as num?)?.toInt(),
     );
   }
 

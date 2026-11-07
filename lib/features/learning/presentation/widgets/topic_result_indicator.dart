@@ -5,6 +5,7 @@ import 'package:school_tasks/core/formatters/duration_formatter.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/visual_grade_scale_widget.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
 import 'package:school_tasks/features/learning/providers/topic_result_display_controller.dart';
@@ -45,30 +46,43 @@ class TopicResultIndicator extends ConsumerWidget {
       result!.currentDuration,
     );
 
+    Widget main(double visualSize) => result!.kind == TopicResultKind.streak
+        ? _buildStreak(result!.bestStreak)
+        : _buildGrade(gradeScale, result!.currentScore, visualSize: visualSize);
+
     return switch (display) {
-      TopicResultDisplay.grade => _buildGrade(
-        gradeScale,
-        result!.currentScore,
-        visualSize: _visualSizeGradeOnly,
-      ),
-
+      TopicResultDisplay.grade => main(_visualSizeGradeOnly),
       TopicResultDisplay.duration => _buildDuration(duration),
-
       TopicResultDisplay.gradeAndDuration => Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildGrade(
-            gradeScale,
-            result!.currentScore,
-            visualSize: _visualSizeGradeAndDuration,
-          ),
+          main(_visualSizeGradeAndDuration),
           const SizedBox(height: 1),
           _buildDuration(duration),
         ],
       ),
     };
+  }
+
+  Widget _buildStreak(int streak) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.local_fire_department, size: 18),
+          Text(
+            '$streak',
+            style: const TextStyle(
+              fontSize: _gradeFontSize,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildGrade(

@@ -2,6 +2,7 @@ import 'package:school_tasks/features/learning/data/topics/topic_addition_digits
 import 'package:school_tasks/features/learning/data/topics/topic_addition_within_10.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_coding.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_fractions.dart';
+import 'package:school_tasks/features/learning/data/topics/topic_memory_demo.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_mult_sel.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_multiplication_table.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_percents.dart';
@@ -93,6 +94,23 @@ abstract final class LearningContent {
             ),
           ],
         ),
+        LearningNode(
+          id: 'memory_section',
+          titleKey: 'Memory',
+          type: LearningNodeType.section,
+          children: [
+            LearningNode(
+              id: 'memory_finite',
+              titleKey: 'Memory: дошка',
+              type: LearningNodeType.topic,
+            ),
+            LearningNode(
+              id: 'memory_endless',
+              titleKey: 'Memory: серія',
+              type: LearningNodeType.topic,
+            ),
+          ],
+        ),
       ],
     ),
   ];
@@ -106,6 +124,8 @@ abstract final class LearningContent {
     'fractions': Fractions.topic,
     'percents': Percents.topic,
     'coding1': TopicCoding.topicCoding,
+    'memory_finite': MemoryFiniteDemo.topic,
+    'memory_endless': MemoryEndlessDemo.topic,
   };
 
   static Topic getTopic(String topicId) {

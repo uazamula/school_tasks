@@ -1,4 +1,5 @@
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_snapshot.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 
 class TopicResult {
   const TopicResult({required this.currentAttempt, required this.bestAttempt});
@@ -27,6 +28,14 @@ class TopicResult {
   DateTime? get bestAt => bestAttempt?.completedAt;
 
   Duration? get bestDuration => bestAttempt?.duration;
+
+  TopicResultKind get kind => currentAttempt.streak != null
+      ? TopicResultKind.streak
+      : TopicResultKind.grade;
+
+  int get currentStreak => currentAttempt.streak ?? 0;
+
+  int get bestStreak => bestAttempt?.streak ?? 0;
 
   Map<String, dynamic> toJson() {
     return {

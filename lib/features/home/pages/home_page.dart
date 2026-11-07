@@ -33,9 +33,16 @@ class _HomePageState extends ConsumerState<HomePage> {
     for (final topic in LearningContent.topics.values) {
       final result = preferences.getTopicResult(topic.id);
 
-      if (result != null) {
-        controller.setResult(topic.id, result);
+      if (result == null) continue;
+
+      // Вид результату змінився (оцінка <-> серія): старий результат
+      // непорівнянний, тому скидаємо його.
+      if (result.kind != topic.resultKind) {
+        await preferences.clearTopicResult(topic.id);
+        continue;
       }
+
+      controller.setResult(topic.id, result);
     }
   }
 

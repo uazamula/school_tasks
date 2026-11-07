@@ -8,7 +8,13 @@ class TopicAttemptResult {
     required this.accuracy,
     required this.duration,
     this.evaluation,
+    this.streak,
+    this.pairsCompleted,
   });
+
+  /// Найкраща серія за спробу (лише для streak-тем).
+  final int? streak;
+  final int? pairsCompleted;
 
   final int totalTasks;
   final int completedTasks;

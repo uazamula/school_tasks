@@ -10,6 +10,7 @@ import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_sna
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
 
 import 'topic_evaluation_details.dart';
@@ -80,9 +81,11 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (result == null)
-            const Text(
-              'Ця тема ще не проходилася. '
-              'Нижче наведено правила оцінювання.',
+            Text(
+              widget.topic.resultKind == TopicResultKind.streak
+                  ? 'Ця тема ще не проходилася.'
+                  : 'Ця тема ще не проходилася. '
+                        'Нижче наведено правила оцінювання.',
             )
           else ...[
             _buildAttemptSummary(
@@ -112,16 +115,17 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
             const SizedBox(height: AppSpacing.md),
           ],
 
-          TopicEvaluationDetails(
-            topic: widget.topic,
-            result: result,
-            initiallyExpanded: _showEvaluationDetails,
-            onExpansionChanged: (expanded) {
-              setState(() {
-                _showEvaluationDetails = expanded;
-              });
-            },
-          ),
+          if (widget.topic.resultKind == TopicResultKind.grade)
+            TopicEvaluationDetails(
+              topic: widget.topic,
+              result: result,
+              initiallyExpanded: _showEvaluationDetails,
+              onExpansionChanged: (expanded) {
+                setState(() {
+                  _showEvaluationDetails = expanded;
+                });
+              },
+            ),
         ],
       ),
     );
@@ -136,6 +140,24 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
   }) {
     final locale = Localizations.localeOf(context);
     final dateFormatter = DateFormat.yMd(locale.toLanguageTag()).add_Hm();
+
+    if (snapshot.streak != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: AppSpacing.xs),
+          Text('Дата: ${dateFormatter.format(snapshot.completedAt)}'),
+          Text('Серія: ${snapshot.streak}'),
+          Text('Пар складено: ${snapshot.pairsCompleted ?? 0}'),
+          Text(
+            'Тривалість: '
+            '${DurationFormatter.formatDetailed(context, snapshot.duration)} '
+            '${context.l10n.secondsShort}',
+          ),
+        ],
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

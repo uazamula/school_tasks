@@ -1,0 +1,1 @@
+enum TopicResultKind { grade, streak }

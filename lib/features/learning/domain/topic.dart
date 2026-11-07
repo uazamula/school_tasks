@@ -7,6 +7,7 @@ import 'package:school_tasks/features/learning/domain/task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 
 class Topic {
   Topic({
@@ -22,7 +23,15 @@ class Topic {
     this.automaticTermination,
     this.taskOrderMode = TaskOrderMode.random,
     this.dashboard = const DashboardConfig(),
-  });
+    this.resultKind = TopicResultKind.grade,
+  }) : assert(
+         resultKind != TopicResultKind.streak ||
+             automaticTermination?.failureLimit != null ||
+             automaticTermination?.countdown != null,
+         'Streak topics need failureLimit or countdown.',
+       );
+
+  final TopicResultKind resultKind;
 
   final String id;
   final Map<LearningTaskType, int> taskTypeCounts;
