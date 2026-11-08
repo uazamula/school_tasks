@@ -351,6 +351,7 @@ class TopicEvaluationDetails extends StatelessWidget {
       TopicCompletionReason.timeExpired => 'Час вичерпано',
       TopicCompletionReason.failureLimitReached => 'Досягнуто ліміту помилок',
       TopicCompletionReason.elementReachedEdge => 'Досягнуто краю ігрової області',
+      TopicCompletionReason.quit => 'Гру завершено гравцем',
     };
   }
 

@@ -35,6 +35,7 @@ class TaskWidget extends StatelessWidget {
     this.interactionScrollable = false,
     this.targetProgress = 0,
     this.feedbackDuration,
+    this.paused = false,
   });
 
   final Duration? feedbackDuration;
@@ -46,6 +47,7 @@ class TaskWidget extends StatelessWidget {
   final TaskCallbacks callbacks;
   final bool feedbackEnabled;
   final int targetProgress;
+  final bool paused;
 
   /// Кількість елементів, які треба скласти.
   /// null — невідома (тоді ефект без явних steps має 1 крок).
@@ -184,6 +186,7 @@ class TaskWidget extends StatelessWidget {
       onAccuracyChanged: callbacks.onAccuracyChanged,
       onStreakChanged: callbacks.onStreakChanged,
       feedbackEnabled: feedbackEnabled,
+        paused: paused
     );
   }
 

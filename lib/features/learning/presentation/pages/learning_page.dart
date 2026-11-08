@@ -76,6 +76,12 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   int _targetProgress = 0;
 
+  bool _isExitPaused = false;
+  bool _resumeStopwatchAfterExit = false;
+
+  bool get _pauseOnExitDialog =>
+      _topic.automaticTermination?.pauseOnExitDialog ?? true;
+
   void _onCorrectSlotFilled(int progress) {
     if (!mounted) return;
 
@@ -127,7 +133,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     _stopwatch = Stopwatch()..start();
 
     _timer = Timer.periodic(const Duration(milliseconds: 250), (_) {
-      if (!mounted || _isFinishing) {
+      if (!mounted || _isFinishing || _isExitPaused) {
         return;
       }
 
@@ -140,6 +146,12 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
       setState(() {});
     });
+    widget.exitGuard
+      ..hasSavableProgress = _hasSavableProgress
+      ..exitSummary = _exitSummary
+      ..onExitDialogOpened = _pauseForExitDialog
+      ..onExitDialogClosed = _resumeAfterExitDialog
+      ..finishOnQuit = _finishOnQuit;
   }
 
   @override
@@ -147,7 +159,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     _timer?.cancel();
     _autoAdvanceTimer?.cancel();
     _stopwatch.stop();
-
+    widget.exitGuard.detach();
     super.dispose();
   }
 
@@ -181,6 +193,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         onElementReachedEdge: _handleElementReachedEdge,
         onStreakChanged: _onStreakChanged,
       ),
+      paused: _isExitPaused,
     );
 
     return AppScaffold(
@@ -639,5 +652,39 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         completionReason: TopicCompletionReason.elementReachedEdge,
       ),
     );
+  }
+
+  bool _hasSavableProgress() {
+    return _isStreakTopic &&
+        !_isFinishing &&
+        !_hasSavedResult &&
+        _streak.pairs > 0;
+  }
+
+  String? _exitSummary() => 'Найкраща серія: ${_streak.best}';
+
+  void _pauseForExitDialog() {
+    if (!mounted || !_pauseOnExitDialog || _isExitPaused) return;
+
+    _resumeStopwatchAfterExit = _stopwatch.isRunning;
+    _stopwatch.stop();
+
+    setState(() => _isExitPaused = true);
+  }
+
+  void _resumeAfterExitDialog() {
+    if (!mounted || !_isExitPaused) return;
+
+    if (_resumeStopwatchAfterExit) _stopwatch.start();
+
+    setState(() => _isExitPaused = false);
+  }
+
+  void _finishOnQuit() {
+    if (!mounted || _isFinishing) return;
+
+    _markFinishing();
+
+    unawaited(_finishAttempt(completionReason: TopicCompletionReason.quit));
   }
 }

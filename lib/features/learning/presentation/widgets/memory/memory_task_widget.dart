@@ -41,8 +41,10 @@ class MemoryTaskWidget extends StatefulWidget {
     required this.onAccuracyChanged,
     required this.feedbackEnabled,
     this.onStreakChanged,
+    this.paused = false,
   });
 
+  final bool paused;
   final MemoryTask task;
   final ValueChanged<TaskResult<MemoryAnswer, List<MemoryPair>>> onTaskAnswered;
   final VoidCallback onProgressStep;
@@ -110,6 +112,14 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
       _firstAttemptCorrectPairIds.clear();
       _boardGeneration++;
       _cards = _createCards(_initialPairs());
+    }
+    if (oldWidget.task == widget.task && oldWidget.paused != widget.paused) {
+      if (widget.paused) {
+        _peekTimer?.cancel();
+      } else if (_phase == _Phase.awaitingA) {
+        // Показ B відновлюється з повною тривалістю.
+        _startPeekTimer();
+      }
     }
   }
 
@@ -314,7 +324,11 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
   void _onPeekTimeout() {
     final b = _selectedB;
 
-    if (!mounted || _stopped || _phase != _Phase.awaitingA || b == null) {
+    if (!mounted ||
+        _stopped ||
+        widget.paused ||
+        _phase != _Phase.awaitingA ||
+        b == null) {
       return;
     }
 
@@ -395,8 +409,7 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
   // ---------------------------------------------------------------- build
 
   VoidCallback? _tapFor(_BoardCard card) {
-    if (_stopped || card.removed) return null;
-
+    if (_stopped || widget.paused || card.removed) return null;
     if (card.isB) {
       return _phase == _Phase.idle && !card.showBack
           ? () => _onBTap(card)
@@ -484,6 +497,7 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
                             peekDuration: config.peekDuration,
                             peekActive:
                                 _phase == _Phase.awaitingA &&
+                                !widget.paused &&
                                 identical(card, _selectedB),
                             peekRun: _peekRun,
                           ),

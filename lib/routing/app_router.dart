@@ -63,6 +63,25 @@ final GoRouter appRouter = GoRouter(
           return true;
         }
 
+        final guard = _learningExitGuard;
+
+        if (guard.hasSavableProgress?.call() ?? false) {
+          guard.onExitDialogOpened?.call();
+
+          final shouldFinish = await _confirmLearningFinish(
+            context,
+            guard.exitSummary?.call(),
+          );
+
+          if (!shouldFinish) {
+            guard.onExitDialogClosed?.call();
+            return false;
+          }
+
+          // Сторінка сама збереже результат і перейде на головну.
+          guard.finishOnQuit?.call();
+          return false;
+        }
         final shouldExit = await _confirmLearningExit(context);
 
         if (!shouldExit) {
@@ -96,6 +115,36 @@ final GoRouter appRouter = GoRouter(
   ],
 );
 
+Future<bool> _confirmLearningFinish(
+    BuildContext context,
+    String? summary,
+    ) async {
+  final result = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Завершити й зберегти?'),
+        content: Text(
+          [?summary, 'Результат буде збережено.'].join('\n'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Продовжити'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Завершити'),
+          ),
+        ],
+      );
+    },
+  );
+
+  return result == true;
+}
+
 Future<bool> _confirmLearningExit(BuildContext context) async {
   final shouldExit = await showDialog<bool>(
     context: context,
@@ -127,4 +176,19 @@ Future<bool> _confirmLearningExit(BuildContext context) async {
 
 class LearningExitGuard {
   bool allowExit = false;
+
+  /// Нижче поля реєструє LearningPage, поки вона відкрита.
+  bool Function()? hasSavableProgress;
+  String? Function()? exitSummary;
+  VoidCallback? onExitDialogOpened;
+  VoidCallback? onExitDialogClosed;
+  VoidCallback? finishOnQuit;
+
+  void detach() {
+    hasSavableProgress = null;
+    exitSummary = null;
+    onExitDialogOpened = null;
+    onExitDialogClosed = null;
+    finishOnQuit = null;
+  }
 }

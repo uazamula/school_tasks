@@ -3,4 +3,5 @@ enum TopicCompletionReason {
   timeExpired,
   failureLimitReached,
   elementReachedEdge,
+  quit,
 }
