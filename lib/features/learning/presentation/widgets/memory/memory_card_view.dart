@@ -19,7 +19,19 @@ class MemoryCardView extends StatelessWidget {
     required this.removed,
     required this.shakeToken,
     this.onTap,
+    this.peekDuration,
+    this.peekActive = false,
+    this.peekRun = 0,
   });
+
+  /// Тривалість показу B; null — без обмеження (смужки немає).
+  final Duration? peekDuration;
+
+  /// Чи показувати смужку зараз (B відкрита й очікує вибору A).
+  final bool peekActive;
+
+  /// Змінюється з кожним запуском таймера, тож смужка стартує спочатку.
+  final int peekRun;
 
   static const removeDuration = Duration(milliseconds: 250);
 
@@ -103,7 +115,26 @@ class MemoryCardView extends StatelessWidget {
             child: SizedBox(
               width: size.width,
               height: size.height,
-              child: shaking,
+              child: Stack(
+                // Без обрізання: струс зміщує картку на кілька пікселів.
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned.fill(child: shaking),
+                  if (peekActive && peekDuration != null)
+                    Positioned(
+                      left: 8,
+                      right: 8,
+                      bottom: 6,
+                      height: 4,
+                      child: IgnorePointer(
+                        child: _PeekBar(
+                          key: ValueKey(peekRun),
+                          duration: peekDuration!,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -189,14 +220,14 @@ class MemoryCardView extends StatelessWidget {
     required EdgeInsets padding,
     required Widget child,
   }) {
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: color,
+    return Material(
+      color: color,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: scheme.outlineVariant),
+        side: BorderSide(color: scheme.outlineVariant),
       ),
-      child: child,
+      child: Padding(padding: padding, child: child),
     );
   }
 }
@@ -303,6 +334,31 @@ class _Flip extends StatelessWidget {
               : front,
         );
       },
+    );
+  }
+}
+
+class _PeekBar extends StatelessWidget {
+  const _PeekBar({super.key, required this.duration});
+
+  final Duration duration;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1.0, end: 0.0),
+      duration: duration,
+      builder: (context, value, _) => ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: LinearProgressIndicator(
+          value: value,
+          minHeight: 4,
+          backgroundColor: scheme.surfaceContainerHighest,
+          color: value < 0.3 ? scheme.error : scheme.primary,
+        ),
+      ),
     );
   }
 }

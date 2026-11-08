@@ -73,6 +73,7 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
 
   Timer? _peekTimer;
   int _epoch = 0;
+  int _peekRun = 0;
   int _boardGeneration = 0;
 
   bool _stopped = false;
@@ -306,6 +307,7 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
     if (duration == null) return;
 
     _peekTimer?.cancel();
+    _peekRun++;
     _peekTimer = Timer(duration, _onPeekTimeout);
   }
 
@@ -479,6 +481,11 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
                             removed: card.removed,
                             shakeToken: card.shakeToken,
                             onTap: _tapFor(card),
+                            peekDuration: config.peekDuration,
+                            peekActive:
+                                _phase == _Phase.awaitingA &&
+                                identical(card, _selectedB),
+                            peekRun: _peekRun,
                           ),
                         ),
                     ],
