@@ -9,12 +9,14 @@ import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/input_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/memory_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/position_selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/selection_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/fraction_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/input_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/matching_task_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/memory/memory_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/position_selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/selection_task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/slot_assembly_task_widget.dart';
@@ -125,6 +127,10 @@ class TaskWidget extends StatelessWidget {
       return _buildSlotAssembly();
     }
 
+    if (task is MemoryTask) {
+      return _buildMemory();
+    }
+
     return null;
   }
 
@@ -163,6 +169,21 @@ class TaskWidget extends StatelessWidget {
         return shouldFinish;
       },
       onElementReachedEdge: callbacks.onElementReachedEdge,
+    );
+  }
+
+  Widget _buildMemory() {
+    return MemoryTaskWidget(
+      key: ObjectKey(task),
+      task: task as MemoryTask,
+      onTaskAnswered: callbacks.onTaskAnswered,
+      onProgressStep: callbacks.onProgressStep,
+      onCorrectPair: callbacks.onCorrectPair,
+      onIncorrectPair: callbacks.onIncorrectPair,
+      onIncorrectPairAttempt: callbacks.onIncorrectPairAttempt,
+      onAccuracyChanged: callbacks.onAccuracyChanged,
+      onStreakChanged: callbacks.onStreakChanged,
+      feedbackEnabled: feedbackEnabled,
     );
   }
 

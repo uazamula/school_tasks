@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/task_data/memory_card_style_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/memory_grid_size.dart';
+import 'package:school_tasks/features/learning/domain/task_data/memory_zone_order.dart';
 
 class MemoryTaskConfig {
   const MemoryTaskConfig({
@@ -13,7 +14,20 @@ class MemoryTaskConfig {
     this.cardStyle = const MemoryCardStyleConfig(),
     this.playAudioOnReveal = true,
     this.replayAudioOnMatch = false,
-  });
+    this.cardAspectRatio = 1.0,
+    this.maxCardSize = 160,
+    this.zoneOrder = MemoryZoneOrder.aFirst,
+  }) : assert(cardAspectRatio > 0),
+       assert(maxCardSize > 0);
+
+  /// Ширина / висота картки. Для слів можна 1.4 і більше.
+  final double cardAspectRatio;
+
+  /// Максимальна ширина картки (px), щоб на вебі вони не були величезними.
+  final double maxCardSize;
+
+  /// Яка зона A/B перша (зверху або ліворуч). Лише для separatedZones.
+  final MemoryZoneOrder zoneOrder;
 
   final MemoryGridSize gridSize;
 

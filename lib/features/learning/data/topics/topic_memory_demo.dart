@@ -1,3 +1,4 @@
+import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
@@ -5,6 +6,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/evaluation_crit
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/task_data/memory_board_mode.dart';
+import 'package:school_tasks/features/learning/domain/task_data/memory_card_style_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/memory_grid_size.dart';
 import 'package:school_tasks/features/learning/domain/task_data/memory_task_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/memory_task_data.dart';
@@ -23,19 +25,21 @@ MemoryPair _pair(String id, String image, String word, String audio) {
   return MemoryPair(
     id: id,
     hiddenContent: ImageContent(
-      'assets/images/$image.png',
+      'assets/images/$image',
       audio: AudioContent.fixed('assets/audio/pronunciation/$audio.mp3'),
     ),
     faceFront: TextContent(word),
-    faceBack: ImageContent('assets/images/$image.png'),
+    faceBack: ImageContent('assets/images/$image'),
   );
 }
 
 final List<MemoryPair> _demoPairs = [
-  _pair('anchor', 'anchor', 'якір', 'uk_name1'),
-  _pair('ants', 'ants', 'мурахи', 'uk_name2'),
-  _pair('apron', 'apron', 'фартух', 'uk_name3'),
-  _pair('arc', 'arc', 'дуга', 'uk_name4'),
+  _pair('crown', 'crown.png', 'корона', 'uk_korona'),
+  _pair('ants', 'ants.png', 'мурахи', 'uk_murakhy'),
+  _pair('apron', 'apron.png', 'фартух', 'uk_fartukh'),
+  _pair('arc', 'arc.png', 'арка', 'uk_arka'),
+  _pair('dew', 'dew.png', 'роса', 'uk_rosa'),
+  _pair('frame', 'frame.jpg', 'рама', 'uk_rama'),
 ];
 
 const _prompt = TaskPrompt(content: [TextContent('Знайди пару')]);
@@ -49,7 +53,14 @@ abstract final class MemoryFiniteDemo {
       MemoryTaskData(
         prompt: _prompt,
         pairPool: _demoPairs,
-        config: const MemoryTaskConfig(gridSize: MemoryGridSize.size3x2),
+        config: const MemoryTaskConfig(
+          gridSize: MemoryGridSize.size3x4,
+          replayAudioOnMatch: true,
+          cardAspectRatio: 1,
+          cardStyle: MemoryCardStyleConfig(
+            front: MemoryFaceStyle(textStyle: AppTextStyles.headline),
+          ),
+        ),
       ),
     ]),
     help: 'Memory: скінченна дошка',
