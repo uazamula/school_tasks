@@ -15,6 +15,7 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
+import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 
@@ -65,6 +66,7 @@ abstract final class MemoryFiniteDemo {
     progressionMode: TopicProgressionMode.automaticWithFeedback,
     automaticTermination: const AutomaticTerminationConfig(failureLimit: 5),
     dashboard: const DashboardConfig(showRemainingAttempts: true),
+    layout: const TopicLayout.minimalPrompt(),
   );
 }
 
@@ -96,6 +98,8 @@ abstract final class MemoryEndlessDemo {
       showProgress: false,
       showTimer: true,
       showRemainingAttempts: true,
+      showStreak: true,
     ),
+    layout: const TopicLayout.minimalPrompt(),
   );
 }

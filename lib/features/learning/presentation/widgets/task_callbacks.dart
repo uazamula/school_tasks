@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/streak_progress.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 
 /// Колбеки, якими віджети завдань повідомляють сторінку про події.
@@ -13,7 +14,11 @@ class TaskCallbacks {
     required this.onAccuracyChanged,
     this.onCorrectSlotFilled,
     this.onElementReachedEdge,
+    this.onStreakChanged,
   });
+
+  /// Лише для endless Memory. Викликати ДО onIncorrectPairAttempt.
+  final ValueChanged<StreakProgress>? onStreakChanged;
 
   /// Завдання повністю виконане.
   final ValueChanged<TaskResult<dynamic, dynamic>> onTaskAnswered;

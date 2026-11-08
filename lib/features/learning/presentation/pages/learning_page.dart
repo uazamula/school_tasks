@@ -14,14 +14,17 @@ import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_res
 import 'package:school_tasks/features/learning/domain/attempts/topic_completion_reason.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/streak_progress.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_progress.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_updater.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/failure_limit_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_progress_indicator.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/streak_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_callbacks.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
@@ -104,6 +107,16 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     return _failureCount >= failureLimit;
   }
 
+  StreakProgress _streak = const StreakProgress();
+
+  bool get _isStreakTopic => _topic.resultKind == TopicResultKind.streak;
+
+  void _onStreakChanged(StreakProgress progress) {
+    if (!mounted || _isFinishing) return;
+
+    setState(() => _streak = progress);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -166,6 +179,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         onAccuracyChanged: _onAccuracyChanged,
         onCorrectSlotFilled: _onCorrectSlotFilled,
         onElementReachedEdge: _handleElementReachedEdge,
+        onStreakChanged: _onStreakChanged,
       ),
     );
 
@@ -191,6 +205,10 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                     children: _buildProgressIndicators(isManualAnswered),
                   ),
                 ),
+                if (_topic.dashboard.showStreak) ...[
+                  const SizedBox(width: 12),
+                  StreakIndicator(progress: _streak),
+                ],
                 if (_topic.dashboard.showRemainingAttempts) ...[
                   const SizedBox(width: 12),
                   FailureLimitIndicator(
@@ -226,7 +244,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   List<Widget> _buildProgressIndicators(bool isManualAnswered) {
     final dashboard = _topic.dashboard;
 
-    if (dashboard.showProgress) {
+    if (dashboard.showProgress && !_isStreakTopic) {
       return [
         Align(
           alignment: Alignment.center,
@@ -374,7 +392,9 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    await _showTimeExpiredDialog();
+    if (!_isStreakTopic) {
+      await _showTimeExpiredDialog();
+    }
 
     if (!mounted) {
       return;
@@ -450,13 +470,15 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     final topicResult = _attempt.getResult(duration: elapsedTime);
 
-    final evaluation = _evaluationCalculator.calculate(
-      topic: _topic,
-      result: topicResult,
-      elapsedTime: elapsedTime,
-      countdownExpired: countdownExpired,
-      failureCount: _failureCount,
-    );
+    final evaluation = _isStreakTopic
+        ? null
+        : _evaluationCalculator.calculate(
+            topic: _topic,
+            result: topicResult,
+            elapsedTime: elapsedTime,
+            countdownExpired: countdownExpired,
+            failureCount: _failureCount,
+          );
 
     final evaluatedResult = TopicAttemptResult(
       totalTasks: topicResult.totalTasks,
@@ -464,11 +486,15 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       accuracy: topicResult.accuracy,
       duration: topicResult.duration,
       evaluation: evaluation,
+      streak: _isStreakTopic ? _streak.best : null,
+      pairsCompleted: _isStreakTopic ? _streak.pairs : null,
     );
 
-    final previousResult = ref.read(
-      learningResultsControllerProvider,
-    )[_topic.id];
+    // Результат іншого виду (оцінка <-> серія) непорівнянний.
+    final storedResult = ref.read(learningResultsControllerProvider)[_topic.id];
+    final previousResult = storedResult?.kind == _topic.resultKind
+        ? storedResult
+        : null;
 
     final updatedResult = _topicResultUpdater.update(
       attempt: evaluatedResult,
@@ -490,6 +516,16 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         .read(learningResultsControllerProvider.notifier)
         .setResult(_topic.id, updatedResult);
 
+    if (_isStreakTopic) {
+      await _showStreakResultDialog(
+        isNewRecord: _streak.best > (previousResult?.bestStreak ?? 0),
+      );
+
+      if (!mounted) {
+        return;
+      }
+    }
+
     // Нормальне завершення теми — це дозволений вихід,
     // тому confirmation через onExit показувати не потрібно.
     widget.exitGuard.allowExit = true;
@@ -499,6 +535,32 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     } else {
       context.pop();
     }
+  }
+
+  Future<void> _showStreakResultDialog({required bool isNewRecord}) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(isNewRecord ? 'Новий рекорд!' : 'Гру завершено'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Найкраща серія: ${_streak.best}'),
+              Text('Пар складено: ${_streak.pairs}'),
+            ],
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _moveToNextTask() {
