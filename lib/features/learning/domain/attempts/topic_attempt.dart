@@ -2,8 +2,6 @@ import 'package:school_tasks/features/learning/domain/attempts/attempt_task.dart
 import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
-import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
-import 'package:school_tasks/features/learning/domain/tasks/slot_assembly_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_progress.dart';
 
 class TopicAttempt {

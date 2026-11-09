@@ -1,27 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_addition.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_fraction.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_geometry_shapes.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_matching.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_position_selection.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_rational.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_roots.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_slot_assembly.dart';
-import 'package:school_tasks/features/learning/data/fixed_task_data/inf/coding/coding.dart';
-import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_generator_config.dart';
-import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_operation.dart';
-import 'package:school_tasks/features/learning/data/generation/arithmetic/arithmetic_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
-import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/slot_assembly_task_data_generator.dart';
-import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
-import 'package:school_tasks/features/learning/data/generation/wrong_answer_generator.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_demo_data.dart';
-import 'package:school_tasks/features/learning/data/word_content/word_matching_demo_data.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/composite_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
@@ -32,11 +14,9 @@ import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
-import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
@@ -46,8 +26,6 @@ import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
-
-import '../fixed_task_data/fixed_data_audio.dart';
 
 abstract final class Tests {
   static final Topic topic = Topic(

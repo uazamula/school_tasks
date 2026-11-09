@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
-import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/audio_linked_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/target_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';

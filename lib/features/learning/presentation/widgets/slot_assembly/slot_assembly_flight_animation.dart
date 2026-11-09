@@ -29,10 +29,7 @@ class SlotAssemblyFlightAnimationState
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
   }
 
   @override
@@ -55,8 +52,7 @@ class SlotAssemblyFlightAnimationState
     _removeOverlay();
 
     final overlay = Overlay.of(context, rootOverlay: true);
-    final overlayBox =
-    overlay.context.findRenderObject() as RenderBox;
+    final overlayBox = overlay.context.findRenderObject() as RenderBox;
 
     _startRect = Rect.fromLTWH(
       overlayBox.globalToLocal(startRect.topLeft).dx,
@@ -80,11 +76,7 @@ class SlotAssemblyFlightAnimationState
         return AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            final rect = Rect.lerp(
-              _startRect,
-              _endRect,
-              _controller.value,
-            )!;
+            final rect = Rect.lerp(_startRect, _endRect, _controller.value)!;
 
             return Positioned.fromRect(
               rect: rect,

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import 'package:school_tasks/core/theme/app_spacing.dart';
@@ -30,10 +29,7 @@ class SlotAssemblyOptions extends StatelessWidget {
     return List.generate(rowCount, (rowIndex) {
       final count = baseCount + (rowIndex < extraCount ? 1 : 0);
 
-      final row = List.generate(
-        count,
-            (_) => index++,
-      );
+      final row = List.generate(count, (_) => index++);
 
       return row;
     });
@@ -46,10 +42,7 @@ class SlotAssemblyOptions extends StatelessWidget {
       maintainState: true,
       maintainAnimation: true,
       maintainSize: true,
-      child: KeyedSubtree(
-        key: optionKey(index),
-        child: optionBuilder(index),
-      ),
+      child: KeyedSubtree(key: optionKey(index), child: optionBuilder(index)),
     );
   }
 
@@ -61,17 +54,17 @@ class SlotAssemblyOptions extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) ...[
-          if (rowIndex > 0)
-            const SizedBox(height: AppSpacing.md),
+          if (rowIndex > 0) const SizedBox(height: AppSpacing.md),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              for (var columnIndex = 0;
-              columnIndex < rows[rowIndex].length;
-              columnIndex++) ...[
-                if (columnIndex > 0)
-                  const SizedBox(width: AppSpacing.md),
+              for (
+                var columnIndex = 0;
+                columnIndex < rows[rowIndex].length;
+                columnIndex++
+              ) ...[
+                if (columnIndex > 0) const SizedBox(width: AppSpacing.md),
                 _buildOptionSlot(rows[rowIndex][columnIndex]),
               ],
             ],

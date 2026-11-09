@@ -100,7 +100,11 @@ class _SharpenImageState extends State<SharpenImage> {
               ? constraints.maxHeight
               : imageSize.height,
         );
-        final shown = applyBoxFit(BoxFit.contain, imageSize, bounds).destination;
+        final shown = applyBoxFit(
+          BoxFit.contain,
+          imageSize,
+          bounds,
+        ).destination;
 
         return Center(
           child: SizedBox(

@@ -186,7 +186,7 @@ class TaskWidget extends StatelessWidget {
       onAccuracyChanged: callbacks.onAccuracyChanged,
       onStreakChanged: callbacks.onStreakChanged,
       feedbackEnabled: feedbackEnabled,
-        paused: paused
+      paused: paused,
     );
   }
 
