@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -531,7 +532,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     if (_isStreakTopic) {
       await _showStreakResultDialog(
-        isNewRecord: _streak.best > (previousResult?.bestStreak ?? 0),
+        previousBest: previousResult?.bestStreak ?? 0,
       );
 
       if (!mounted) {
@@ -550,7 +551,10 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     }
   }
 
-  Future<void> _showStreakResultDialog({required bool isNewRecord}) {
+  Future<void> _showStreakResultDialog({required int previousBest}) {
+    final isNewRecord = _streak.best > previousBest;
+    final record = isNewRecord ? _streak.best : previousBest;
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -561,7 +565,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Найкраща серія: ${_streak.best}'),
+              Text('Серія в цій грі: ${_streak.best}'),
+              Text('Рекорд: $record'),
               Text('Пар складено: ${_streak.pairs}'),
             ],
           ),
@@ -661,9 +666,18 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         _streak.pairs > 0;
   }
 
-  String? _exitSummary() => 'Найкраща серія: ${_streak.best}';
+  String? _exitSummary() {
+    final stored = ref.read(learningResultsControllerProvider)[_topic.id];
+    final previousBest = stored?.kind == _topic.resultKind
+        ? stored!.bestStreak
+        : 0;
+
+    return 'Серія в цій грі: ${_streak.best}\n'
+        'Рекорд: ${max(_streak.best, previousBest)}';
+  }
 
   void _pauseForExitDialog() {
+    if (!_isStreakTopic) return;
     if (!mounted || !_pauseOnExitDialog || _isExitPaused) return;
 
     _resumeStopwatchAfterExit = _stopwatch.isRunning;
@@ -673,6 +687,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   }
 
   void _resumeAfterExitDialog() {
+    if (!_isStreakTopic) return;
     if (!mounted || !_isExitPaused) return;
 
     if (_resumeStopwatchAfterExit) _stopwatch.start();

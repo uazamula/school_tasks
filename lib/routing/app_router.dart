@@ -82,12 +82,14 @@ final GoRouter appRouter = GoRouter(
           guard.finishOnQuit?.call();
           return false;
         }
+        guard.onExitDialogOpened?.call();
+
         final shouldExit = await _confirmLearningExit(context);
 
         if (!shouldExit) {
+          guard.onExitDialogClosed?.call();
           return false;
         }
-
         // Не дозволяємо поточному Back завершити маршрут.
         // Замість цього нижче виконаємо такий самий перехід,
         // як при нормальному завершенні теми.
@@ -116,18 +118,16 @@ final GoRouter appRouter = GoRouter(
 );
 
 Future<bool> _confirmLearningFinish(
-    BuildContext context,
-    String? summary,
-    ) async {
+  BuildContext context,
+  String? summary,
+) async {
   final result = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
     builder: (context) {
       return AlertDialog(
         title: const Text('Завершити й зберегти?'),
-        content: Text(
-          [?summary, 'Результат буде збережено.'].join('\n'),
-        ),
+        content: Text([?summary, 'Результат буде збережено.'].join('\n')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),

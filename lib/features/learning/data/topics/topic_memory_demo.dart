@@ -104,7 +104,7 @@ abstract final class MemoryEndlessDemo {
     automaticTermination: const AutomaticTerminationConfig(
       failureLimit: 3,
       countdown: Duration(minutes: 2),
-      pauseOnExitDialog: true,
+      pauseOnExitDialog: false,
     ),
     dashboard: const DashboardConfig(
       showProgress: false,
