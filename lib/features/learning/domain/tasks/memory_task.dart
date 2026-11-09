@@ -17,7 +17,10 @@ class MemoryTask extends LearningTask<MemoryAnswer, List<MemoryPair>>
     required List<MemoryPair> pairs,
     required this.config,
     this.boardSource,
-  }) : super(
+    this.targetStreak,
+    this.continueAfterGoal = false,
+  }) : assert(targetStreak == null || boardSource != null),
+       super(
          interaction: const MemoryInteraction(),
          solution: Solution<MemoryAnswer, List<MemoryPair>>(
            value: List.unmodifiable(pairs),
@@ -26,6 +29,13 @@ class MemoryTask extends LearningTask<MemoryAnswer, List<MemoryPair>>
        ) {
     _validate(pairs);
   }
+
+  final int? targetStreak;
+  final bool continueAfterGoal;
+
+  /// Нескінченне завдання не має фіксованої кількості кроків.
+  @override
+  int get progressSteps => isEndless ? (targetStreak ?? 0) : pairs.length;
 
   final MemoryTaskConfig config;
 
@@ -36,10 +46,6 @@ class MemoryTask extends LearningTask<MemoryAnswer, List<MemoryPair>>
 
   /// Скінченний: пари дошки. Нескінченний: увесь пул.
   List<MemoryPair> get pairs => solution.value;
-
-  /// Нескінченне завдання не має фіксованої кількості кроків.
-  @override
-  int get progressSteps => isEndless ? 0 : pairs.length;
 
   void _validate(List<MemoryPair> pairs) {
     final ids = <String>{};

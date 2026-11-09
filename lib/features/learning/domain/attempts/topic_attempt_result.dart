@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 
 class TopicAttemptResult {
   const TopicAttemptResult({
@@ -10,6 +11,7 @@ class TopicAttemptResult {
     this.evaluation,
     this.streak,
     this.pairsCompleted,
+    this.kind = TopicResultKind.grade,
   });
 
   /// Найкраща серія за спробу (лише для streak-тем).
@@ -26,4 +28,5 @@ class TopicAttemptResult {
   bool get isFinished => completedTasks == totalTasks;
 
   double get score => accuracy.value;
+  final TopicResultKind kind;
 }

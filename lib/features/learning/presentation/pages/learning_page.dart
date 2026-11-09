@@ -18,6 +18,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calc
 import 'package:school_tasks/features/learning/domain/evaluation/streak_progress.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/matching_task.dart';
+import 'package:school_tasks/features/learning/domain/tasks/memory_task.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_progress.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
@@ -94,6 +95,18 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         _completedProgressSteps += addedSteps;
       }
     });
+  }
+
+  late final MemoryTask? _endlessMemory = _findEndlessMemory();
+
+  bool get _hasEndlessMemory => _endlessMemory != null;
+
+  MemoryTask? _findEndlessMemory() {
+    for (final attemptTask in _attempt.tasks) {
+      final task = attemptTask.task;
+      if (task is MemoryTask && task.isEndless) return task;
+    }
+    return null;
   }
 
   bool get _feedbackEnabled {
@@ -406,7 +419,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    if (!_isStreakTopic) {
+    if (!_hasEndlessMemory) {
       await _showTimeExpiredDialog();
     }
 
@@ -500,8 +513,9 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       accuracy: topicResult.accuracy,
       duration: topicResult.duration,
       evaluation: evaluation,
-      streak: _isStreakTopic ? _streak.best : null,
-      pairsCompleted: _isStreakTopic ? _streak.pairs : null,
+      kind: _topic.resultKind,
+      streak: _hasEndlessMemory ? _streak.best : null,
+      pairsCompleted: _hasEndlessMemory ? _streak.pairs : null,
     );
 
     // Результат іншого виду (оцінка <-> серія) непорівнянний.
@@ -530,14 +544,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         .read(learningResultsControllerProvider.notifier)
         .setResult(_topic.id, updatedResult);
 
-    if (_isStreakTopic) {
-      await _showStreakResultDialog(
+    if (_hasEndlessMemory) {
+      await _showEndlessResultDialog(
         previousBest: previousResult?.bestStreak ?? 0,
       );
-
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
     }
 
     // Нормальне завершення теми — це дозволений вихід,
@@ -551,22 +562,33 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     }
   }
 
-  Future<void> _showStreakResultDialog({required int previousBest}) {
-    final isNewRecord = _streak.best > previousBest;
+  Future<void> _showEndlessResultDialog({required int previousBest}) {
+    final goal = _endlessMemory?.targetStreak;
+    final goalReached = goal != null && _streak.best >= goal;
+    final isNewRecord = goal == null && _streak.best > previousBest;
     final record = isNewRecord ? _streak.best : previousBest;
+
+    final title = goalReached
+        ? 'Мету досягнуто!'
+        : isNewRecord
+        ? 'Новий рекорд!'
+        : 'Гру завершено';
 
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          title: Text(isNewRecord ? 'Новий рекорд!' : 'Гру завершено'),
+          title: Text(title),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Серія в цій грі: ${_streak.best}'),
-              Text('Рекорд: $record'),
+              if (goal != null)
+                Text('Мета: $goal')
+              else
+                Text('Рекорд: $record'),
               Text('Пар складено: ${_streak.pairs}'),
             ],
           ),
@@ -660,13 +682,16 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   }
 
   bool _hasSavableProgress() {
-    return _isStreakTopic &&
+    return _hasEndlessMemory &&
         !_isFinishing &&
         !_hasSavedResult &&
         _streak.pairs > 0;
   }
 
   String? _exitSummary() {
+    final goal = _endlessMemory?.targetStreak;
+    if (goal != null) return 'Серія в цій грі: ${_streak.best} із $goal';
+
     final stored = ref.read(learningResultsControllerProvider)[_topic.id];
     final previousBest = stored?.kind == _topic.resultKind
         ? stored!.bestStreak
@@ -677,7 +702,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   }
 
   void _pauseForExitDialog() {
-    if (!_isStreakTopic) return;
+    if (!_hasEndlessMemory) return;
     if (!mounted || !_pauseOnExitDialog || _isExitPaused) return;
 
     _resumeStopwatchAfterExit = _stopwatch.isRunning;
@@ -687,7 +712,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   }
 
   void _resumeAfterExitDialog() {
-    if (!_isStreakTopic) return;
+    if (!_hasEndlessMemory) return;
     if (!mounted || !_isExitPaused) return;
 
     if (_resumeStopwatchAfterExit) _stopwatch.start();

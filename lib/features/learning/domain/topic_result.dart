@@ -29,9 +29,7 @@ class TopicResult {
 
   Duration? get bestDuration => bestAttempt?.duration;
 
-  TopicResultKind get kind => currentAttempt.streak != null
-      ? TopicResultKind.streak
-      : TopicResultKind.grade;
+  TopicResultKind get kind => currentAttempt.kind;
 
   int get currentStreak => currentAttempt.streak ?? 0;
 

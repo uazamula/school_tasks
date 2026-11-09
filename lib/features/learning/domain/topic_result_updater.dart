@@ -14,12 +14,10 @@ class TopicResultUpdater {
     TopicCompletionReason completionReason = TopicCompletionReason.completed,
     int failureCount = 0,
   }) {
-    final streak = attempt.streak;
-
-    if (streak != null) {
+    if (attempt.kind == TopicResultKind.streak) {
       return _updateStreak(
         attempt: attempt,
-        streak: streak,
+        streak: attempt.streak ?? 0,
         currentAt: currentAt,
         previous: previous,
         completionReason: completionReason,
@@ -49,6 +47,8 @@ class TopicResultUpdater {
       completionReason: completionReason,
       failureCount: failureCount,
       evaluation: attempt.evaluation,
+      streak: attempt.streak,
+      pairsCompleted: attempt.pairsCompleted,
     );
 
     if (comparable == null) {
@@ -84,6 +84,7 @@ class TopicResultUpdater {
       isPassed: true,
       completionReason: completionReason,
       failureCount: failureCount,
+      kind: TopicResultKind.streak,
       streak: streak,
       pairsCompleted: attempt.pairsCompleted ?? 0,
     );

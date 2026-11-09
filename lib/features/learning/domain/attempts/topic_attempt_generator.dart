@@ -37,6 +37,7 @@ import 'package:school_tasks/features/learning/domain/tasks/solutions/tolerance_
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 
 class TopicAttemptGenerator {
   TopicAttemptGenerator({
@@ -155,7 +156,19 @@ class TopicAttemptGenerator {
     if (endless.length > 1) {
       throw StateError('A topic can contain at most one endless memory task.');
     }
+    final memory = endless.single.task as MemoryTask;
+    final hasGoal = memory.targetStreak != null;
 
+    if (hasGoal != (topic.resultKind == TopicResultKind.grade)) {
+      throw StateError(
+        'Endless memory with a goal needs resultKind grade; '
+        'without a goal it needs resultKind streak.',
+      );
+    }
+
+    if (hasGoal && topic.evaluation.weights.isEmpty) {
+      throw StateError('Endless memory with a goal needs evaluation weights.');
+    }
     final termination = topic.automaticTermination;
     if (termination?.failureLimit == null && termination?.countdown == null) {
       throw StateError(
@@ -325,13 +338,18 @@ class TopicAttemptGenerator {
           ),
         );
 
-      case EndlessMemoryMode(:final failedPairWeight):
+      case EndlessMemoryMode(
+        :final failedPairWeight,
+        :final targetStreak,
+        :final continueAfterGoal,
+      ):
         return AttemptTask<MemoryAnswer, List<MemoryPair>>(
           task: MemoryTask(
             prompt: data.prompt,
             pairs: pool,
             config: data.config,
-            // Новий source на кожну спробу: він зберігає стан.
+            targetStreak: targetStreak,
+            continueAfterGoal: continueAfterGoal,
             boardSource: WeightedMemoryBoardSource(
               pool: pool,
               pairsPerBoard: pairCount,

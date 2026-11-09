@@ -3,6 +3,7 @@ import 'package:school_tasks/features/learning/domain/automatic_termination_conf
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/task_data/memory_board_mode.dart';
@@ -42,7 +43,7 @@ final List<MemoryPair> _demoPairs = [
   _pair('frame', 'frame.jpg', 'рама', 'uk_rama'),
 ];
 
-const _prompt = TaskPrompt(content: [TextContent('Знайди пару')]);
+TaskPrompt _prompt(String text) => TaskPrompt(content: [TextContent(text)]);
 
 abstract final class MemoryFiniteDemo {
   static final Topic topic = Topic(
@@ -51,7 +52,7 @@ abstract final class MemoryFiniteDemo {
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: FixedTaskDataSource([
       MemoryTaskData(
-        prompt: _prompt,
+        prompt: _prompt('Знайди пару'),
         pairPool: _demoPairs,
         config: const MemoryTaskConfig(
           gridSize: MemoryGridSize.size3x4,
@@ -88,7 +89,7 @@ abstract final class MemoryEndlessDemo {
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: FixedTaskDataSource([
       MemoryTaskData(
-        prompt: _prompt,
+        prompt: _prompt('Знайди пару'),
         pairPool: _demoPairs,
         mode: const EndlessMemoryMode(failedPairWeight: 3),
         config: const MemoryTaskConfig(
@@ -113,5 +114,50 @@ abstract final class MemoryEndlessDemo {
       showStreak: true,
     ),
     layout: const TopicLayout.minimalPrompt(),
+  );
+}
+
+abstract final class MemoryGoalDemo {
+  static final Topic topic = Topic(
+    id: 'memory_goal',
+    taskTypeCounts: {LearningTaskType.memory: 1},
+    taskOrderMode: TaskOrderMode.deterministic,
+    dataSource: FixedTaskDataSource([
+      MemoryTaskData(
+        prompt: _prompt('Склади 8 пар'),
+        pairPool: _demoPairs,
+        mode: const EndlessMemoryMode(
+          targetStreak: 8,
+          failedPairWeight: 3,
+          continueAfterGoal: true,
+        ),
+        config: const MemoryTaskConfig(
+          gridSize: MemoryGridSize.size2x2,
+          peekDuration: Duration(seconds: 5),
+          separatedZones: false,
+        ),
+      ),
+    ]),
+    help: 'Memory: досягни серії 8 підряд',
+    evaluation: const EvaluationConfig(
+      weights: {
+        EvaluationCriterionType.accuracy: 1,
+        EvaluationCriterionType.time: 1,
+      },
+      time: TimeEvaluationConfig(
+        targetTime: Duration(seconds: 40),
+        maximumTime: Duration(seconds: 180),
+      ),
+    ),
+    passingCriteria: const PassingCriteria(minimumAccuracy: 1.0),
+    layout: const TopicLayout.minimalPrompt(),
+    progressionMode: TopicProgressionMode.automaticWithFeedback,
+    automaticTermination: const AutomaticTerminationConfig(failureLimit: 3),
+    dashboard: const DashboardConfig(
+      showTimer: true,
+      showStreak: true,
+      showRemainingAttempts: true,
+    ),
+    resultKind: TopicResultKind.grade,
   );
 }

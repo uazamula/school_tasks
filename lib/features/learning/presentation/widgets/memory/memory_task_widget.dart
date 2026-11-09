@@ -229,9 +229,13 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
     final firstTry = !_failedPairIds.contains(pairId);
 
     if (_isEndless) {
+      final previousBest = _streak.best;
+
       _streak = _streak.registerCorrect();
       widget.onStreakChanged?.call(_streak);
       _task.boardSource!.reportPairResult(pairId, failed: !firstTry);
+
+      _reportGoalProgress(previousBest);
     } else {
       if (firstTry) _firstAttemptCorrectPairIds.add(pairId);
 
@@ -259,6 +263,11 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
 
     _selectedB = null;
 
+    if (_goalReached && !_task.continueAfterGoal) {
+      await _finishGoal();
+      return;
+    }
+
     if (_cards.every((card) => card.removed)) {
       if (_isEndless) {
         await _nextBoard();
@@ -269,6 +278,32 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
     }
 
     setState(() => _phase = _Phase.idle);
+  }
+
+  bool get _goalReached {
+    final goal = _task.targetStreak;
+    return goal != null && _streak.best >= goal;
+  }
+
+  void _reportGoalProgress(int previousBest) {
+    final goal = _task.targetStreak;
+    if (goal == null) return;
+
+    widget.onAccuracyChanged(
+      AccuracyResult(correct: min(_streak.best, goal), total: goal),
+    );
+
+    // Один крок прогресу за кожне нове значення найкращої серії.
+    if (_streak.best > previousBest && _streak.best <= goal) {
+      widget.onProgressStep();
+    }
+  }
+
+  Future<void> _finishGoal() {
+    final goal = _task.targetStreak!;
+    return _finishTask(
+      accuracy: AccuracyResult(correct: goal, total: goal),
+    );
   }
 
   Future<void> _resolveWrong(_BoardCard b, _BoardCard a) async {
@@ -361,16 +396,18 @@ class _MemoryTaskWidgetState extends State<MemoryTaskWidget> {
     });
   }
 
-  Future<void> _finishTask() async {
+  Future<void> _finishTask({AccuracyResult? accuracy}) async {
     if (_isFinishing) return;
     _isFinishing = true;
 
     final result = TaskResult<MemoryAnswer, List<MemoryPair>>(
       state: TaskAnswerState.correct,
-      accuracy: AccuracyResult(
-        correct: _firstAttemptCorrectPairIds.length,
-        total: _task.pairs.length,
-      ),
+      accuracy:
+          accuracy ??
+          AccuracyResult(
+            correct: _firstAttemptCorrectPairIds.length,
+            total: _task.pairs.length,
+          ),
     );
 
     final playback = _lastPlayback;

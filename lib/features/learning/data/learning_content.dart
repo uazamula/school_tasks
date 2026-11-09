@@ -109,6 +109,11 @@ abstract final class LearningContent {
               titleKey: 'Memory: серія',
               type: LearningNodeType.topic,
             ),
+            LearningNode(
+              id: 'memory_goal',
+              titleKey: 'Memory: goal',
+              type: LearningNodeType.topic,
+            ),
           ],
         ),
       ],
@@ -126,6 +131,7 @@ abstract final class LearningContent {
     'coding1': TopicCoding.topicCoding,
     'memory_finite': MemoryFiniteDemo.topic,
     'memory_endless': MemoryEndlessDemo.topic,
+    'memory_goal': MemoryGoalDemo.topic,
   };
 
   static Topic getTopic(String topicId) {

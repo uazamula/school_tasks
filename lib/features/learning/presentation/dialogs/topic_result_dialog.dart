@@ -141,7 +141,7 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
     final locale = Localizations.localeOf(context);
     final dateFormatter = DateFormat.yMd(locale.toLanguageTag()).add_Hm();
 
-    if (snapshot.streak != null) {
+    if (snapshot.kind == TopicResultKind.streak) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -181,6 +181,10 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
           '${DurationFormatter.formatDetailed(context, snapshot.duration)} '
           '${context.l10n.secondsShort}',
         ),
+        if (snapshot.streak != null) ...[
+          Text('Серія: ${snapshot.streak}'),
+          Text('Пар складено: ${snapshot.pairsCompleted ?? 0}'),
+        ],
       ],
     );
   }

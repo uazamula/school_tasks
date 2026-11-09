@@ -3,6 +3,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result
 import 'package:school_tasks/features/learning/domain/evaluation/criterion_evaluation_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_result.dart';
+import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 
 class TopicAttemptSnapshot {
   const TopicAttemptSnapshot({
@@ -18,6 +19,7 @@ class TopicAttemptSnapshot {
     this.evaluation,
     this.streak,
     this.pairsCompleted,
+    this.kind = TopicResultKind.grade,
   });
 
   final int? streak;
@@ -29,6 +31,7 @@ class TopicAttemptSnapshot {
   final int totalTasks;
   final AccuracyResult accuracy;
   final int failureCount;
+  final TopicResultKind kind;
 
   /// Фінальна оцінка, яку зберігаємо для відображення результату.
   ///
@@ -53,6 +56,7 @@ class TopicAttemptSnapshot {
       'failureCount': failureCount,
       'streak': streak,
       'pairsCompleted': pairsCompleted,
+      'kind': kind.name,
     };
   }
 
@@ -77,6 +81,11 @@ class TopicAttemptSnapshot {
       failureCount: (json['failureCount'] as num?)?.toInt() ?? 0,
       streak: (json['streak'] as num?)?.toInt(),
       pairsCompleted: (json['pairsCompleted'] as num?)?.toInt(),
+      kind: json['kind'] != null
+          ? TopicResultKind.values.byName(json['kind'] as String)
+          : (json['streak'] != null
+                ? TopicResultKind.streak
+                : TopicResultKind.grade),
     );
   }
 
