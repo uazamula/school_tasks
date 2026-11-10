@@ -137,6 +137,8 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
       final eligibleSyllables = switch (position) {
         SyllableSearchPosition.any => word.syllables,
         SyllableSearchPosition.first => word.syllables.take(1).toList(),
+        //todo
+        SyllableSearchPosition.last => word.syllables.take(1).toList(),
       };
 
       final hasMatchingSyllable = eligibleSyllables.any(

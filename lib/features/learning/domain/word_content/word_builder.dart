@@ -132,7 +132,8 @@ WordRecord words(
       image: image == null
           ? null
           : _imagesDir + _withExt(image, _defaultImageExt),
-      tags: tags,
+      // Батьківські теги додаються автоматично (domesticAnimal → animal).
+      tags: tags.withAncestors,
     ),
     entries: [for (final f in forms) _buildEntry(id, f)],
   );
