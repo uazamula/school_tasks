@@ -19,6 +19,30 @@ class WordBank {
     return WordBank._(Map.unmodifiable(map));
   }
 
+  /// Тимчасовий міст зі старого формату (окремі списки слів і концептів).
+  /// Слова без концепту отримують синтетичний id `мова:слово`.
+  factory WordBank.fromLegacy({
+    required Iterable<WordEntry> words,
+    required Iterable<WordConcept> concepts,
+  }) {
+    final conceptsById = {for (final c in concepts) c.id: c};
+    final recordConcepts = <String, WordConcept>{};
+    final recordEntries = <String, List<WordEntry>>{};
+
+    for (final word in words) {
+      final conceptId = word.conceptId ?? '${word.language.name}:${word.word}';
+      final concept = conceptsById[conceptId] ?? WordConcept(id: conceptId);
+
+      recordConcepts.putIfAbsent(conceptId, () => concept);
+      recordEntries.putIfAbsent(conceptId, () => []).add(word);
+    }
+
+    return WordBank([
+      for (final id in recordConcepts.keys)
+        WordRecord(concept: recordConcepts[id]!, entries: recordEntries[id]!),
+    ]);
+  }
+
   final Map<String, WordRecord> _byId;
 
   /// Усі записи в порядку додавання.

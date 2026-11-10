@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/word_content/content_tag.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_concept.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_entry.dart';
@@ -7,7 +8,11 @@ import 'package:school_tasks/features/learning/domain/word_content/word_entry.da
 /// Image paths are relative to the Flutter project's asset root.
 final List<WordConcept> syllableDemoConcepts = [
   WordConcept(id: 'anchor', image: 'assets/images/anchor.png'),
-  WordConcept(id: 'ants', image: 'assets/images/ants.png'),
+  WordConcept(
+    id: 'ants',
+    image: 'assets/images/ants.png',
+    tags: {ContentTag.animal},
+  ),
   WordConcept(id: 'apron', image: 'assets/images/apron.png'),
   WordConcept(id: 'arc', image: 'assets/images/arc.png'),
   WordConcept(id: 'arm', image: 'assets/images/arm.png'),
@@ -19,7 +24,11 @@ final List<WordConcept> syllableDemoConcepts = [
   WordConcept(id: 'cheese', image: 'assets/images/cheese.png'),
   WordConcept(id: 'cheetah', image: 'assets/images/cheetah.png'),
   WordConcept(id: 'coat', image: 'assets/images/coat.png'),
-  WordConcept(id: 'cow', image: 'assets/images/cow.png'),
+  WordConcept(
+    id: 'cow',
+    image: 'assets/images/cow.png',
+    tags: {ContentTag.animal},
+  ),
   WordConcept(id: 'crown', image: 'assets/images/crown.png'),
   WordConcept(id: 'cuckoo', image: 'assets/images/cuckoo.png'),
   WordConcept(id: 'cupboard', image: 'assets/images/cupboard.png'),
@@ -31,7 +40,11 @@ final List<WordConcept> syllableDemoConcepts = [
   WordConcept(id: 'eye', image: 'assets/images/eye.png'),
   WordConcept(id: 'eyes', image: 'assets/images/eyes.png'),
   WordConcept(id: 'fairy', image: 'assets/images/fairy.png'),
-  WordConcept(id: 'fish', image: 'assets/images/fish.png'),
+  WordConcept(
+    id: 'fish',
+    image: 'assets/images/fish.png',
+    tags: {ContentTag.animal},
+  ),
   WordConcept(id: 'fly', image: 'assets/images/fly.png'),
   WordConcept(id: 'foal', image: 'assets/images/foal.png'),
   WordConcept(id: 'foam', image: 'assets/images/foam.png'),

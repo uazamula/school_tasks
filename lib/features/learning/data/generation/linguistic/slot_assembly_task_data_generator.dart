@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
@@ -10,10 +11,12 @@ import 'package:school_tasks/features/learning/domain/tasks/content/target_conte
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
+import 'package:school_tasks/features/learning/domain/word_content/audio_paths.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
-import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
-import 'package:school_tasks/features/learning/domain/word_content/word_concept.dart';
-import 'package:school_tasks/features/learning/domain/word_content/word_entry.dart';
+import 'package:school_tasks/features/learning/domain/word_content/wildcard_pattern.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_text.dart';
 
 enum SlotAssemblyTargetType {
   image,
@@ -23,47 +26,64 @@ enum SlotAssemblyTargetType {
   audio,
 }
 
+/// Як добираються хибні склади (дистрактори).
+enum SlotAssemblyDistractorMode {
+  /// Випадкові склади з пулу `syllableAudio`, відфільтрованого маскою
+  /// дистракторів (за замовчуванням — маска складу з фільтра).
+  pool,
+
+  /// Для кожного правильного складу беруться найбільш схожі склади з пулу
+  /// (найменша редакційна відстань): «ра» → «ро», «ре», «ба».
+  /// Маска дистракторів застосовується лише якщо задана явно.
+  similarToCorrect,
+}
+
 class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
   SlotAssemblyTaskDataGenerator({
-    required List<WordEntry> words,
-    required List<WordConcept> concepts,
+    required this.bank,
     required this.taskCount,
     required this.wrongAnswerCount,
-    required this.syllablePattern,
     required this.targetType,
+    this.filter = const WordFilter(),
     this.language = Language.uk,
-    this.position = SyllableSearchPosition.any,
-
+    this.distractorPattern,
+    this.distractorMode = SlotAssemblyDistractorMode.pool,
     this.targetEffect,
     this.targetFontSize,
     this.promptContent = const [TextContent('Склади слово')],
-
     this.textCase = MatchingTextCase.unchanged,
     Map<String, String> syllableAudio = const {},
     this.syllableHasSound = true,
+    this.requireSyllableAudio = true,
     this.uiConfig = const SlotAssemblyUiConfig(),
     this.requiresSequentialSelection = true,
     this.interactionMode = const PressForSlotInteractionMode(),
+    this.printDiagnostics = true,
     Random? random,
-  }) : _words = List.unmodifiable(words),
-       _concepts = List.unmodifiable(concepts),
-       syllableAudio = Map.unmodifiable({
+  }) : syllableAudio = Map.unmodifiable({
          for (final entry in syllableAudio.entries)
-           entry.key.trim().toLowerCase(): entry.value,
+           normalizeWordKey(entry.key): entry.value,
        }),
        _random = random ?? Random();
 
-  final List<WordEntry> _words;
-  final List<WordConcept> _concepts;
+  final WordBank bank;
   final Random _random;
 
   final int taskCount;
   final int wrongAnswerCount;
-  final String syllablePattern;
+
+  /// Фільтр слів (маска складу, позиція, теги, довжини тощо).
+  final WordFilter filter;
 
   final SlotAssemblyTargetType targetType;
   final Language language;
-  final SyllableSearchPosition position;
+
+  /// Маска складів-дистракторів. Якщо null:
+  /// - режим [SlotAssemblyDistractorMode.pool] використовує маску складу
+  ///   з [filter] (або всі склади, якщо її теж немає);
+  /// - режим [SlotAssemblyDistractorMode.similarToCorrect] не обмежує пул.
+  final String? distractorPattern;
+  final SlotAssemblyDistractorMode distractorMode;
 
   /// Ефект цілі (saturation — для зображень, glow — для тексту).
   /// null — без ефекту. Кількість кроків за замовчуванням
@@ -79,15 +99,20 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
   /// і [targetFontSize].
   final List<TaskContent> promptContent;
 
+  /// Склад (нормалізований) → файл озвучки. Це також пул дистракторів.
   final Map<String, String> syllableAudio;
   final bool syllableHasSound;
+
+  /// Якщо true і [syllableHasSound] увімкнено, слова, у яких хоча б
+  /// один склад не має озвучки, пропускаються.
+  final bool requireSyllableAudio;
 
   final SlotAssemblyUiConfig uiConfig;
   final bool requiresSequentialSelection;
   final SlotAssemblyInteractionMode interactionMode;
 
-  static const String _pronunciationAudioDirectory =
-      'assets/audio/pronunciation/';
+  /// Друкувати воронку відбору в консоль (лише в debug).
+  final bool printDiagnostics;
 
   @override
   List<TaskData> generate() {
@@ -103,117 +128,49 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
       );
     }
 
-    if (syllablePattern.trim().isEmpty) {
-      throw ArgumentError.value(
-        syllablePattern,
-        'syllablePattern',
-        'Must not be empty.',
+    final selection = _select();
+    final matches = [...selection.funnel.matches];
+
+    if (kDebugMode && printDiagnostics) {
+      debugPrint(
+        'SlotAssembly [${targetType.name}]: ${selection.funnel.funnel} '
+        '(потрібно: $taskCount)',
       );
     }
 
-    final conceptsById = {for (final concept in _concepts) concept.id: concept};
-
-    // Build the unique distractor syllable pool from audio resources.
-    final distractorPool = _createDistractorPool();
-
-    final suitableWords = <_SlotAssemblyCandidate>[];
-    final usedWordKeys = <String>{};
-
-    for (final word in _words) {
-      if (word.language != language) continue;
-
-      final wordKey = _normalize(word.word);
-
-      if (wordKey.isEmpty || usedWordKeys.contains(wordKey)) {
-        continue;
-      }
-
-      if (word.syllables.isEmpty ||
-          word.syllables.any((syllable) => syllable.trim().isEmpty)) {
-        continue;
-      }
-
-      // Check the target word against the requested position.
-      final eligibleSyllables = switch (position) {
-        SyllableSearchPosition.any => word.syllables,
-        SyllableSearchPosition.first => word.syllables.take(1).toList(),
-        //todo
-        SyllableSearchPosition.last => word.syllables.take(1).toList(),
-      };
-
-      final hasMatchingSyllable = eligibleSyllables.any(
-        (syllable) => _matchesPattern(syllable, syllablePattern),
-      );
-
-      if (!hasMatchingSyllable) continue;
-
-      final conceptId = word.conceptId;
-      final concept = conceptId == null ? null : conceptsById[conceptId];
-
-      final target = _createTargetContent(word: word, concept: concept);
-
-      if (target == null) continue;
-
-      // All syllables of the selected word are correct answers.
-      final correctAnswers = word.syllables
-          .map(_createSyllableContent)
-          .toList();
-
-      // Exclude correct syllables from the distractor pool.
-      final correctSyllableKeys = word.syllables.map(_normalize).toSet();
-
-      final availableDistractors = distractorPool.entries
-          .where((entry) => !correctSyllableKeys.contains(entry.key))
-          .toList();
-
-      // Skip this word if there aren't enough unique distractors.
-      if (availableDistractors.length < wrongAnswerCount) {
-        continue;
-      }
-
-      // Select exactly wrongAnswerCount random distractors.
-      availableDistractors.shuffle(_random);
-
-      final wrongAnswers = availableDistractors
-          .take(wrongAnswerCount)
-          .map((entry) => entry.value)
-          .toList();
-
-      suitableWords.add(
-        _SlotAssemblyCandidate(
-          target: target,
-          correctAnswers: correctAnswers,
-          wrongAnswers: wrongAnswers,
-        ),
-      );
-
-      usedWordKeys.add(wordKey);
-    }
-
-    if (suitableWords.length < taskCount) {
+    if (matches.length < taskCount) {
       throw StateError(
         'Not enough suitable words to generate SlotAssemblyTaskData. '
-        'Requested: $taskCount, available: ${suitableWords.length}. '
-        'Check the target resources and available distractor syllables.',
+        'Requested: $taskCount, available: ${matches.length}. '
+        'Funnel: ${selection.funnel.funnel}.',
       );
     }
 
-    suitableWords.shuffle(_random);
+    matches.shuffle(_random);
 
     return List<SlotAssemblyTaskData<TaskContent>>.generate(taskCount, (index) {
-      final candidate = suitableWords[index];
+      final match = matches[index];
+      final syllables = match.entry.syllables;
+
+      // Усі склади вибраного слова є правильними відповідями.
+      final correctAnswers = syllables.map(_createSyllableContent).toList();
+
+      final wrongAnswers = _pickDistractors(
+        syllables,
+        selection.pool,
+      ).map(_createSyllableContent).toList();
 
       return SlotAssemblyTaskData<TaskContent>(
         prompt: TaskPrompt(
           content: promptContent,
           target: TargetContent(
-            target: candidate.target,
+            target: selection.targets[match.record.id]!,
             effect: targetEffect,
             fontSize: targetFontSize,
           ),
         ),
-        correctAnswers: List.unmodifiable(candidate.correctAnswers),
-        wrongAnswers: List.unmodifiable(candidate.wrongAnswers),
+        correctAnswers: List.unmodifiable(correctAnswers),
+        wrongAnswers: List.unmodifiable(wrongAnswers),
         wrongAnswerCount: wrongAnswerCount,
         uiConfig: uiConfig,
         requiresSequentialSelection: requiresSequentialSelection,
@@ -222,8 +179,89 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     });
   }
 
-  Map<String, TaskContent> _createDistractorPool() {
-    final result = <String, TaskContent>{};
+  /// Воронка відбору без генерації завдань і без винятків:
+  /// показує, скільки слів лишається після кожного етапу.
+  WordFilterResult diagnose() => _select().funnel;
+
+  // ---------------------------------------------------------------------
+  // Відбір слів
+  // ---------------------------------------------------------------------
+
+  _Selection _select() {
+    final targets = <String, TaskContent>{};
+    final usedWordKeys = <String>{};
+    final pool = _createDistractorPool();
+
+    final needsSyllableAudio = syllableHasSound && requireSyllableAudio;
+    final effectiveFilter = needsSyllableAudio
+        ? filter.copyWith(requireSyllableAudio: SyllableAudioRequirement.all)
+        : filter;
+
+    var funnel = effectiveFilter.apply(
+      bank,
+      language,
+      syllableAudio: syllableAudio,
+    );
+
+    // Слово має складатися з непорожніх складів.
+    funnel = funnel.refine(
+      'склади',
+      (m) =>
+          m.entry.syllables.isNotEmpty &&
+          m.entry.syllables.every((s) => s.trim().isNotEmpty),
+    );
+
+    // Потрібні ресурси для цілі (картинка, аудіо слова).
+    funnel = funnel.refine('ресурси цілі', (m) {
+      final target = _createTargetContent(m);
+      if (target == null) return false;
+
+      targets[m.record.id] = target;
+      return true;
+    });
+
+    // Достатньо унікальних дистракторів, не рахуючи правильних складів.
+    funnel = funnel.refine('дистрактори', (m) {
+      final correctKeys = m.entry.syllables.map(normalizeWordKey).toSet();
+      final overlap = correctKeys.where(pool.containsKey).length;
+      return pool.length - overlap >= wrongAnswerCount;
+    });
+
+    // Однакові слова (омоніми різних концептів) не повторюються.
+    funnel = funnel.refine('унікальність слова', (m) {
+      final key = normalizeWordKey(m.entry.word);
+      return key.isNotEmpty && usedWordKeys.add(key);
+    });
+
+    return _Selection(funnel: funnel, targets: targets, pool: pool);
+  }
+
+  // ---------------------------------------------------------------------
+  // Дистрактори
+  // ---------------------------------------------------------------------
+
+  String? get _effectiveDistractorPattern {
+    if (distractorPattern != null) return distractorPattern;
+
+    return switch (distractorMode) {
+      SlotAssemblyDistractorMode.pool => filter.syllablePattern,
+      SlotAssemblyDistractorMode.similarToCorrect => null,
+    };
+  }
+
+  /// Пул дистракторів: нормалізований склад → склад з озвучкою.
+  Map<String, String> _createDistractorPool() {
+    final pattern = _effectiveDistractorPattern;
+
+    if (pattern != null && pattern.trim().isEmpty) {
+      throw ArgumentError.value(
+        pattern,
+        'distractorPattern',
+        'Must not be empty.',
+      );
+    }
+
+    final result = <String, String>{};
 
     for (final entry in syllableAudio.entries) {
       final syllable = entry.key.trim();
@@ -231,22 +269,123 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
 
       if (syllable.isEmpty || audioPath.isEmpty) continue;
 
-      if (!_matchesPattern(syllable, syllablePattern)) {
+      if (pattern != null && !WildcardPattern.matches(syllable, pattern)) {
         continue;
       }
 
-      final key = _normalize(syllable);
-
-      result.putIfAbsent(key, () => _createSyllableContent(syllable));
+      result.putIfAbsent(normalizeWordKey(syllable), () => syllable);
     }
 
     return result;
   }
 
-  TaskContent? _createTargetContent({
-    required WordEntry word,
-    required WordConcept? concept,
-  }) {
+  /// Вибирає рівно [wrongAnswerCount] унікальних хибних складів.
+  List<String> _pickDistractors(
+    List<String> correctSyllables,
+    Map<String, String> pool,
+  ) {
+    if (wrongAnswerCount == 0) return const [];
+
+    final correctKeys = correctSyllables.map(normalizeWordKey).toSet();
+
+    final available = [
+      for (final entry in pool.entries)
+        if (!correctKeys.contains(entry.key)) entry,
+    ];
+
+    switch (distractorMode) {
+      case SlotAssemblyDistractorMode.pool:
+        available.shuffle(_random);
+        return available.take(wrongAnswerCount).map((e) => e.value).toList();
+
+      case SlotAssemblyDistractorMode.similarToCorrect:
+        return _pickSimilarDistractors(correctKeys.toList(), available);
+    }
+  }
+
+  /// Для кожного правильного складу складає рейтинг схожості, потім по колу
+  /// бере по одному найближчому складу, поки не набере потрібну кількість.
+  List<String> _pickSimilarDistractors(
+    List<String> correctKeys,
+    List<MapEntry<String, String>> available,
+  ) {
+    final rankings = [
+      for (final correct in correctKeys)
+        ([
+          for (final candidate in available)
+            (
+              candidate: candidate,
+              distance: _editDistance(correct, candidate.key),
+              tie: _random.nextInt(1 << 30),
+            ),
+        ]..sort((a, b) {
+          final byDistance = a.distance.compareTo(b.distance);
+          return byDistance != 0 ? byDistance : a.tie.compareTo(b.tie);
+        })),
+    ];
+
+    final cursors = List<int>.filled(rankings.length, 0);
+    final chosenKeys = <String>{};
+    final result = <String>[];
+
+    while (result.length < wrongAnswerCount) {
+      var progressed = false;
+
+      for (var i = 0; i < rankings.length; i++) {
+        if (result.length >= wrongAnswerCount) break;
+
+        final ranking = rankings[i];
+
+        while (cursors[i] < ranking.length &&
+            chosenKeys.contains(ranking[cursors[i]].candidate.key)) {
+          cursors[i]++;
+        }
+
+        if (cursors[i] >= ranking.length) continue;
+
+        final pick = ranking[cursors[i]++].candidate;
+        chosenKeys.add(pick.key);
+        result.add(pick.value);
+        progressed = true;
+      }
+
+      if (!progressed) break;
+    }
+
+    result.shuffle(_random);
+    return result;
+  }
+
+  /// Редакційна відстань Левенштейна між двома рядками.
+  static int _editDistance(String a, String b) {
+    final x = a.runes.toList();
+    final y = b.runes.toList();
+
+    var previous = List<int>.generate(y.length + 1, (i) => i);
+
+    for (var i = 1; i <= x.length; i++) {
+      final current = List<int>.filled(y.length + 1, 0);
+      current[0] = i;
+
+      for (var j = 1; j <= y.length; j++) {
+        final cost = x[i - 1] == y[j - 1] ? 0 : 1;
+        current[j] = min(
+          min(current[j - 1] + 1, previous[j] + 1),
+          previous[j - 1] + cost,
+        );
+      }
+
+      previous = current;
+    }
+
+    return previous[y.length];
+  }
+
+  // ---------------------------------------------------------------------
+  // Контент
+  // ---------------------------------------------------------------------
+
+  TaskContent? _createTargetContent(WordMatch match) {
     final requiresWordAudio =
         targetType == SlotAssemblyTargetType.imageWithAudio ||
         targetType == SlotAssemblyTargetType.wordWithAudio ||
@@ -255,19 +394,19 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     AudioContent? audio;
 
     if (requiresWordAudio) {
-      final audioPath = word.audio?.trim();
+      final audioPath = match.entry.audio?.trim();
 
       if (audioPath == null || audioPath.isEmpty) {
         return null;
       }
 
-      audio = AudioContent.fixed(_resolveAudioPath(audioPath));
+      audio = AudioContent.fixed(AudioPaths.resolvePronunciation(audioPath));
     }
 
     switch (targetType) {
       case SlotAssemblyTargetType.image:
       case SlotAssemblyTargetType.imageWithAudio:
-        final imagePath = concept?.image?.trim();
+        final imagePath = match.concept.image?.trim();
 
         if (imagePath == null || imagePath.isEmpty) {
           return null;
@@ -277,7 +416,7 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
 
       case SlotAssemblyTargetType.word:
       case SlotAssemblyTargetType.wordWithAudio:
-        return TextContent(_formatText(word.word), audio: audio);
+        return TextContent(textCase.format(match.entry.word), audio: audio);
 
       case SlotAssemblyTargetType.audio:
         return audio;
@@ -285,13 +424,13 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
   }
 
   TaskContent _createSyllableContent(String syllable) {
-    final formattedSyllable = _formatText(syllable);
+    final formattedSyllable = textCase.format(syllable);
 
     if (!syllableHasSound) {
       return TextContent(formattedSyllable);
     }
 
-    final audioPath = syllableAudio[_normalize(syllable)]?.trim();
+    final audioPath = syllableAudio[normalizeWordKey(syllable)]?.trim();
 
     if (audioPath == null || audioPath.isEmpty) {
       return TextContent(formattedSyllable);
@@ -299,87 +438,24 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
 
     return TextContent(
       formattedSyllable,
-      audio: AudioContent.fixed(_resolveAudioPath(audioPath)),
+      audio: AudioContent.fixed(AudioPaths.resolvePronunciation(audioPath)),
     );
-  }
-
-  String _resolveAudioPath(String audio) {
-    final value = audio.trim();
-
-    if (value.startsWith('assets/')) {
-      return value;
-    }
-
-    return '$_pronunciationAudioDirectory$value';
-  }
-
-  static String _normalize(String value) {
-    return value.trim().toLowerCase();
-  }
-
-  static bool _matchesPattern(String value, String pattern) {
-    final text = value.trim().toLowerCase().runes.toList();
-    final mask = pattern.trim().toLowerCase().runes.toList();
-
-    var textIndex = 0;
-    var maskIndex = 0;
-    var lastStarIndex = -1;
-    var retryTextIndex = 0;
-
-    while (textIndex < text.length) {
-      if (maskIndex < mask.length &&
-          (mask[maskIndex] == 0x3F || mask[maskIndex] == text[textIndex])) {
-        maskIndex++;
-        textIndex++;
-      } else if (maskIndex < mask.length && mask[maskIndex] == 0x2A) {
-        lastStarIndex = maskIndex;
-        retryTextIndex = textIndex;
-        maskIndex++;
-      } else if (lastStarIndex != -1) {
-        maskIndex = lastStarIndex + 1;
-        retryTextIndex++;
-        textIndex = retryTextIndex;
-      } else {
-        return false;
-      }
-    }
-
-    while (maskIndex < mask.length && mask[maskIndex] == 0x2A) {
-      maskIndex++;
-    }
-
-    return maskIndex == mask.length;
-  }
-
-  String _formatText(String text) {
-    switch (textCase) {
-      case MatchingTextCase.unchanged:
-        return text;
-
-      case MatchingTextCase.uppercase:
-        return text.toUpperCase();
-
-      case MatchingTextCase.lowercase:
-        return text.toLowerCase();
-
-      case MatchingTextCase.title:
-        final value = text.toLowerCase();
-
-        if (value.isEmpty) return value;
-
-        return '${value[0].toUpperCase()}${value.substring(1)}';
-    }
   }
 }
 
-class _SlotAssemblyCandidate {
-  const _SlotAssemblyCandidate({
-    required this.target,
-    required this.correctAnswers,
-    required this.wrongAnswers,
+/// Результат відбору: слова з воронкою, цілі та пул дистракторів.
+class _Selection {
+  const _Selection({
+    required this.funnel,
+    required this.targets,
+    required this.pool,
   });
 
-  final TaskContent target;
-  final List<TaskContent> correctAnswers;
-  final List<TaskContent> wrongAnswers;
+  final WordFilterResult funnel;
+
+  /// id концепту → контент цілі.
+  final Map<String, TaskContent> targets;
+
+  /// Нормалізований склад → склад з озвучкою.
+  final Map<String, String> pool;
 }

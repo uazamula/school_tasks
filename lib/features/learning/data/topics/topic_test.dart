@@ -24,8 +24,12 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_area_order.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/word_content/content_tag.dart';
+import 'package:school_tasks/features/learning/domain/word_content/int_range.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
 
 import '../fixed_task_data/fixed_data_matching.dart';
 
@@ -44,13 +48,22 @@ abstract final class Tests {
     dataSource: CompositeTaskDataSource([
       GeneratedTaskDataSource([
         SlotAssemblyTaskDataGenerator(
-          words: syllableDemoWords,
-          concepts: syllableDemoConcepts,
-          taskCount: 1,
+          bank: WordBank.fromLegacy(
+            words: syllableDemoWords,
+            concepts: syllableDemoConcepts,
+          ),
+          taskCount: 2,
           wrongAnswerCount: 3,
-          syllablePattern: '*р*',
+          filter: WordFilter(
+            syllablePattern: '*р*',
+            position: SyllableSearchPosition.any,
+            tagsAnyOf: {ContentTag.animal},
+            syllableCount: IntRange(min: 2, max: 3),
+          ),
           targetType: SlotAssemblyTargetType.wordWithAudio,
           language: Language.uk,
+          distractorMode: SlotAssemblyDistractorMode.similarToCorrect,
+          requireSyllableAudio: false,
 
           promptContent: [TextContent('Склади слово, натискаючи на склади')],
           targetFontSize: 42,
@@ -66,8 +79,6 @@ abstract final class Tests {
               flashScale: 0.08,
             ),
           ),
-
-          position: SyllableSearchPosition.any,
           textCase: MatchingTextCase.uppercase,
           syllableAudio: syllableAudioUk,
           syllableHasSound: true,
