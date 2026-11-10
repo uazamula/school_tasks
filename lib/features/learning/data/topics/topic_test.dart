@@ -27,6 +27,8 @@ import 'package:school_tasks/features/learning/domain/topic_progression_mode.dar
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
 
+import '../fixed_task_data/fixed_data_matching.dart';
+
 abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
@@ -134,7 +136,7 @@ abstract final class Tests {
         // ...GeometryShapesData.shapes,
         // ...CodingTasks.codingForTest,
         // ...CodingTasks.codingTasksSel,
-        // ...matchingTasks,
+        ...matchingTasks,
         // ...additionWithSound,
         // ...matchingTasks,
         // ...positionSelectionTasks,

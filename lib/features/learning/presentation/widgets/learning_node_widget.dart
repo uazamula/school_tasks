@@ -27,7 +27,7 @@ class LearningNodeWidget extends StatelessWidget {
   final ValueChanged<String>? onExpansionChanged;
 
   static const double _topicResultWidth = 56;
-  static const double _topicCardHeight = 64;
+  static const double _topicCardHeight = 94;
   static const double _topicCardRadius = 8;
 
   @override

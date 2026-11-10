@@ -50,6 +50,7 @@ final matchingTasks = [
     pairs: [
       MatchingPair(left: EmojiContent('🦌'), right: TextContent('1')),
       MatchingPair(left: TextContent('2 × 3'), right: TextContent('6')),
+      MatchingPair(left: TextContent('3 × 2'), right: TextContent('6')),
       MatchingPair(
         left: ImageContent('assets/images/cheetah.png'),
         right: TextContent('5 × 2'),
@@ -80,7 +81,7 @@ final matchingTasks = [
         right: TextContent('яблуко'),
       ),
     ],
-    pairCount: 7,
+    pairCount: 8,
     buttonConfig: configLarge,
   ),
 

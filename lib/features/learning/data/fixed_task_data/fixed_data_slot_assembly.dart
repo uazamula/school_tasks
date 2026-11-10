@@ -7,6 +7,29 @@ import 'package:school_tasks/features/learning/domain/tasks/content/target_conte
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
+import 'package:school_tasks/features/learning/domain/word_content/content_tag.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_builder.dart';
+
+// Optional parameters are positional, so to pass tags without syllables
+// you write null: wordUk('x', 'x', 'a', 'w', null, {t.animal}).
+typedef t = ContentTag;
+
+final demoWords = WordBank([
+  // одна мова
+  wordUk('ants', 'ants', 'uk_murakhy', 'мурахи', 'му-ра-хи', {t.animal}),
+  wordUk('buddy', null, null, 'чоловіче', null, {t.animal}),
+  wordUk('bark', 'bark.jpg', 'uk_kora', 'кора', 'ко-ра'),
+
+  // дві мови (або три): один концепт, кілька форм
+  words(
+    'dog',
+    'dog',
+    [uk('uk_pes', 'пес', null), en('en_dog', 'dog')],
+    {t.animal, t.domesticAnimal},
+  ),
+]);
+final recordsWithTags = demoWords.withAllTags({t.animal});
 
 final myButtonConfig = SelectionButtonConfig(
   fontSize: 10,
@@ -45,6 +68,18 @@ final List<TaskData> slotAssemblyWord = [
       TextContent(
         'БА',
         audio: AudioContent.fixed('assets/audio/pronunciation/uk_ryba.mp3'),
+      ),
+      TextContent(
+        'ЛА',
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ro.mp3'),
+      ),
+      TextContent(
+        'ЛА',
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ro.mp3'),
+      ),
+      TextContent(
+        'ЛА',
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_ro.mp3'),
       ),
     ],
     wrongAnswers: [],
