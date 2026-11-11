@@ -45,9 +45,20 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
   int? _selectedLeftIndex;
   int? _selectedRightIndex;
 
-  final Set<int> _completedPairIndices = {};
-  final Set<int> _attemptedPairIndices = {};
-  final Set<int> _firstAttemptCorrectPairIndices = {};
+  /// Пари розв'язку, що вже «спожиті». Пошук іде за значенням,
+  /// тому дублікати взаємозамінні.
+  final Set<int> _consumedPairIndices = {};
+
+  /// Приховані елементи кожної колонки: рівно ті, на які натиснув
+  /// користувач (а не ті, що збіглися за значенням).
+  final Set<int> _hiddenLeftIndices = {};
+  final Set<int> _hiddenRightIndices = {};
+
+  /// Ліві елементи, з якими вже була спроба (правильна чи ні).
+  final Set<int> _attemptedLeftIndices = {};
+
+  /// Ліві елементи, зіставлені правильно з першої спроби.
+  final Set<int> _firstAttemptCorrectLeftIndices = {};
 
   final Random _random = Random();
 
@@ -106,7 +117,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     return MatchingColumn(
       pairs: widget.task.pairs,
       order: _leftOrder,
-      completedPairIndices: _completedPairIndices,
+      hiddenIndices: _hiddenLeftIndices,
       selectedIndex: _selectedLeftIndex,
       isLeft: true,
       onItemTap: _selectLeft,
@@ -119,7 +130,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     return MatchingColumn(
       pairs: widget.task.pairs,
       order: _rightOrder,
-      completedPairIndices: _completedPairIndices,
+      hiddenIndices: _hiddenRightIndices,
       selectedIndex: _selectedRightIndex,
       isLeft: false,
       onItemTap: _selectRight,
@@ -136,9 +147,11 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
       _selectedLeftIndex = null;
       _selectedRightIndex = null;
 
-      _completedPairIndices.clear();
-      _attemptedPairIndices.clear();
-      _firstAttemptCorrectPairIndices.clear();
+      _consumedPairIndices.clear();
+      _hiddenLeftIndices.clear();
+      _hiddenRightIndices.clear();
+      _attemptedLeftIndices.clear();
+      _firstAttemptCorrectLeftIndices.clear();
 
       _createRightOrder();
     }
@@ -194,18 +207,23 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
         return;
       }
 
-      _registerIncorrectAttempt(leftIndex);
+      _attemptedLeftIndices.add(leftIndex);
       _clearSelection();
       setState(() {});
       return;
     }
 
-    _registerCorrectAttempt(pairIndex);
-    _completedPairIndices.add(pairIndex);
+    _registerCorrectAttempt(leftIndex);
+
+    // Пара розв'язку споживається за значенням, а ховаються саме ті
+    // елементи, на які натиснули (важливо при дублікатах).
+    _consumedPairIndices.add(pairIndex);
+    _hiddenLeftIndices.add(leftIndex);
+    _hiddenRightIndices.add(rightIndex);
 
     widget.onAccuracyChanged(
       AccuracyResult(
-        correct: _firstAttemptCorrectPairIndices.length,
+        correct: _firstAttemptCorrectLeftIndices.length,
         total: widget.task.pairs.length,
       ),
     );
@@ -221,14 +239,14 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     _clearSelection();
     setState(() {});
 
-    if (_completedPairIndices.length == widget.task.pairs.length) {
+    if (_consumedPairIndices.length == widget.task.pairs.length) {
       unawaited(_finishTask());
     }
   }
 
   int? _findCorrectPair(MatchingAnswer answer) {
     for (var index = 0; index < widget.task.pairs.length; index++) {
-      if (_completedPairIndices.contains(index)) {
+      if (_consumedPairIndices.contains(index)) {
         continue;
       }
 
@@ -242,17 +260,15 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     return null;
   }
 
-  void _registerIncorrectAttempt(int leftIndex) {
-    _attemptedPairIndices.add(leftIndex);
-  }
+  /// Правильна спроба з першого разу: лівий елемент раніше не фігурував
+  /// у спробах (ні в правильних, ні в неправильних).
+  void _registerCorrectAttempt(int leftIndex) {
+    final isFirstAttempt = !_attemptedLeftIndices.contains(leftIndex);
 
-  void _registerCorrectAttempt(int pairIndex) {
-    final isFirstAttempt = !_attemptedPairIndices.contains(pairIndex);
-
-    _attemptedPairIndices.add(pairIndex);
+    _attemptedLeftIndices.add(leftIndex);
 
     if (isFirstAttempt) {
-      _firstAttemptCorrectPairIndices.add(pairIndex);
+      _firstAttemptCorrectLeftIndices.add(leftIndex);
     }
   }
 
@@ -268,7 +284,7 @@ class _MatchingTaskWidgetState extends State<MatchingTaskWidget> {
     _isFinishing = true;
 
     final accuracy = AccuracyResult(
-      correct: _firstAttemptCorrectPairIndices.length,
+      correct: _firstAttemptCorrectLeftIndices.length,
       total: widget.task.pairs.length,
     );
 

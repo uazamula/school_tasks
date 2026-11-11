@@ -43,9 +43,9 @@ abstract final class MatchingSyllablesGeneratorDemo {
         SyllableMatchingTaskDataGenerator(
           bank: syllableDemoBank,
           taskCount: 2,
-          pairCount: 4,
+          pairCount: 3,
           filter: WordFilter(
-            syllablePattern: '*р*',
+            syllablePattern: 'ра',
             position: SyllableSearchPosition.any,
           ),
           language: Language.uk,
@@ -58,6 +58,7 @@ abstract final class MatchingSyllablesGeneratorDemo {
 
           textCase: MatchingTextCase.uppercase,
           syllableAudio: syllableAudioUk,
+          swapColumns: true,
           buttonConfig: MatchingButtonConfig(
             fontSize: 20,
             buttonWidth: 160,

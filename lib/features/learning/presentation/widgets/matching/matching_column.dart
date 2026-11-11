@@ -10,7 +10,7 @@ class MatchingColumn extends StatelessWidget {
     super.key,
     required this.pairs,
     required this.order,
-    required this.completedPairIndices,
+    required this.hiddenIndices,
     required this.selectedIndex,
     required this.isLeft,
     required this.onItemTap,
@@ -20,12 +20,20 @@ class MatchingColumn extends StatelessWidget {
 
   final List<MatchingPair> pairs;
   final List<int> order;
-  final Set<int> completedPairIndices;
+
+  /// Індекси елементів цієї колонки, які вже складено й приховано.
+  /// Для кожної колонки множина своя: ховається саме той елемент,
+  /// на який натиснули, навіть якщо є дублікати за значенням.
+  final Set<int> hiddenIndices;
   final int? selectedIndex;
   final bool isLeft;
   final ValueChanged<int> onItemTap;
   final MatchingButtonConfig? buttonConfig;
   final ValueChanged<Future<void>?>? onAudioPlaybackStarted;
+
+  /// Ключ елемента колонки (використовується, зокрема, у тестах).
+  static ValueKey<String> itemKey({required bool isLeft, required int index}) =>
+      ValueKey('matching-${isLeft ? 'left' : 'right'}-$index');
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +46,8 @@ class MatchingColumn extends StatelessWidget {
               bottom: buttonConfig?.spacing ?? AppSpacing.md,
             ),
             child: Visibility(
-              visible: !completedPairIndices.contains(index),
+              key: itemKey(isLeft: isLeft, index: index),
+              visible: !hiddenIndices.contains(index),
               maintainSize: true,
               maintainAnimation: true,
               maintainState: true,
