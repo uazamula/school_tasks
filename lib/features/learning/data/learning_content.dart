@@ -2,6 +2,7 @@ import 'package:school_tasks/features/learning/data/topics/topic_addition_digits
 import 'package:school_tasks/features/learning/data/topics/topic_addition_within_10.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_coding.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_fractions.dart';
+import 'package:school_tasks/features/learning/data/topics/topic_matching_demo.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_memory_demo.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_mult_sel.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_multiplication_table.dart';
@@ -95,6 +96,18 @@ abstract final class LearningContent {
           ],
         ),
         LearningNode(
+          id: 'matching_section',
+          titleKey: 'Matching',
+          type: LearningNodeType.section,
+          children: [
+            LearningNode(
+              id: 'matching_syllables',
+              titleKey: 'Matching generator',
+              type: LearningNodeType.topic,
+            ),
+          ],
+        ),
+        LearningNode(
           id: 'memory_section',
           titleKey: 'Memory',
           type: LearningNodeType.section,
@@ -132,6 +145,7 @@ abstract final class LearningContent {
     'memory_finite': MemoryFiniteDemo.topic,
     'memory_endless': MemoryEndlessDemo.topic,
     'memory_goal': MemoryGoalDemo.topic,
+    'matching_syllables': MatchingSyllablesGeneratorDemo.topic,
   };
 
   static Topic getTopic(String topicId) {

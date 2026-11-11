@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
@@ -11,20 +12,19 @@ import 'package:school_tasks/features/learning/domain/tasks/content/matching_pai
 import 'package:school_tasks/features/learning/domain/tasks/content/math_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
+import 'package:school_tasks/features/learning/domain/word_content/audio_paths.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
-import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
-import 'package:school_tasks/features/learning/domain/word_content/word_concept.dart';
-import 'package:school_tasks/features/learning/domain/word_content/word_entry.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_text.dart';
 
 class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
   SyllableMatchingTaskDataGenerator({
-    required List<WordEntry> words,
-    required List<WordConcept> concepts,
+    required this.bank,
     required this.taskCount,
     required this.pairCount,
-    required this.syllablePattern,
+    this.filter = const WordFilter(),
     this.language = Language.uk,
-    this.position = SyllableSearchPosition.any,
     this.buttonConfig,
     this.prompt = const TaskPrompt(content: [TextContent('Зістав елементи')]),
     this.leftColumnElement = MatchingColumnElement.image,
@@ -34,10 +34,12 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     this.swapColumns = false,
     this.textCase = MatchingTextCase.unchanged,
     Map<String, String> syllableAudio = const {},
+    this.printDiagnostics = true,
     Random? random,
-  }) : _words = List.unmodifiable(words),
-       _concepts = List.unmodifiable(concepts),
-       syllableAudio = Map.unmodifiable(syllableAudio),
+  }) : syllableAudio = Map.unmodifiable({
+         for (final entry in syllableAudio.entries)
+           normalizeWordKey(entry.key): entry.value,
+       }),
        _random = random ?? Random() {
     _validateColumnConfiguration(
       leftColumnElement,
@@ -51,16 +53,16 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     );
   }
 
-  final List<WordEntry> _words;
-  final List<WordConcept> _concepts;
+  final WordBank bank;
   final Random _random;
 
   final int taskCount;
   final int pairCount;
-  final String syllablePattern;
+
+  /// Фільтр слів (маска складу, позиція, теги, довжини тощо).
+  final WordFilter filter;
 
   final Language language;
-  final SyllableSearchPosition position;
   final MatchingButtonConfig? buttonConfig;
   final TaskPrompt prompt;
 
@@ -73,10 +75,11 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
   final bool swapColumns;
   final MatchingTextCase textCase;
 
+  /// Склад (нормалізований) → файл озвучки.
   final Map<String, String> syllableAudio;
 
-  static const String _pronunciationAudioDirectory =
-      'assets/audio/pronunciation/';
+  /// Друкувати воронку відбору в консоль (лише в debug).
+  final bool printDiagnostics;
 
   static void _validateColumnConfiguration(
     MatchingColumnElement element,
@@ -89,16 +92,6 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     }
   }
 
-  String _resolveAudioPath(String audio) {
-    final value = audio.trim();
-
-    if (value.startsWith('assets/')) {
-      return value;
-    }
-
-    return '$_pronunciationAudioDirectory$value';
-  }
-
   @override
   List<TaskData> generate() {
     if (taskCount < 1) {
@@ -109,110 +102,28 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       throw ArgumentError.value(pairCount, 'pairCount', 'Must be at least 1.');
     }
 
-    if (syllablePattern.trim().isEmpty) {
-      throw ArgumentError.value(
-        syllablePattern,
-        'syllablePattern',
-        'Must not be empty.',
+    final selection = _select();
+    final pairs = selection.pairs;
+
+    if (kDebugMode && printDiagnostics) {
+      debugPrint(
+        'SyllableMatching: ${selection.funnel.funnel} '
+        '(потрібно пар: $pairCount)',
       );
-    }
-
-    final conceptsById = <String, WordConcept>{
-      for (final concept in _concepts) concept.id: concept,
-    };
-
-    final needsImage =
-        leftColumnElement == MatchingColumnElement.image ||
-        rightColumnElement == MatchingColumnElement.image;
-
-    final pairs = <MatchingPair>[];
-    final usedConceptIds = <String>{};
-
-    for (final word in _words) {
-      if (word.language != language) continue;
-
-      final conceptId = word.conceptId;
-      if (conceptId == null || usedConceptIds.contains(conceptId)) {
-        continue;
-      }
-
-      // Зберігаємо попередню політику: потрібен наявний концепт.
-      final concept = conceptsById[conceptId];
-      if (concept == null) continue;
-
-      // Зображення є обов'язковим лише для конфігурацій, які його показують.
-      if (needsImage) {
-        final imagePath = concept.image;
-        if (imagePath == null || imagePath.trim().isEmpty) {
-          continue;
-        }
-      }
-
-      if (word.syllables.isEmpty) continue;
-
-      final eligibleSyllables = switch (position) {
-        SyllableSearchPosition.any => word.syllables,
-        SyllableSearchPosition.first => word.syllables.take(1).toList(),
-        //todo
-        SyllableSearchPosition.last => word.syllables.take(1).toList(),
-      };
-
-      final matchingSyllables = eligibleSyllables
-          .where(
-            (syllable) =>
-                syllable.trim().isNotEmpty &&
-                _matchesPattern(syllable, syllablePattern),
-          )
-          .toList();
-
-      if (matchingSyllables.isEmpty) continue;
-
-      final selectedSyllable =
-          matchingSyllables[_random.nextInt(matchingSyllables.length)];
-
-      final leftContent = _createColumnContent(
-        word: word,
-        concept: concept,
-        syllable: selectedSyllable,
-        element: leftColumnElement,
-        audio: leftColumnAudio,
-      );
-
-      final rightContent = _createColumnContent(
-        word: word,
-        concept: concept,
-        syllable: selectedSyllable,
-        element: rightColumnElement,
-        audio: rightColumnAudio,
-      );
-
-      // Якщо для обраної конфігурації бракує потрібного аудіо
-      // або іншого ресурсу, цей запис не використовується.
-      if (leftContent == null || rightContent == null) {
-        continue;
-      }
-
-      pairs.add(
-        MatchingPair(
-          left: swapColumns ? rightContent : leftContent,
-          right: swapColumns ? leftContent : rightContent,
-        ),
-      );
-
-      usedConceptIds.add(conceptId);
     }
 
     if (pairs.isEmpty) {
       throw StateError(
-        'No matching pairs found for the selected configuration '
-        'and syllable pattern "$syllablePattern".',
+        'No matching pairs found for the selected configuration. '
+        'Funnel: ${selection.funnel.funnel}.',
       );
     }
 
     if (pairCount > pairs.length) {
       throw StateError(
         'Requested $pairCount pairs, but only ${pairs.length} '
-        'eligible pairs are available.',
+        'eligible pairs are available. '
+        'Funnel: ${selection.funnel.funnel}.',
       );
     }
 
@@ -227,9 +138,95 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     );
   }
 
+  /// Воронка відбору без генерації завдань і без винятків:
+  /// показує, скільки слів лишається після кожного етапу.
+  WordFilterResult diagnose() => _select().funnel;
+
+  // ---------------------------------------------------------------------
+  // Відбір слів і побудова пар
+  // ---------------------------------------------------------------------
+
+  _Selection _select() {
+    final pairsByConceptId = <String, MatchingPair>{};
+
+    final needsImage =
+        leftColumnElement == MatchingColumnElement.image ||
+        rightColumnElement == MatchingColumnElement.image;
+
+    // Якщо озвучка потрібна для складу, обираємо лише серед складів,
+    // які її мають.
+    final needsSyllableAudio =
+        leftColumnAudio == MatchingColumnAudio.syllable ||
+        rightColumnAudio == MatchingColumnAudio.syllable;
+
+    final effectiveFilter =
+        needsSyllableAudio &&
+            filter.requireSyllableAudio == SyllableAudioRequirement.none
+        ? filter.copyWith(
+            requireSyllableAudio: SyllableAudioRequirement.matching,
+          )
+        : filter;
+
+    var funnel = effectiveFilter.apply(
+      bank,
+      language,
+      syllableAudio: syllableAudio,
+    );
+
+    // Зображення є обов'язковим лише для конфігурацій, які його показують.
+    if (needsImage) {
+      funnel = funnel.refine(
+        'зображення',
+        (m) => (m.concept.image?.trim() ?? '').isNotEmpty,
+      );
+    }
+
+    // Потрібен хоча б один непорожній склад.
+    funnel = funnel.transform('склади', (m) {
+      final syllables = m.syllables.where((s) => s.trim().isNotEmpty).toList();
+      return syllables.isEmpty ? null : m.withSyllables(syllables);
+    });
+
+    // Якщо для обраної конфігурації бракує потрібного аудіо
+    // або іншого ресурсу, цей запис не використовується.
+    funnel = funnel.refine('ресурси пар', (m) {
+      final syllable = m.syllables[_random.nextInt(m.syllables.length)];
+
+      final leftContent = _createColumnContent(
+        match: m,
+        syllable: syllable,
+        element: leftColumnElement,
+        audio: leftColumnAudio,
+      );
+
+      final rightContent = _createColumnContent(
+        match: m,
+        syllable: syllable,
+        element: rightColumnElement,
+        audio: rightColumnAudio,
+      );
+
+      if (leftContent == null || rightContent == null) return false;
+
+      pairsByConceptId[m.record.id] = MatchingPair(
+        left: swapColumns ? rightContent : leftContent,
+        right: swapColumns ? leftContent : rightContent,
+      );
+      return true;
+    });
+
+    return _Selection(
+      funnel: funnel,
+      pairs: [for (final m in funnel.matches) pairsByConceptId[m.record.id]!],
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Контент
+  // ---------------------------------------------------------------------
+
   TaskContent? _createColumnContent({
-    required WordEntry word,
-    required WordConcept concept,
+    required WordMatch match,
     required String syllable,
     required MatchingColumnElement element,
     required MatchingColumnAudio audio,
@@ -242,7 +239,7 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
         break;
 
       case MatchingColumnElement.image:
-        final imagePath = concept.image?.trim();
+        final imagePath = match.concept.image?.trim();
         if (imagePath == null || imagePath.isEmpty) {
           return null;
         }
@@ -250,11 +247,11 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
         break;
 
       case MatchingColumnElement.word:
-        visibleContent = TextContent(_formatText(word.word));
+        visibleContent = TextContent(textCase.format(match.entry.word));
         break;
 
       case MatchingColumnElement.syllable:
-        visibleContent = TextContent(_formatText(syllable));
+        visibleContent = TextContent(textCase.format(syllable));
         break;
     }
 
@@ -270,11 +267,11 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
         break;
 
       case MatchingColumnAudio.word:
-        audioFile = word.audio;
+        audioFile = match.entry.audio;
         break;
 
       case MatchingColumnAudio.syllable:
-        audioFile = syllableAudio[syllable.trim().toLowerCase()];
+        audioFile = syllableAudio[normalizeWordKey(syllable)];
         break;
     }
 
@@ -285,7 +282,9 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       return null;
     }
 
-    final audioContent = AudioContent.fixed(_resolveAudioPath(normalizedAudio));
+    final audioContent = AudioContent.fixed(
+      AudioPaths.resolvePronunciation(normalizedAudio),
+    );
 
     // Аудіо без тексту/зображення стає самостійним елементом.
     if (visibleContent == null) {
@@ -306,66 +305,12 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
       ),
     };
   }
+}
 
-  /// Matches a string against a wildcard pattern.
-  ///
-  /// Matching is case-insensitive.
-  /// `*` matches any sequence, including an empty sequence.
-  /// `?` matches exactly one Unicode code point.
-  static bool _matchesPattern(String value, String pattern) {
-    final text = value.trim().toLowerCase().runes.toList();
-    final mask = pattern.trim().toLowerCase().runes.toList();
+/// Результат відбору: воронка та готові пари.
+class _Selection {
+  const _Selection({required this.funnel, required this.pairs});
 
-    var textIndex = 0;
-    var maskIndex = 0;
-    var lastStarIndex = -1;
-    var retryTextIndex = 0;
-
-    while (textIndex < text.length) {
-      if (maskIndex < mask.length &&
-          (mask[maskIndex] == 0x3F || mask[maskIndex] == text[textIndex])) {
-        // '?' or an exact character.
-        maskIndex++;
-        textIndex++;
-      } else if (maskIndex < mask.length && mask[maskIndex] == 0x2A) {
-        // Remember '*' so it can absorb more characters if necessary.
-        lastStarIndex = maskIndex;
-        retryTextIndex = textIndex;
-        maskIndex++;
-      } else if (lastStarIndex != -1) {
-        // Let the most recent '*' absorb one more character.
-        maskIndex = lastStarIndex + 1;
-        retryTextIndex++;
-        textIndex = retryTextIndex;
-      } else {
-        return false;
-      }
-    }
-
-    // Trailing '*' characters can match an empty sequence.
-    while (maskIndex < mask.length && mask[maskIndex] == 0x2A) {
-      maskIndex++;
-    }
-
-    return maskIndex == mask.length;
-  }
-
-  String _formatText(String text) {
-    switch (textCase) {
-      case MatchingTextCase.unchanged:
-        return text;
-
-      case MatchingTextCase.uppercase:
-        return text.toUpperCase();
-
-      case MatchingTextCase.lowercase:
-        return text.toLowerCase();
-
-      case MatchingTextCase.title:
-        final value = text.toLowerCase();
-        if (value.isEmpty) return value;
-
-        return '${value[0].toUpperCase()}${value.substring(1)}';
-    }
-  }
+  final WordFilterResult funnel;
+  final List<MatchingPair> pairs;
 }
