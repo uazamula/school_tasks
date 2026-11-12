@@ -4,6 +4,7 @@ import 'package:school_tasks/features/learning/data/generation/linguistic/matchi
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
+import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/composite_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
@@ -19,19 +20,7 @@ import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
-import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
-import 'package:school_tasks/features/learning/domain/word_content/word_builder.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
-
-final syllableDemoBank = WordBank([
-  wordUk('ants', 'ants', 'uk_murakhy', 'мурахи', 'му-ра-хи'),
-  wordUk('fish', 'fish', 'uk_ryba', 'риба', 'ри-ба'),
-  wordUk('cow', 'cow', 'uk_korova', 'корова', 'ко-ро-ва'),
-  wordUk('buddy', null, null, 'чоловіче', null),
-  wordUk('bark', 'bark.jpg', 'uk_kora', 'кора', 'ко-ра'),
-  wordUk('guitar', 'guitar', 'uk_hitara', 'гітара', 'гі-та-ра'),
-  wordUk('frame', 'frame.jpg', 'uk_rama', 'рама', 'ра-ма'),
-]);
 
 abstract final class MatchingSyllablesGeneratorDemo {
   static final Topic topic = Topic(
@@ -41,7 +30,7 @@ abstract final class MatchingSyllablesGeneratorDemo {
     dataSource: CompositeTaskDataSource([
       GeneratedTaskDataSource([
         SyllableMatchingTaskDataGenerator(
-          bank: syllableDemoBank,
+          bank: ukWordBank,
           taskCount: 2,
           pairCount: 3,
           filter: WordFilter(

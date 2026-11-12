@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_matching.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
@@ -6,6 +7,7 @@ import 'package:school_tasks/features/learning/data/generation/linguistic/slot_a
 import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_demo_data.dart';
+import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/composite_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
@@ -34,16 +36,6 @@ import 'package:school_tasks/features/learning/domain/word_content/syllable_sear
 import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_builder.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
-
-import '../fixed_task_data/fixed_data_matching.dart';
-
-final syllableDemoBank = WordBank([
-  // одна мова
-  wordUk('ants', 'ants', 'uk_murakhy', 'мурахи', 'му-ра-хи'),
-  wordUk('fish', 'fish', 'uk_ryba', 'риба', 'ри-ба'),
-  wordUk('buddy', null, null, 'чоловіче', null),
-  wordUk('bark', 'bark.jpg', 'uk_kora', 'кора', 'ко-ра'),
-]);
 
 abstract final class Tests {
   static final Topic topic = Topic(
@@ -102,7 +94,7 @@ abstract final class Tests {
           uiConfig: SlotAssemblyUiConfig(showSlotHints: true),
         ),
         SyllableMatchingTaskDataGenerator(
-          bank: syllableDemoBank,
+          bank: ukWordBank,
           taskCount: 1,
           pairCount: 2,
           filter: WordFilter(

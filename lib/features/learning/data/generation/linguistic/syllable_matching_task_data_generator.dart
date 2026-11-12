@@ -106,9 +106,11 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
     final pairs = selection.pairs;
 
     if (kDebugMode && printDiagnostics) {
+      final rules = selection.funnel.rulesReport;
       debugPrint(
         'SyllableMatching: ${selection.funnel.funnel} '
-        '(потрібно пар: $pairCount)',
+        '(потрібно пар: $pairCount)'
+        '${rules.isEmpty ? '' : '\n$rules'}',
       );
     }
 

@@ -69,17 +69,32 @@ class WordFilterResult {
   WordFilterResult({
     required List<WordMatch> matches,
     required List<WordFilterStage> stages,
+    List<WordFilterStage> ruleCounts = const [],
   }) : matches = List.unmodifiable(matches),
-       stages = List.unmodifiable(stages);
+       stages = List.unmodifiable(stages),
+       ruleCounts = List.unmodifiable(ruleCounts);
 
   final List<WordMatch> matches;
   final List<WordFilterStage> stages;
+
+  /// Скільки слів мови проходить кожне правило окремо (незалежно від
+  /// інших). Показує, яке правило найжорсткіше.
+  final List<WordFilterStage> ruleCounts;
 
   bool get isEmpty => matches.isEmpty;
 
   /// Воронка одним рядком: `uk: 40 → теги: 12 → патерн складу: 6`.
   String get funnel =>
       stages.map((s) => '${s.name}: ${s.remaining}').join(' → ');
+
+  /// Кожне правило окремо одним рядком: `окремо: теги: 12, патерн складу: 20`.
+  /// Порожній рядок, якщо правил немає.
+  String get rulesReport {
+    if (ruleCounts.isEmpty) return '';
+
+    final parts = ruleCounts.map((s) => '${s.name}: ${s.remaining}');
+    return 'окремо: ${parts.join(', ')}';
+  }
 
   /// Додатковий етап від генератора (наприклад, «ресурси цілі»):
   /// лишає слова, для яких [keep] повертає true, і дописує етап у воронку.
@@ -92,6 +107,7 @@ class WordFilterResult {
     return WordFilterResult(
       matches: kept,
       stages: [...stages, WordFilterStage(name, kept.length)],
+      ruleCounts: ruleCounts,
     );
   }
 
@@ -110,6 +126,7 @@ class WordFilterResult {
     return WordFilterResult(
       matches: kept,
       stages: [...stages, WordFilterStage(name, kept.length)],
+      ruleCounts: ruleCounts,
     );
   }
 }
@@ -231,7 +248,19 @@ class WordFilter {
       WordFilterStage(language.name, current.length),
     ];
 
-    for (final rule in rules(audioKeys)) {
+    final activeRules = rules(audioKeys);
+    final initial = current;
+
+    // Кожне правило окремо на всіх словах мови.
+    final ruleCounts = [
+      for (final rule in activeRules)
+        WordFilterStage(
+          rule.name,
+          initial.where((m) => rule.apply(m) != null).length,
+        ),
+    ];
+
+    for (final rule in activeRules) {
       final next = <WordMatch>[];
 
       for (final match in current) {
@@ -243,7 +272,47 @@ class WordFilter {
       stages.add(WordFilterStage(rule.name, current.length));
     }
 
-    return WordFilterResult(matches: current, stages: stages);
+    return WordFilterResult(
+      matches: current,
+      stages: stages,
+      ruleCounts: ruleCounts,
+    );
+  }
+
+  /// Назва першого правила, яке слово не проходить; null — слово проходить
+  /// усі правила. Зручно при налагодженні даних: чому "ants" не потрапило
+  /// у вибірку.
+  String? explain(
+    WordBank bank,
+    Language language,
+    String conceptId, {
+    Map<String, String> syllableAudio = const {},
+  }) {
+    final record = bank.byId(conceptId);
+    if (record == null) return 'немає слова з id "$conceptId" у банку';
+
+    final entry = record.entry(language);
+    if (entry == null) return 'немає слова мовою ${language.name}';
+
+    final audioKeys = <String>{
+      for (final e in syllableAudio.entries)
+        if (e.key.trim().isNotEmpty && e.value.trim().isNotEmpty)
+          normalizeWordKey(e.key),
+    };
+
+    var match = WordMatch(
+      record: record,
+      entry: entry,
+      syllables: entry.syllables,
+    );
+
+    for (final rule in rules(audioKeys)) {
+      final next = rule.apply(match);
+      if (next == null) return rule.name;
+      match = next;
+    }
+
+    return null;
   }
 
   /// Активні правила в порядку застосування. Незадані параметри

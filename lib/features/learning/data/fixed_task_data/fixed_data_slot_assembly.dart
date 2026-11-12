@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/task_data/selection_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
@@ -8,12 +9,10 @@ import 'package:school_tasks/features/learning/domain/tasks/content/task_content
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/slot_assembly_interaction_mode.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
-import 'package:school_tasks/features/learning/domain/word_content/content_tag.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_builder.dart';
 
 // Optional parameters are positional, so to pass tags without syllables
 // you write null: wordUk('x', 'x', 'a', 'w', null, {t.animal}).
-typedef t = ContentTag;
 
 final demoWords = WordBank([
   // одна мова

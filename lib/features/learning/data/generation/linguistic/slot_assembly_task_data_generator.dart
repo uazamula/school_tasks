@@ -132,9 +132,11 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     final matches = [...selection.funnel.matches];
 
     if (kDebugMode && printDiagnostics) {
+      final rules = selection.funnel.rulesReport;
       debugPrint(
         'SlotAssembly [${targetType.name}]: ${selection.funnel.funnel} '
-        '(потрібно: $taskCount)',
+        '(потрібно: $taskCount)'
+        '${rules.isEmpty ? '' : '\n$rules'}',
       );
     }
 
