@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'content_tag.dart';
+import 'double_range.dart';
+import 'image_meta.dart';
+import 'image_meta.g.dart';
 import 'int_range.dart';
 import 'language.dart';
 import 'syllable_search_position.dart';
@@ -141,6 +144,9 @@ class WordFilter {
     this.wordLength,
     this.syllableCount,
     this.longestSyllableLength,
+    this.imageAspect,
+    this.minImageWidth,
+    this.minImageHeight,
     this.syllablePattern,
     this.position = SyllableSearchPosition.any,
     this.requireSyllableAudio = SyllableAudioRequirement.none,
@@ -162,6 +168,17 @@ class WordFilter {
 
   /// Довжина (у літерах) найдовшого складу слова.
   final IntRange? longestSyllableLength;
+
+  /// Співвідношення сторін зображення (ширина / висота), наприклад
+  /// `ImageAspect.square`. Слова без зображення чи без запису в таблиці
+  /// розмірів не проходять.
+  final DoubleRange? imageAspect;
+
+  /// Мінімальна ширина зображення в пікселях.
+  final int? minImageWidth;
+
+  /// Мінімальна висота зображення в пікселях.
+  final int? minImageHeight;
 
   /// Маска складу: слово проходить, якщо хоча б один склад збігається.
   final String? syllablePattern;
@@ -194,6 +211,9 @@ class WordFilter {
     IntRange? wordLength,
     IntRange? syllableCount,
     IntRange? longestSyllableLength,
+    DoubleRange? imageAspect,
+    int? minImageWidth,
+    int? minImageHeight,
     String? syllablePattern,
     SyllableSearchPosition? position,
     SyllableAudioRequirement? requireSyllableAudio,
@@ -209,6 +229,9 @@ class WordFilter {
       syllableCount: syllableCount ?? this.syllableCount,
       longestSyllableLength:
           longestSyllableLength ?? this.longestSyllableLength,
+      imageAspect: imageAspect ?? this.imageAspect,
+      minImageWidth: minImageWidth ?? this.minImageWidth,
+      minImageHeight: minImageHeight ?? this.minImageHeight,
       syllablePattern: syllablePattern ?? this.syllablePattern,
       position: position ?? this.position,
       requireSyllableAudio: requireSyllableAudio ?? this.requireSyllableAudio,
@@ -228,6 +251,7 @@ class WordFilter {
     WordBank bank,
     Language language, {
     Map<String, String> syllableAudio = const {},
+    ImageMetaTable imageMeta = const ImageMetaTable(generatedImageMeta),
   }) {
     _validate();
 
@@ -248,7 +272,7 @@ class WordFilter {
       WordFilterStage(language.name, current.length),
     ];
 
-    final activeRules = rules(audioKeys);
+    final activeRules = rules(audioKeys, imageMeta);
     final initial = current;
 
     // Кожне правило окремо на всіх словах мови.
@@ -287,6 +311,7 @@ class WordFilter {
     Language language,
     String conceptId, {
     Map<String, String> syllableAudio = const {},
+    ImageMetaTable imageMeta = const ImageMetaTable(generatedImageMeta),
   }) {
     final record = bank.byId(conceptId);
     if (record == null) return 'немає слова з id "$conceptId" у банку';
@@ -306,7 +331,7 @@ class WordFilter {
       syllables: entry.syllables,
     );
 
-    for (final rule in rules(audioKeys)) {
+    for (final rule in rules(audioKeys, imageMeta)) {
       final next = rule.apply(match);
       if (next == null) return rule.name;
       match = next;
@@ -319,7 +344,10 @@ class WordFilter {
   /// правил не створюють.
   ///
   /// [syllableAudioKeys] — нормалізовані склади, що мають озвучку.
-  List<WordFilterRule> rules([Set<String> syllableAudioKeys = const {}]) {
+  List<WordFilterRule> rules([
+    Set<String> syllableAudioKeys = const {},
+    ImageMetaTable imageMeta = const ImageMetaTable(generatedImageMeta),
+  ]) {
     final rules = <WordFilterRule>[];
 
     if (includeIds.isNotEmpty || excludeIds.isNotEmpty) {
@@ -342,6 +370,30 @@ class WordFilter {
           }
           if (!tags.containsAll(tagsAllOf)) return null;
           if (tagsNoneOf.any(tags.contains)) return null;
+          return m;
+        }),
+      );
+    }
+
+    final aspectRange = imageAspect;
+    if (aspectRange != null) {
+      rules.add(
+        WordFilterRule('пропорції зображення', (m) {
+          final meta = imageMeta.of(m.concept.image);
+          return meta != null && aspectRange.contains(meta.aspect) ? m : null;
+        }),
+      );
+    }
+
+    final minWidth = minImageWidth;
+    final minHeight = minImageHeight;
+    if (minWidth != null || minHeight != null) {
+      rules.add(
+        WordFilterRule('розмір зображення', (m) {
+          final meta = imageMeta.of(m.concept.image);
+          if (meta == null) return null;
+          if (minWidth != null && meta.width < minWidth) return null;
+          if (minHeight != null && meta.height < minHeight) return null;
           return m;
         }),
       );

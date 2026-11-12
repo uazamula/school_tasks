@@ -19,6 +19,7 @@
 import 'cli/cli.dart';
 import 'cli/command_registry.dart';
 import 'commands/help_command.dart';
+import 'commands/images_command.dart';
 import 'commands/tree_command.dart';
 import 'commands/stats_command.dart';
 
@@ -28,6 +29,7 @@ Future<void> main(List<String> args) async {
   registry.register(() => HelpCommand(registry));
   registry.register(() => const TreeCommand());
   registry.register(() => const StatsCommand());
+  registry.register(() => const ImagesCommand());
 
   final cli = Cli(registry);
 
