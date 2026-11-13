@@ -61,8 +61,10 @@ final ukWords = [
   wordUk('marten', 'marten', 'uk_kunytsja', 'куниця', 'ку-ни-ця'),
   // wordUk('marlin', 'marlin', null, 'риба-меч', 'ри-ба-меч'),
   wordUk('mouth', 'mouth', 'uk_rot', 'рот', 'рот'),
+  wordUk('owl', ':🦉', 'uk_sova', 'сова', 'сова'),
   wordUk('peregrine', 'peregrine', null, 'сапсан', 'сап-сан'),
   wordUk('river', 'river', 'uk_richka', 'ріка', 'рі-ка'),
+  wordUk('wheel', ':🎡', 'uk_koleso', 'колесо', 'колесо'),
   wordUk('yoga', 'yoga', 'uk_yoha', 'йога', 'йо-га'),
 ];
 

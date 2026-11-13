@@ -34,7 +34,7 @@ abstract final class MatchingSyllablesGeneratorDemo {
           taskCount: 2,
           pairCount: 3,
           filter: WordFilter(
-            syllablePattern: 'ра',
+            syllablePattern: 'с*',
             position: SyllableSearchPosition.any,
           ),
           language: Language.uk,
@@ -43,7 +43,7 @@ abstract final class MatchingSyllablesGeneratorDemo {
           leftColumnAudio: MatchingColumnAudio.word,
 
           rightColumnElement: MatchingColumnElement.syllable,
-          rightColumnAudio: MatchingColumnAudio.syllable,
+          rightColumnAudio: MatchingColumnAudio.none,
 
           textCase: MatchingTextCase.uppercase,
           syllableAudio: syllableAudioUk,

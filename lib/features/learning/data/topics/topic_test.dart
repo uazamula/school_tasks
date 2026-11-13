@@ -34,7 +34,6 @@ import 'package:school_tasks/features/learning/domain/word_content/int_range.dar
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
-import 'package:school_tasks/features/learning/domain/word_content/word_builder.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
 
 abstract final class Tests {

@@ -111,7 +111,11 @@ WordRecord wordTr(
 ///   en('en_ants', 'ants')], {t.animal})`
 ///
 /// Правила:
-/// - [image]: без розширення = '.png'; шлях додається автоматично; може бути null;
+/// - [image] (візуал концепту), може бути null:
+///   - `'ants'` — файл: без розширення = '.png', шлях додається автоматично;
+///   - `'bark.jpg'` — файл з розширенням;
+///   - `':🍐'` — лише емодзі (маркер ':' на початку);
+///   - `'pear:🍐'` — і файл, і емодзі (генератори віддають перевагу файлу);
 /// - аудіо: без розширення = '.mp3';
 /// - склади через '-' перетворюються на список (без запису — порожній список).
 WordRecord words(
@@ -126,12 +130,13 @@ WordRecord words(
     'Для "$id" мова повторюється',
   );
 
+  final visual = _parseVisual(id, image);
+
   return WordRecord(
     concept: WordConcept(
       id: id,
-      image: image == null
-          ? null
-          : _imagesDir + _withExt(image, _defaultImageExt),
+      image: visual.image,
+      emoji: visual.emoji,
       // Батьківські теги додаються автоматично (domesticAnimal → animal).
       tags: tags.withAncestors,
     ),
@@ -151,6 +156,37 @@ WordEntry _buildEntry(String id, LangForm f) {
     word: f.word,
     audio: f.audio == null ? null : _withExt(f.audio!, _defaultAudioExt),
     syllables: f.split == null ? const [] : f.split!.split(_syllableSeparator),
+  );
+}
+
+/// Схоже на назву файлу, а не на емодзі (перевірка лише в debug).
+final RegExp _looksLikeFileName = RegExp(r'^[A-Za-z0-9_.\-]+$');
+
+/// Розбирає запис візуалу: `'файл'`, `':емодзі'` або `'файл:емодзі'`.
+({String? image, String? emoji}) _parseVisual(String id, String? spec) {
+  final value = spec?.trim() ?? '';
+
+  if (value.isEmpty) return (image: null, emoji: null);
+
+  final colon = value.indexOf(':');
+
+  // Без двокрапки — лише файл зображення.
+  if (colon < 0) {
+    return (image: _imagesDir + _withExt(value, _defaultImageExt), emoji: null);
+  }
+
+  final file = value.substring(0, colon).trim();
+  final emoji = value.substring(colon + 1).trim();
+
+  assert(emoji.isNotEmpty, '[$id] Після ":" немає емодзі: "$value"');
+  assert(
+    !_looksLikeFileName.hasMatch(emoji),
+    '[$id] "$emoji" схоже на назву файлу, а не на емодзі',
+  );
+
+  return (
+    image: file.isEmpty ? null : _imagesDir + _withExt(file, _defaultImageExt),
+    emoji: emoji.isEmpty ? null : emoji,
   );
 }
 

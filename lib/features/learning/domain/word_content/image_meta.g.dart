@@ -6,6 +6,7 @@ import 'image_meta.dart';
 
 /// Розміри зображень: шлях ресурсу → ширина і висота в пікселях.
 const Map<String, ImageMeta> generatedImageMeta = {
+  'assets/images/accordion.png': ImageMeta(320, 294),
   'assets/images/anchor.png': ImageMeta(512, 640),
   'assets/images/ant.png': ImageMeta(640, 421),
   'assets/images/ants.png': ImageMeta(351, 260),
@@ -34,6 +35,8 @@ const Map<String, ImageMeta> generatedImageMeta = {
   'assets/images/eye.png': ImageMeta(420, 260),
   'assets/images/eyes.png': ImageMeta(314, 146),
   'assets/images/fairy.png': ImageMeta(258, 325),
+  'assets/images/feather.png': ImageMeta(389, 272),
+  'assets/images/fieldmark.jpg': ImageMeta(271, 180),
   'assets/images/fish.png': ImageMeta(200, 117),
   'assets/images/fly.png': ImageMeta(300, 302),
   'assets/images/foal.png': ImageMeta(219, 315),
@@ -48,7 +51,16 @@ const Map<String, ImageMeta> generatedImageMeta = {
   'assets/images/goat.png': ImageMeta(284, 238),
   'assets/images/guitar.png': ImageMeta(156, 329),
   'assets/images/horns.png': ImageMeta(575, 375),
+  'assets/images/icecream.png': ImageMeta(113, 211),
+  'assets/images/jelly.png': ImageMeta(194, 179),
+  'assets/images/kettlebell.png': ImageMeta(308, 360),
+  'assets/images/kitten.png': ImageMeta(229, 320),
+  'assets/images/kiwi.png': ImageMeta(311, 246),
+  'assets/images/knife.png': ImageMeta(333, 326),
+  'assets/images/leg.png': ImageMeta(320, 640),
+  'assets/images/lemon.png': ImageMeta(301, 322),
   'assets/images/marlin.png': ImageMeta(640, 614),
+  'assets/images/marten.png': ImageMeta(640, 250),
   'assets/images/mouth.png': ImageMeta(300, 322),
   'assets/images/peregrine.png': ImageMeta(362, 297),
   'assets/images/river.png': ImageMeta(640, 407),
@@ -58,4 +70,5 @@ const Map<String, ImageMeta> generatedImageMeta = {
   'assets/images/tasks/ellipse.png': ImageMeta(141, 142),
   'assets/images/tasks/square.png': ImageMeta(84, 84),
   'assets/images/tasks/triangle.png': ImageMeta(131, 134),
+  'assets/images/yoga.png': ImageMeta(320, 341),
 };

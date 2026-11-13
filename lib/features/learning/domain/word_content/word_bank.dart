@@ -86,11 +86,10 @@ class WordBank {
         r,
   ];
 
-  /// Записи із зображенням (для завдань «картинка → слово»).
+  /// Записи із зображенням або емодзі (для завдань «картинка → слово»).
   List<WordRecord> withImage({Language? language}) => [
     for (final r in _byId.values)
-      if (r.concept.image != null &&
-          (language == null || r.hasLanguage(language)))
+      if (r.concept.hasPicture && (language == null || r.hasLanguage(language)))
         r,
   ];
 

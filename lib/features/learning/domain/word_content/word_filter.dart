@@ -134,6 +134,15 @@ class WordFilterResult {
   }
 }
 
+/// Співвідношення сторін візуалу концепту: зображення (з таблиці розмірів),
+/// інакше емодзі (умовно 1.0). null — візуалу немає або зображення
+/// немає в таблиці.
+double? _pictureAspect(WordConcept concept, ImageMetaTable table) {
+  if (concept.hasImage) return table.of(concept.image)?.aspect;
+  if (concept.hasEmoji) return 1.0;
+  return null;
+}
+
 /// Спільний фільтр слів для генераторів завдань.
 ///
 /// Усі параметри необов'язкові: незаданий параметр правило не вмикає.
@@ -170,8 +179,8 @@ class WordFilter {
   final IntRange? longestSyllableLength;
 
   /// Співвідношення сторін зображення (ширина / висота), наприклад
-  /// `ImageAspect.square`. Слова без зображення чи без запису в таблиці
-  /// розмірів не проходять.
+  /// `ImageAspect.square`. Слова без візуалу чи зі зображенням без запису
+  /// в таблиці розмірів не проходять. Емодзі вважається квадратним.
   final DoubleRange? imageAspect;
 
   /// Мінімальна ширина зображення в пікселях.
@@ -375,12 +384,19 @@ class WordFilter {
       );
     }
 
+    // ПАМ'ЯТКА (емодзі): у концептів з емодзі немає файлу, тож немає ні
+    // розміру, ні пропорцій. Умовно: емодзі квадратне (проходить
+    // ImageAspect.square), а мінімальний розмір не обмежується (емодзі
+    // масштабується). Якщо у концепта є і зображення, і емодзі, діють
+    // розміри зображення (генератори віддають перевагу йому).
+    // Повернутися до цього рішення, якщо вигляд емодзі в завданнях
+    // виявиться проблемним.
     final aspectRange = imageAspect;
     if (aspectRange != null) {
       rules.add(
         WordFilterRule('пропорції зображення', (m) {
-          final meta = imageMeta.of(m.concept.image);
-          return meta != null && aspectRange.contains(meta.aspect) ? m : null;
+          final aspect = _pictureAspect(m.concept, imageMeta);
+          return aspect != null && aspectRange.contains(aspect) ? m : null;
         }),
       );
     }
@@ -390,6 +406,9 @@ class WordFilter {
     if (minWidth != null || minHeight != null) {
       rules.add(
         WordFilterRule('розмір зображення', (m) {
+          // Лише емодзі: розмір не обмежується (див. ПАМ'ЯТКУ вище).
+          if (!m.concept.hasImage) return m.concept.hasEmoji ? m : null;
+
           final meta = imageMeta.of(m.concept.image);
           if (meta == null) return null;
           if (minWidth != null && meta.width < minWidth) return null;

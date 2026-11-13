@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/word_picture.dart';
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/slot_assembly_ui_config.dart';
@@ -408,13 +409,8 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     switch (targetType) {
       case SlotAssemblyTargetType.image:
       case SlotAssemblyTargetType.imageWithAudio:
-        final imagePath = match.concept.image?.trim();
-
-        if (imagePath == null || imagePath.isEmpty) {
-          return null;
-        }
-
-        return ImageContent(imagePath, audio: audio);
+        // Зображення, а за його відсутності — емодзі.
+        return createPictureContent(match.concept, audio: audio);
 
       case SlotAssemblyTargetType.word:
       case SlotAssemblyTargetType.wordWithAudio:

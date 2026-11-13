@@ -15,6 +15,7 @@
 /// dart run tool/project_tools.dart tree --files --depth 1
 /// dart run tool/project_tools.dart tree . --files --depth 1
 /// dart run tool/project_tools.dart tree lib/features/learning
+/// dart run tool/project_tools.dart images
 
 import 'cli/cli.dart';
 import 'cli/command_registry.dart';

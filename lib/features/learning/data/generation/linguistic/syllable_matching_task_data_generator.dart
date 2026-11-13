@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_text_case.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/word_picture.dart';
 import 'package:school_tasks/features/learning/data/generation/task_data_generator.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_button_config.dart';
 import 'package:school_tasks/features/learning/domain/task_data/matching_task_data.dart';
@@ -177,10 +178,7 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
 
     // Зображення є обов'язковим лише для конфігурацій, які його показують.
     if (needsImage) {
-      funnel = funnel.refine(
-        'зображення',
-        (m) => (m.concept.image?.trim() ?? '').isNotEmpty,
-      );
+      funnel = funnel.refine('зображення', (m) => m.concept.hasPicture);
     }
 
     // Потрібен хоча б один непорожній склад.
@@ -241,11 +239,11 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
         break;
 
       case MatchingColumnElement.image:
-        final imagePath = match.concept.image?.trim();
-        if (imagePath == null || imagePath.isEmpty) {
+        // Зображення, а за його відсутності — емодзі.
+        visibleContent = createPictureContent(match.concept);
+        if (visibleContent == null) {
           return null;
         }
-        visibleContent = ImageContent(imagePath);
         break;
 
       case MatchingColumnElement.word:
