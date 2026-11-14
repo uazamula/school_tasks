@@ -18,6 +18,7 @@ import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/word_content/image_aspect.dart';
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
@@ -36,6 +37,7 @@ abstract final class MatchingSyllablesGeneratorDemo {
           filter: WordFilter(
             syllablePattern: 'с*',
             position: SyllableSearchPosition.any,
+         //   imageAspect: ImageAspect.square
           ),
           language: Language.uk,
 

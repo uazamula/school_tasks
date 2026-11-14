@@ -22,25 +22,44 @@ import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 
-MemoryPair _pair(String id, String image, String word, String audio) {
+/// Візуал пари:
+/// - 'crown.png'    — файл із assets/images;
+/// - ':🍐'          — емодзі (маркер ':' на початку);
+/// - 'crown.png:🍐' — і файл, і емодзі (перевага файлу, як у word_builder).
+TaskContent _picture(String spec, {AudioContent? audio}) {
+  final colon = spec.indexOf(':');
+  final file = colon < 0 ? spec.trim() : spec.substring(0, colon).trim();
+  final emoji = colon < 0 ? '' : spec.substring(colon + 1).trim();
+
+  if (file.isNotEmpty) {
+    return ImageContent('assets/images/$file', audio: audio);
+  }
+
+  assert(emoji.isNotEmpty, 'Порожній візуал пари: "$spec"');
+  return EmojiContent(emoji, audio: audio);
+}
+
+MemoryPair _pair(String id, String picture, String word, String audio) {
   return MemoryPair(
     id: id,
-    hiddenContent: ImageContent(
-      'assets/images/$image',
+    hiddenContent: _picture(
+      picture,
       audio: AudioContent.fixed('assets/audio/pronunciation/$audio.mp3'),
     ),
     faceFront: TextContent(word),
-    faceBack: ImageContent('assets/images/$image'),
+    faceBack: _picture(picture),
   );
 }
 
 final List<MemoryPair> _demoPairs = [
-  _pair('crown', 'crown.png', 'корона', 'uk_korona'),
+  _pair('crown', 'crown.png:👑', 'корона', 'uk_korona'),
   _pair('ants', 'ants.png', 'мурахи', 'uk_murakhy'),
   _pair('apron', 'apron.png', 'фартух', 'uk_fartukh'),
   _pair('arc', 'arc.png', 'арка', 'uk_arka'),
   _pair('dew', 'dew.png', 'роса', 'uk_rosa'),
   _pair('frame', 'frame.jpg', 'рама', 'uk_rama'),
+  _pair('owl', ':🦉', 'сова', 'uk_sova'),
+  _pair('wheel', ':🎡', 'колесо', 'uk_koleso'),
 ];
 
 TaskPrompt _prompt(String text) => TaskPrompt(content: [TextContent(text)]);
