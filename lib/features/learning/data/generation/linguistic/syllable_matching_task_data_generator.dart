@@ -240,7 +240,10 @@ class SyllableMatchingTaskDataGenerator extends TaskDataGenerator {
 
       case MatchingColumnElement.image:
         // Зображення, а за його відсутності — емодзі.
-        visibleContent = createPictureContent(match.concept);
+        visibleContent = createPictureContent(
+          match.concept,
+          source: filter.pictureSource,
+        );
         if (visibleContent == null) {
           return null;
         }

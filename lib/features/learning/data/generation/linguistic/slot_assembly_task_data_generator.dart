@@ -410,7 +410,11 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
       case SlotAssemblyTargetType.image:
       case SlotAssemblyTargetType.imageWithAudio:
         // Зображення, а за його відсутності — емодзі.
-        return createPictureContent(match.concept, audio: audio);
+        return createPictureContent(
+          match.concept,
+          audio: audio,
+          source: filter.pictureSource,
+        );
 
       case SlotAssemblyTargetType.word:
       case SlotAssemblyTargetType.wordWithAudio:

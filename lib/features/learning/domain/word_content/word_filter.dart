@@ -6,6 +6,7 @@ import 'image_meta.dart';
 import 'image_meta.g.dart';
 import 'int_range.dart';
 import 'language.dart';
+import 'picture_source.dart';
 import 'syllable_search_position.dart';
 import 'wildcard_pattern.dart';
 import 'word_bank.dart';
@@ -137,9 +138,17 @@ class WordFilterResult {
 /// Співвідношення сторін візуалу концепту: зображення (з таблиці розмірів),
 /// інакше емодзі (умовно 1.0). null — візуалу немає або зображення
 /// немає в таблиці.
-double? _pictureAspect(WordConcept concept, ImageMetaTable table) {
-  if (concept.hasImage) return table.of(concept.image)?.aspect;
-  if (concept.hasEmoji) return 1.0;
+double? _pictureAspect(
+  WordConcept concept,
+  ImageMetaTable table,
+  PictureSource source,
+) {
+  final useImage = source != PictureSource.emojiOnly && concept.hasImage;
+  if (useImage) return table.of(concept.image)?.aspect;
+
+  final useEmoji = source != PictureSource.imageOnly && concept.hasEmoji;
+  if (useEmoji) return 1.0;
+
   return null;
 }
 
@@ -156,6 +165,7 @@ class WordFilter {
     this.imageAspect,
     this.minImageWidth,
     this.minImageHeight,
+    this.pictureSource = PictureSource.any,
     this.syllablePattern,
     this.position = SyllableSearchPosition.any,
     this.requireSyllableAudio = SyllableAudioRequirement.none,
@@ -188,6 +198,11 @@ class WordFilter {
 
   /// Мінімальна висота зображення в пікселях.
   final int? minImageHeight;
+
+  /// Який візуал допустимий: будь-який (перевага зображення), лише
+  /// зображення чи лише емодзі. Генератори беруть контент у тому самому
+  /// режимі, тож фільтр і завдання узгоджені.
+  final PictureSource pictureSource;
 
   /// Маска складу: слово проходить, якщо хоча б один склад збігається.
   final String? syllablePattern;
@@ -223,6 +238,7 @@ class WordFilter {
     DoubleRange? imageAspect,
     int? minImageWidth,
     int? minImageHeight,
+    PictureSource? pictureSource,
     String? syllablePattern,
     SyllableSearchPosition? position,
     SyllableAudioRequirement? requireSyllableAudio,
@@ -241,6 +257,7 @@ class WordFilter {
       imageAspect: imageAspect ?? this.imageAspect,
       minImageWidth: minImageWidth ?? this.minImageWidth,
       minImageHeight: minImageHeight ?? this.minImageHeight,
+      pictureSource: pictureSource ?? this.pictureSource,
       syllablePattern: syllablePattern ?? this.syllablePattern,
       position: position ?? this.position,
       requireSyllableAudio: requireSyllableAudio ?? this.requireSyllableAudio,
@@ -384,6 +401,25 @@ class WordFilter {
       );
     }
 
+    // Лише зображення або лише емодзі.
+    switch (pictureSource) {
+      case PictureSource.any:
+        break;
+
+      case PictureSource.imageOnly:
+        rules.add(
+          WordFilterRule(
+            'лише зображення',
+            (m) => m.concept.hasImage ? m : null,
+          ),
+        );
+
+      case PictureSource.emojiOnly:
+        rules.add(
+          WordFilterRule('лише емодзі', (m) => m.concept.hasEmoji ? m : null),
+        );
+    }
+
     // ПАМ'ЯТКА (емодзі): у концептів з емодзі немає файлу, тож немає ні
     // розміру, ні пропорцій. Умовно: емодзі квадратне (проходить
     // ImageAspect.square), а мінімальний розмір не обмежується (емодзі
@@ -395,7 +431,7 @@ class WordFilter {
     if (aspectRange != null) {
       rules.add(
         WordFilterRule('пропорції зображення', (m) {
-          final aspect = _pictureAspect(m.concept, imageMeta);
+          final aspect = _pictureAspect(m.concept, imageMeta, pictureSource);
           return aspect != null && aspectRange.contains(aspect) ? m : null;
         }),
       );
@@ -406,10 +442,18 @@ class WordFilter {
     if (minWidth != null || minHeight != null) {
       rules.add(
         WordFilterRule('розмір зображення', (m) {
-          // Лише емодзі: розмір не обмежується (див. ПАМ'ЯТКУ вище).
-          if (!m.concept.hasImage) return m.concept.hasEmoji ? m : null;
+          final concept = m.concept;
+          final useImage =
+              pictureSource != PictureSource.emojiOnly && concept.hasImage;
 
-          final meta = imageMeta.of(m.concept.image);
+          // Емодзі: розмір не обмежується (див. ПАМ'ЯТКУ вище).
+          if (!useImage) {
+            final useEmoji =
+                pictureSource != PictureSource.imageOnly && concept.hasEmoji;
+            return useEmoji ? m : null;
+          }
+
+          final meta = imageMeta.of(concept.image);
           if (meta == null) return null;
           if (minWidth != null && meta.width < minWidth) return null;
           if (minHeight != null && meta.height < minHeight) return null;
