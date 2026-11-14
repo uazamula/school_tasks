@@ -1,4 +1,8 @@
 import 'package:school_tasks/core/theme/app_text_styles.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/memory_pair_building.dart';
+import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
+import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
@@ -21,6 +25,10 @@ import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
+import 'package:school_tasks/features/learning/domain/word_content/image_aspect.dart';
+import 'package:school_tasks/features/learning/domain/word_content/picture_source.dart';
+import 'package:school_tasks/features/learning/domain/word_content/syllable_search_position.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
 
 /// Візуал пари:
 /// - 'crown.png'    — файл із assets/images;
@@ -62,6 +70,30 @@ final List<MemoryPair> _demoPairs = [
   _pair('wheel', ':🎡', 'колесо', 'uk_koleso'),
 ];
 
+final pairs1 = MemoryPairBuilder(
+  bank: ukWordBank,
+  minPairs: 6, // gridSize.pairCount для скінченної дошки
+  filter: WordFilter(
+    pictureSource: PictureSource.imageOnly,
+    imageAspect: ImageAspect.square,
+  ),
+).build();
+
+final pairs2 = MemoryPairBuilder(
+  bank: ukWordBank,
+  minPairs: 6,
+  filter: WordFilter(
+    syllablePattern: '*р*',
+    position: SyllableSearchPosition.any,
+  ),
+  hiddenElement: MatchingColumnElement.image,
+  faceFrontElement: MatchingColumnElement.syllable,
+  faceBackElement: MatchingColumnElement.none,
+  audioPlace: MemoryAudioPlace.hidden,
+  audioSource: MemoryAudioSource.word,
+  syllableAudio: syllableAudioUk,
+).build();
+
 TaskPrompt _prompt(String text) => TaskPrompt(content: [TextContent(text)]);
 
 abstract final class MemoryFiniteDemo {
@@ -72,7 +104,7 @@ abstract final class MemoryFiniteDemo {
     dataSource: FixedTaskDataSource([
       MemoryTaskData(
         prompt: _prompt('Знайди пару'),
-        pairPool: _demoPairs,
+        pairPool: pairs1,
         config: const MemoryTaskConfig(
           gridSize: MemoryGridSize.size3x4,
           replayAudioOnMatch: true,
@@ -109,10 +141,10 @@ abstract final class MemoryEndlessDemo {
     dataSource: FixedTaskDataSource([
       MemoryTaskData(
         prompt: _prompt('Знайди пару'),
-        pairPool: _demoPairs,
+        pairPool: pairs2,
         mode: const EndlessMemoryMode(failedPairWeight: 3),
         config: const MemoryTaskConfig(
-          gridSize: MemoryGridSize.size2x2,
+          gridSize: MemoryGridSize.size4x6,
           peekDuration: Duration(seconds: 5),
         ),
       ),
