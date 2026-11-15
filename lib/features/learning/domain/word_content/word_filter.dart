@@ -166,6 +166,7 @@ class WordFilter {
     this.minImageWidth,
     this.minImageHeight,
     this.pictureSource = PictureSource.any,
+    this.requiredLanguages = const {},
     this.syllablePattern,
     this.position = SyllableSearchPosition.any,
     this.requireSyllableAudio = SyllableAudioRequirement.none,
@@ -204,6 +205,11 @@ class WordFilter {
   /// режимі, тож фільтр і завдання узгоджені.
   final PictureSource pictureSource;
 
+  /// Мови, які слово зобов'язане мати, крім основної мови генератора
+  /// (наприклад, `{Language.tr}` для завдань «слово М1 + слово М2»).
+  /// Слова без перекладу відсіюються; у воронці це етап з назвою мови.
+  final Set<Language> requiredLanguages;
+
   /// Маска складу: слово проходить, якщо хоча б один склад збігається.
   final String? syllablePattern;
 
@@ -239,6 +245,7 @@ class WordFilter {
     int? minImageWidth,
     int? minImageHeight,
     PictureSource? pictureSource,
+    Set<Language>? requiredLanguages,
     String? syllablePattern,
     SyllableSearchPosition? position,
     SyllableAudioRequirement? requireSyllableAudio,
@@ -258,6 +265,7 @@ class WordFilter {
       minImageWidth: minImageWidth ?? this.minImageWidth,
       minImageHeight: minImageHeight ?? this.minImageHeight,
       pictureSource: pictureSource ?? this.pictureSource,
+      requiredLanguages: requiredLanguages ?? this.requiredLanguages,
       syllablePattern: syllablePattern ?? this.syllablePattern,
       position: position ?? this.position,
       requireSyllableAudio: requireSyllableAudio ?? this.requireSyllableAudio,
@@ -375,6 +383,21 @@ class WordFilter {
     ImageMetaTable imageMeta = const ImageMetaTable(generatedImageMeta),
   ]) {
     final rules = <WordFilterRule>[];
+
+    // Обов'язкові додаткові мови: слово має мати переклад. Правила йдуть
+    // першими, тож воронка читається як `uk: 40 → tr: 31 → теги: 12`.
+    final extraLanguages = requiredLanguages.toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+
+    for (final required in extraLanguages) {
+      rules.add(
+        WordFilterRule(required.name, (m) {
+          // Основна мова вже перевірена на першому етапі.
+          if (m.entry.language == required) return m;
+          return m.record.hasLanguage(required) ? m : null;
+        }),
+      );
+    }
 
     if (includeIds.isNotEmpty || excludeIds.isNotEmpty) {
       rules.add(

@@ -133,16 +133,121 @@ final ukWords = [
   wordUk('zebra', ':🦓', 'uk_zebra', 'зебра', 'зе-бра'),
 ];
 
-final ukEnWordBank = WordBank([
+final ukEnTrWordBank = WordBank([
   // дві мови (або три): один концепт, кілька форм
-  words(
-    'dog',
-    'dog:🐕',
-    [
-      uk('uk_pes', 'собака', 'со-ба-ка'),
-      en('en_dog', 'dog'),
-      tr('tr_koepek', 'köpek'),
-    ],
-    {t.animal, t.domesticAnimal},
-  ),
+  words('fish', 'fish:🐟', [
+    uk('uk_ryba', 'риба', 'ри-ба'),
+    en('en_fish', 'fish'),
+    tr('tr_balixk', 'balık', 'ba-lık'),
+  ]),
+  words('cheetah', 'cheetah:🐆', [
+    uk('uk_hepard', 'гепард', 'ге-пард'),
+    en('en_cheetah', 'cheetah'),
+    tr('tr_cxita', 'çita', 'çi-ta'),
+  ]),
+  words('apple', ':🍎', [
+    uk('uk_jabluko', 'яблуко', 'я-блу-ко'),
+    en('en_apple', 'apple'),
+    tr('tr_elma', 'elma', 'el-ma'),
+  ]),
+  words('meat', ':🥩', [
+    uk('uk_mjaso', 'м\'ясо', 'м\'я-со'),
+    en('en_meat', 'meat'),
+    tr('tr_et', 'et', 'et'),
+  ]),
+  words('hand', ':✋', [
+    uk('uk_ruka', 'рука', 'ру-ка'),
+    en('en_hand', 'hand'),
+    tr('tr_el', 'el', 'el'),
+  ]),
+  words('ship', ':🚢', [
+    uk('uk_korabel', 'корабель', 'ко-ра-бель'),
+    en('en_ship', 'ship'),
+    tr('tr_gemi', 'gemi', 'ge-mi'),
+  ]),
+  words('door', ':🚪', [
+    uk('uk_dveri', 'двері', 'две-рі'),
+    en('en_door', 'door'),
+    tr('tr_kapix', 'kapı', 'ka-pı'),
+  ]),
+  words('cat', ':🐈', [
+    uk('uk_kit', 'кіт', 'кіт'),
+    en('en_cat', 'cat'),
+    tr('tr_kedi', 'kedi', 'ke-di'),
+  ]),
+  words('kiwi', 'kiwi:🥝', [
+    uk('uk_kivi', 'ківі', 'кі-ві'),
+    en('en_kiwi', 'kiwi'),
+    tr('tr_kivi', 'kivi', 'ki-vi'),
+  ]),
+  words('bucket', ':🪣', [
+    uk('uk_vidro', 'відро', 'від-ро'),
+    en('en_bucket', 'bucket'),
+    tr('tr_kova', 'kova', 'ko-va'),
+  ]),
+  words('lemon', 'lemon:🍋', [
+    uk('uk_lymon', 'лимон', 'ли-мон'),
+    en('en_lemon', 'lemon'),
+    tr('tr_limon', 'limon', 'li-mon'),
+  ]),
+  words('table', 'table', [
+    uk('uk_stil', 'стіл', 'стіл'),
+    en('en_table', 'table'),
+    tr('tr_masa', 'masa', 'ma-sa'),
+  ]),
+  words('banana', ':🍌', [
+    uk('uk_banan', 'банан', 'ба-нан'),
+    en('en_banana', 'banana'),
+    tr('tr_muz', 'muz', 'muz'),
+  ]),
+  words('fairy', 'fairy:🧚', [
+    uk('uk_feja', 'фея', 'фе-я'),
+    en('en_fairy', 'fairy'),
+    tr('tr_peri', 'peri', 'pe-ri'),
+  ]),
+  words('suitcase', ':🧳', [
+    uk('uk_valiza', 'валіза', 'ва-лі-за'),
+    en('en_suitcase', 'suitcase'),
+    tr('tr_valiz', 'valiz', 'va-liz'),
+  ]),
+  words('vase', ':🏺', [
+    uk('uk_vaza', 'ваза', 'ва-за'),
+    en('en_vase', 'vase'),
+    tr('tr_vazo', 'vazo', 'va-zo'),
+  ]),
+  words('seal', ':🦭', [
+    uk('uk_tjulen', 'тюлень', 'тю-лень'),
+    en('en_seal', 'seal'),
+    tr('tr_fok', 'fok', 'fok'),
+  ]),
+  words('elephant', ':🐘', [
+    uk('uk_slon', 'слон', 'слон'),
+    en('en_elephant', 'elephant'),
+    tr('tr_fil', 'fil', 'fil'),
+  ]),
+  words('arrow', ':🏹', [
+    uk('uk_strila', 'стріла', 'стрі-ла'),
+    en('en_arrow', 'arrow'),
+    tr('tr_ok', 'ok', 'ok'),
+  ]),
+  words('grass', ':🌿', [
+    uk('uk_trava', 'трава', 'тра-ва'),
+    en('en_grass', 'grass'),
+    tr('tr_ot', 'ot', 'ot'),
+  ]),
+  words('water', ':💧', [
+    uk('uk_voda', 'вода', 'во-да'),
+    en('en_water', 'water'),
+    tr('tr_su', 'su', 'su'),
+  ]),
+  words('ball', ':⚽', [
+    uk('uk_mjach', 'м\'яч', 'м\'яч'),
+    en('en_ball', 'ball'),
+    tr('tr_top', 'top', 'top'),
+  ]),
+  words('giraffe', 'giraffe:🦒', [
+    uk('uk_zhyrafa', 'жирафа', 'жи-ра-фа'),
+    en('en_giraffe', 'giraffe'),
+    tr('tr_zuerafa', 'zürafa', 'zü-ra-fa'),
+  ]),
 ]);

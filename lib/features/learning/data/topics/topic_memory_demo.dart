@@ -1,6 +1,6 @@
 import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
-import 'package:school_tasks/features/learning/data/generation/linguistic/memory_pair_building.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/memory_pair_builder.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
@@ -77,6 +77,7 @@ final pairs1 = MemoryPairBuilder(
     pictureSource: PictureSource.imageOnly,
     imageAspect: ImageAspect.square,
   ),
+  printDiagnostics: false,
 ).build();
 
 final pairs2 = MemoryPairBuilder(
@@ -92,6 +93,7 @@ final pairs2 = MemoryPairBuilder(
   audioPlace: MemoryAudioPlace.hidden,
   audioSource: MemoryAudioSource.word,
   syllableAudio: syllableAudioUk,
+  printDiagnostics: false
 ).build();
 
 TaskPrompt _prompt(String text) => TaskPrompt(content: [TextContent(text)]);
