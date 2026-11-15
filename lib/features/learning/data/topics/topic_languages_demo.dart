@@ -1,9 +1,12 @@
 import 'package:school_tasks/core/theme/app_text_styles.dart';
+import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/memory_pair_builder.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
+import 'package:school_tasks/features/learning/domain/composite_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_criterion_type.dart';
@@ -69,11 +72,12 @@ final memoryTaskData1 = MemoryTaskData(
     ),
   ),
 );
+
 final memoryTaskData2 = MemoryTaskData(
   prompt: _prompt('Знайди пару'),
   pairPool: [...pairs2],
   config: const MemoryTaskConfig(
-    gridSize: MemoryGridSize.size3x2,
+    gridSize: MemoryGridSize.size2x2,
     replayAudioOnMatch: true,
     cardAspectRatio: 1,
     cardStyle: MemoryCardStyleConfig(
@@ -83,6 +87,44 @@ final memoryTaskData2 = MemoryTaskData(
   ),
 );
 
+final smtdGenerator1 = SyllableMatchingTaskDataGenerator(
+  bank: ukEnTrWordBank,
+  taskCount: 1,
+  pairCount: 4,
+  language: Language.uk,
+  leftColumnElement: MatchingColumnElement.word,
+  rightColumnElement: MatchingColumnElement.word,
+  rightColumnLanguage: Language.tr,
+  rightColumnAudio: MatchingColumnAudio.word,
+  printDiagnostics: false,
+);
+
+final smtdGenerator2 = SyllableMatchingTaskDataGenerator(
+  bank: ukEnTrWordBank,
+  taskCount: 1,
+  pairCount: 3,
+  language: Language.uk,
+  leftColumnElement: MatchingColumnElement.word,
+  leftColumnAudio: MatchingColumnAudio.word,
+  leftAudioLanguage: Language.tr,
+  rightColumnElement: MatchingColumnElement.image,
+  printDiagnostics: false,
+);
+
+final smtdGenerator3 = SyllableMatchingTaskDataGenerator(
+  bank: ukEnTrWordBank,
+  taskCount: 1,
+  pairCount: 2,
+  language: Language.tr,
+  leftColumnElement: MatchingColumnElement.none,
+  leftColumnAudio: MatchingColumnAudio.word,
+  rightColumnLanguage: Language.uk,
+  rightColumnElement: MatchingColumnElement.word,
+  rightColumnAudio: MatchingColumnAudio.none,
+  rightAudioLanguage: Language.uk,
+  printDiagnostics: true,
+);
+
 TaskPrompt _prompt(String text) => TaskPrompt(content: [TextContent(text)]);
 
 abstract final class MemoryLanguagesDemo {
@@ -90,7 +132,10 @@ abstract final class MemoryLanguagesDemo {
     id: 'languages_memory',
     taskTypeCounts: {LearningTaskType.memory: 1},
     taskOrderMode: TaskOrderMode.deterministic,
-    dataSource: FixedTaskDataSource([memoryTaskData1, memoryTaskData2]),
+    dataSource: CompositeTaskDataSource([
+      GeneratedTaskDataSource([smtdGenerator1, smtdGenerator2, smtdGenerator3]),
+      FixedTaskDataSource([memoryTaskData1, memoryTaskData2]),
+    ]),
     help: 'Memory: скінченна дошка',
     evaluation: const EvaluationConfig(
       weights: {EvaluationCriterionType.accuracy: 1},
