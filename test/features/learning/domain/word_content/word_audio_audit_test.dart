@@ -8,6 +8,7 @@ import 'package:school_tasks/features/learning/domain/word_content/audio_asset_l
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_audio_audit.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
+
 // TODO: підключіть файли з вашими даними (слова, концепти, syllableAudioUk).
 //
 // Приклад імпортів (шляхи замініть на свої):
@@ -32,7 +33,7 @@ import 'package:school_tasks/features/learning/domain/word_content/word_bank.dar
 ///       en('en_dog', 'dog'),
 ///     ], {t.animal, t.domesticAnimal}),
 ///   ]);
-WordBank _loadBank() => ukEnTrWordBank; //ukWordBank;
+WordBank _loadBank() => ukWordBank; //ukEnTrWordBank;
 
 /// TODO: мапи озвучки складів за мовами.
 ///
@@ -66,36 +67,57 @@ Map<Language, Map<String, String>> _loadSyllableAudio() => {
 /// Суфікс _2, _3 дозволений і виняток для них не потрібен.
 /// Ключі винятків не залежать від регістру.
 const Map<String, String> _audioNameExceptions = {
-  'рись': 'uk_rysj.mp3',
-  'р\'ї': 'uk_rji.mp3',
-  'рю': 'uk_rju.mp3',
-  'рюк': 'uk_rjuk.mp3',
-  'ря': 'uk_rja.mp3',
-  'ряк': 'uk_rjak.mp3',
-  'ай': 'uk_aj.mp3',
-  'дя': 'uk_dja.mp3',
-  'дю': 'uk_dju.mp3',
-  'я': 'uk_ja.mp3',
-  'як': 'uk_jak.mp3',
-  'ян': 'uk_jan.mp3',
-  'є': 'uk_je.mp3',
-  'ї': 'uk_ji.mp3',
-  'йо': 'uk_jo.mp3',
-  'ю': 'uk_ju.mp3',
-  'ля': 'uk_lja.mp3',
-  'льо': 'uk_ljo.mp3',
-  'лю': 'uk_lju.mp3',
-  'ня': 'uk_nja.mp3',
-  'ню': 'uk_nju.mp3',
-  'ой': 'uk_oj.mp3',
-  'ся': 'uk_sja.mp3',
-  'сьо': 'uk_sjo.mp3',
-  'зя': 'uk_zja.mp3',
-  'зю': 'uk_zju.mp3',
-  'яй': 'uk_jaj.mp3',
-  'м\'я': 'uk_mja.mp3',
-  'м\'яч': 'uk_mjach.mp3',
-  'ця': 'uk_tsja.mp3',
+  'рись': 'rysj',
+  'р\'ї': 'rji',
+  'рю': 'rju',
+  'рюк': 'rjuk',
+  'ря': 'rja',
+  'ряк': 'rjak',
+  'ай': 'aj',
+  'дя': 'dja',
+  'дю': 'dju',
+  'я': 'ja',
+  'як': 'jak',
+  'ян': 'jan',
+  'є': 'je',
+  'ї': 'ji',
+  'йо': 'jo',
+  'ю': 'ju',
+  'ля': 'lja',
+  'льо': 'ljo',
+  'лю': 'lju',
+  'ня': 'nja',
+  'ню': 'nju',
+  'ой': 'oj',
+  'ся': 'sja',
+  'сьо': 'sjo',
+  'зя': 'zja',
+  'зю': 'zju',
+  'яй': 'jaj',
+  'м\'я': 'mja',
+  'м\'яч': 'mjach',
+  'ця': 'tsja',
+  'чай': 'chaj',
+  'міль': 'milj',
+  'м\'як': 'mjak',
+  "фея": "feja",
+  "лисиця": "lysytsja",
+  "заєць": "zajets",
+  "їжак": "jizhak",
+  "кінь": "kinj",
+  "чайник": "chajnyk",
+  "гиря": "hyrja",
+  "куниця": "kunytsja",
+  "м'ясо": "mjaso",
+  "диня": "dynja",
+  "цибуля": "tsybulja",
+  "літак": "ljitak",
+  "тюлень": "tjulen",
+  "зозуля": "zozulja",
+  "теля": "telja",
+  "рюкзак": "rjukzak",
+  "яблуко": "jabluko",
+  "баян": "bajan",
 };
 
 /// ---------------------------------------------------------------------------
