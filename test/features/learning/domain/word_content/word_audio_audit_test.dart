@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:school_tasks/features/learning/data/word_content/syllable_audio_tr.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/word_content/audio_asset_listing.dart';
@@ -31,7 +32,7 @@ import 'package:school_tasks/features/learning/domain/word_content/word_bank.dar
 ///       en('en_dog', 'dog'),
 ///     ], {t.animal, t.domesticAnimal}),
 ///   ]);
-WordBank _loadBank() => ukWordBank;
+WordBank _loadBank() => ukEnTrWordBank; //ukWordBank;
 
 /// TODO: мапи озвучки складів за мовами.
 ///
@@ -44,9 +45,11 @@ WordBank _loadBank() => ukWordBank;
 /// Мапа syllableAudioUk має вигляд {'ар': 'uk_ar.mp3', 'ба': 'uk_ba.mp3', ...}.
 Map<Language, Map<String, String>> _loadSyllableAudio() => {
   Language.uk: syllableAudioUk,
+  Language.tr: syllableAudioTr,
 };
 
-/// Свідомі винятки з правил транслітерації 2010 року:
+/// Свідомі винятки з правил транслітерації (uk: 2010 рік; tr: ö→oe, ü→ue,
+/// ı→ix, ç→cx, ş→sx, ğ→gx; en: без змін):
 /// слово або склад → назва файлу БЕЗ мовного префікса й розширення.
 /// Попередження про такі слова не показується.
 ///
@@ -56,12 +59,44 @@ Map<Language, Map<String, String>> _loadSyllableAudio() => {
 ///     'юла': 'iula',     // правило: «ю» на початку слова → yu (yula)
 ///     'цирк': 'cyrk',    // правило: «ц» → ts, «и» → y (tsyrk)
 ///     'я': 'ia',         // склад «я», озвучений як «ia»
+///     'köpek': 'kopek',  // турецьке: за правилами ö → oe (koepek)
 ///   };
 ///
 /// Омоніми (замок, коса) називайте з суфіксом: uk_zamok.mp3, uk_zamok_2.mp3.
 /// Суфікс _2, _3 дозволений і виняток для них не потрібен.
 /// Ключі винятків не залежать від регістру.
-const Map<String, String> _audioNameExceptions = {};
+const Map<String, String> _audioNameExceptions = {
+  'рись': 'uk_rysj.mp3',
+  'р\'ї': 'uk_rji.mp3',
+  'рю': 'uk_rju.mp3',
+  'рюк': 'uk_rjuk.mp3',
+  'ря': 'uk_rja.mp3',
+  'ряк': 'uk_rjak.mp3',
+  'ай': 'uk_aj.mp3',
+  'дя': 'uk_dja.mp3',
+  'дю': 'uk_dju.mp3',
+  'я': 'uk_ja.mp3',
+  'як': 'uk_jak.mp3',
+  'ян': 'uk_jan.mp3',
+  'є': 'uk_je.mp3',
+  'ї': 'uk_ji.mp3',
+  'йо': 'uk_jo.mp3',
+  'ю': 'uk_ju.mp3',
+  'ля': 'uk_lja.mp3',
+  'льо': 'uk_ljo.mp3',
+  'лю': 'uk_lju.mp3',
+  'ня': 'uk_nja.mp3',
+  'ню': 'uk_nju.mp3',
+  'ой': 'uk_oj.mp3',
+  'ся': 'uk_sja.mp3',
+  'сьо': 'uk_sjo.mp3',
+  'зя': 'uk_zja.mp3',
+  'зю': 'uk_zju.mp3',
+  'яй': 'uk_jaj.mp3',
+  'м\'я': 'uk_mja.mp3',
+  'м\'яч': 'uk_mjach.mp3',
+  'ця': 'uk_tsja.mp3',
+};
 
 /// ---------------------------------------------------------------------------
 /// Як запускати

@@ -1,6 +1,6 @@
+import 'audio_name_transliteration.dart';
 import 'audio_paths.dart';
 import 'language.dart';
-import 'ukrainian_transliteration.dart';
 import 'word_bank.dart';
 import 'word_text.dart';
 
@@ -57,7 +57,9 @@ class AuditReport {
   final List<AuditIssue> issues;
 
   List<AuditIssue> get errors => _bySeverity(AuditSeverity.error);
+
   List<AuditIssue> get warnings => _bySeverity(AuditSeverity.warning);
+
   List<AuditIssue> get infos => _bySeverity(AuditSeverity.info);
 
   bool get isClean => issues.isEmpty;
@@ -286,23 +288,29 @@ abstract final class WordAudioAudit {
       return;
     }
 
-    // Транслітерацію перевіряємо лише для української.
-    if (language != Language.uk) return;
-
     final base = name.substring(prefix.length);
     final normalizedKey = normalizeWordKey(key);
 
     if (exceptions[normalizedKey] == base) return;
 
-    if (!_matchesTransliteration(normalizedKey, base, isSyllable: isSyllable)) {
-      final expected = UkrainianTransliteration.transliterate(normalizedKey);
+    if (!_matchesTransliteration(
+      language,
+      normalizedKey,
+      base,
+      isSyllable: isSyllable,
+    )) {
+      final expected = AudioNameTransliteration.transliterate(
+        language,
+        normalizedKey,
+      );
       issues.add(
         AuditIssue(
           severity: AuditSeverity.warning,
           code: AuditIssueCode.transliterationMismatch,
           subject: subject,
           message:
-              '"$key" за правилами 2010 року → "$expected", '
+              '"$key" ${AudioNameTransliteration.ruleName(language)} '
+              '→ "$expected", '
               'а у файлі "$base"',
         ),
       );
@@ -313,14 +321,15 @@ abstract final class WordAudioAudit {
   /// для омонімів). Для складів приймаються обидва варіанти першої літери:
   /// як на початку слова та всередині.
   static bool _matchesTransliteration(
+    Language language,
     String key,
     String base, {
     required bool isSyllable,
   }) {
     final candidates = {
-      UkrainianTransliteration.transliterate(key),
+      AudioNameTransliteration.transliterate(language, key),
       if (isSyllable)
-        UkrainianTransliteration.transliterate(key, initial: false),
+        AudioNameTransliteration.transliterate(language, key, initial: false),
     }..remove('');
 
     // Нічого перевіряти (наприклад, слово не кирилицею).

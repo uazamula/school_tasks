@@ -2,7 +2,9 @@ import 'package:school_tasks/core/theme/app_text_styles.dart';
 import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/matching_column_element.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/memory_pair_builder.dart';
+import 'package:school_tasks/features/learning/data/generation/linguistic/slot_assembly_task_data_generator.dart';
 import 'package:school_tasks/features/learning/data/generation/linguistic/syllable_matching_task_data_generator.dart';
+import 'package:school_tasks/features/learning/data/word_content/syllable_audio_tr.dart';
 import 'package:school_tasks/features/learning/data/word_content/syllable_audio_uk.dart';
 import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
@@ -32,7 +34,7 @@ import 'package:school_tasks/features/learning/domain/word_content/word_filter.d
 final pairs1 = MemoryPairBuilder(
   bank: ukEnTrWordBank,
   minPairs: 3,
-  filter: WordFilter(wordPattern: 'k*', position: SyllableSearchPosition.any),
+  filter: WordFilter(wordPattern: '*k*', position: SyllableSearchPosition.any),
   language: Language.tr,
   hiddenElement: MatchingColumnElement.word,
   faceFrontElement: MatchingColumnElement.word,
@@ -87,7 +89,7 @@ final memoryTaskData2 = MemoryTaskData(
   ),
 );
 
-final smtdGenerator1 = SyllableMatchingTaskDataGenerator(
+final sMatchingTDGenerator1 = SyllableMatchingTaskDataGenerator(
   bank: ukEnTrWordBank,
   taskCount: 1,
   pairCount: 4,
@@ -99,7 +101,7 @@ final smtdGenerator1 = SyllableMatchingTaskDataGenerator(
   printDiagnostics: false,
 );
 
-final smtdGenerator2 = SyllableMatchingTaskDataGenerator(
+final sMatchingTDGenerator2 = SyllableMatchingTaskDataGenerator(
   bank: ukEnTrWordBank,
   taskCount: 1,
   pairCount: 3,
@@ -111,7 +113,7 @@ final smtdGenerator2 = SyllableMatchingTaskDataGenerator(
   printDiagnostics: false,
 );
 
-final smtdGenerator3 = SyllableMatchingTaskDataGenerator(
+final sMatchingTDGenerator3 = SyllableMatchingTaskDataGenerator(
   bank: ukEnTrWordBank,
   taskCount: 1,
   pairCount: 2,
@@ -124,6 +126,39 @@ final smtdGenerator3 = SyllableMatchingTaskDataGenerator(
   rightAudioLanguage: Language.uk,
   printDiagnostics: true,
 );
+// Бачимо турецьке слово й чуємо його, складаємо українське:
+final slotAtdGenerator1 = SlotAssemblyTaskDataGenerator(
+  bank: ukEnTrWordBank,
+  taskCount: 1,
+  wrongAnswerCount: 3,
+  language: Language.uk,
+  targetLanguage: Language.tr,
+  targetType: SlotAssemblyTargetType.wordWithAudio,
+  syllableAudio: syllableAudioUk,
+  printDiagnostics: false,
+);
+//Бачимо українське слово, а чуємо турецьке, складаємо українське:
+final slotAtdGenerator2 = SlotAssemblyTaskDataGenerator(
+  bank: ukEnTrWordBank,
+  taskCount: 1,
+  wrongAnswerCount: 3,
+  language: Language.uk,
+  targetAudioLanguage: Language.tr,
+  targetType: SlotAssemblyTargetType.wordWithAudio,
+  syllableAudio: syllableAudioUk,
+);
+
+//Бачимо українське слово, а чуємо і складаємо турецьке:
+final slotAtdGenerator3 = SlotAssemblyTaskDataGenerator(
+  bank: ukEnTrWordBank,
+  taskCount: 1,
+  wrongAnswerCount: 3,
+  language: Language.tr,
+  targetLanguage: Language.uk,
+  targetAudioLanguage: Language.tr,
+  targetType: SlotAssemblyTargetType.wordWithAudio,
+  syllableAudio: syllableAudioTr,
+);
 
 TaskPrompt _prompt(String text) => TaskPrompt(content: [TextContent(text)]);
 
@@ -133,7 +168,14 @@ abstract final class MemoryLanguagesDemo {
     taskTypeCounts: {LearningTaskType.memory: 1},
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([
-      GeneratedTaskDataSource([smtdGenerator1, smtdGenerator2, smtdGenerator3]),
+      GeneratedTaskDataSource([
+        slotAtdGenerator1,
+        slotAtdGenerator2,
+        slotAtdGenerator3,
+        sMatchingTDGenerator1,
+        sMatchingTDGenerator2,
+        sMatchingTDGenerator3,
+      ]),
       FixedTaskDataSource([memoryTaskData1, memoryTaskData2]),
     ]),
     help: 'Memory: скінченна дошка',

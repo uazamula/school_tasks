@@ -16,6 +16,7 @@ import 'package:school_tasks/features/learning/domain/word_content/audio_paths.d
 import 'package:school_tasks/features/learning/domain/word_content/language.dart';
 import 'package:school_tasks/features/learning/domain/word_content/wildcard_pattern.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_bank.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_entry.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
 import 'package:school_tasks/features/learning/domain/word_content/word_text.dart';
 
@@ -39,6 +40,26 @@ enum SlotAssemblyDistractorMode {
   similarToCorrect,
 }
 
+/// Генератор завдань SlotAssembly зі слів банку.
+///
+/// Мови. [language] це мова слова, яке складають зі складів (М1): за нею
+/// працюють фільтр, склади, їх озвучка й дистрактори. Ціль (слово чи аудіо)
+/// може бути іншою мовою (М2): [targetLanguage] для слова в цілі,
+/// [targetAudioLanguage] для аудіо в цілі. Потрібні мови додаються у фільтр
+/// автоматично, слова без перекладу відсіюються.
+///
+/// Приклад «бачимо турецьке слово й чуємо його, складаємо українське»:
+/// ```dart
+/// SlotAssemblyTaskDataGenerator(
+///   bank: bank,
+///   taskCount: 3,
+///   wrongAnswerCount: 3,
+///   language: Language.uk,
+///   targetLanguage: Language.tr,
+///   targetType: SlotAssemblyTargetType.wordWithAudio,
+///   syllableAudio: syllableAudioUk,
+/// )
+/// ```
 class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
   SlotAssemblyTaskDataGenerator({
     required this.bank,
@@ -47,6 +68,8 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     required this.targetType,
     this.filter = const WordFilter(),
     this.language = Language.uk,
+    this.targetLanguage,
+    this.targetAudioLanguage,
     this.distractorPattern,
     this.distractorMode = SlotAssemblyDistractorMode.pool,
     this.targetEffect,
@@ -77,7 +100,16 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
   final WordFilter filter;
 
   final SlotAssemblyTargetType targetType;
+
+  /// Мова слова, яке складають (М1).
   final Language language;
+
+  /// Мова слова в цілі (типи word і wordWithAudio). null — основна.
+  final Language? targetLanguage;
+
+  /// Мова аудіо в цілі (типи imageWithAudio, wordWithAudio, audio).
+  /// null — [targetLanguage], а якщо й вона не задана, основна.
+  final Language? targetAudioLanguage;
 
   /// Маска складів-дистракторів. Якщо null:
   /// - режим [SlotAssemblyDistractorMode.pool] використовує маску складу
@@ -114,6 +146,24 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
 
   /// Друкувати воронку відбору в консоль (лише в debug).
   final bool printDiagnostics;
+
+  Language get _targetLang => targetLanguage ?? language;
+  Language get _targetAudioLang => targetAudioLanguage ?? _targetLang;
+
+  /// Чи показує ціль слово.
+  bool get _targetShowsWord =>
+      targetType == SlotAssemblyTargetType.word ||
+      targetType == SlotAssemblyTargetType.wordWithAudio;
+
+  /// Чи має ціль аудіо.
+  bool get _targetHasAudio =>
+      targetType == SlotAssemblyTargetType.imageWithAudio ||
+      targetType == SlotAssemblyTargetType.wordWithAudio ||
+      targetType == SlotAssemblyTargetType.audio;
+
+  /// Слово потрібною мовою: основну беремо з відбору, іншу з запису.
+  WordEntry? _entryFor(WordMatch match, Language lang) =>
+      lang == language ? match.entry : match.record.entry(lang);
 
   @override
   List<TaskData> generate() {
@@ -196,9 +246,24 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     final pool = _createDistractorPool();
 
     final needsSyllableAudio = syllableHasSound && requireSyllableAudio;
-    final effectiveFilter = needsSyllableAudio
+    var effectiveFilter = needsSyllableAudio
         ? filter.copyWith(requireSyllableAudio: SyllableAudioRequirement.all)
         : filter;
+
+    // Слова без потрібного перекладу відсіюються.
+    final extraLanguages = <Language>{
+      if (_targetShowsWord) _targetLang,
+      if (_targetHasAudio) _targetAudioLang,
+    }..remove(language);
+
+    if (extraLanguages.isNotEmpty) {
+      effectiveFilter = effectiveFilter.copyWith(
+        requiredLanguages: {
+          ...effectiveFilter.requiredLanguages,
+          ...extraLanguages,
+        },
+      );
+    }
 
     var funnel = effectiveFilter.apply(
       bank,
@@ -222,6 +287,15 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
       targets[m.record.id] = target;
       return true;
     });
+
+    // Ціль не має збігатися зі словом, яке складають (наприклад, однакове
+    // слово в двох мовах: radar / radar). Для однієї мови збіг очікуваний.
+    if (_targetShowsWord && _targetLang != language) {
+      funnel = funnel.refine('збіг цілі зі словом', (m) {
+        final target = _entryFor(m, _targetLang)?.word ?? '';
+        return normalizeWordKey(target) != normalizeWordKey(m.entry.word);
+      });
+    }
 
     // Достатньо унікальних дистракторів, не рахуючи правильних складів.
     funnel = funnel.refine('дистрактори', (m) {
@@ -397,7 +471,7 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
     AudioContent? audio;
 
     if (requiresWordAudio) {
-      final audioPath = match.entry.audio?.trim();
+      final audioPath = _entryFor(match, _targetAudioLang)?.audio?.trim();
 
       if (audioPath == null || audioPath.isEmpty) {
         return null;
@@ -418,7 +492,16 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
 
       case SlotAssemblyTargetType.word:
       case SlotAssemblyTargetType.wordWithAudio:
-        return TextContent(textCase.format(match.entry.word), audio: audio);
+        final targetEntry = _entryFor(match, _targetLang);
+
+        if (targetEntry == null) {
+          return null;
+        }
+
+        return TextContent(
+          textCase.format(targetEntry.word, _targetLang),
+          audio: audio,
+        );
 
       case SlotAssemblyTargetType.audio:
         return audio;
@@ -426,7 +509,7 @@ class SlotAssemblyTaskDataGenerator extends TaskDataGenerator {
   }
 
   TaskContent _createSyllableContent(String syllable) {
-    final formattedSyllable = textCase.format(syllable);
+    final formattedSyllable = textCase.format(syllable, language);
 
     if (!syllableHasSound) {
       return TextContent(formattedSyllable);
