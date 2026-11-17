@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/features/learning/presentation/dialogs/kids_exit_dialog.dart';
 import 'package:school_tasks/features/profile/pages/profile_page.dart';
 
 import '../core/navigation/main_shell.dart';
@@ -64,6 +65,37 @@ final GoRouter appRouter = GoRouter(
         }
 
         final guard = _learningExitGuard;
+
+        // Дитячий режим: один діалог з двома піктограмами.
+        if (guard.isKidsUi) {
+          guard.onExitDialogOpened?.call();
+
+          final shouldExit = await showKidsExitDialog(context);
+
+          if (!shouldExit) {
+            guard.onExitDialogClosed?.call();
+            return false;
+          }
+
+          // Серія зі складеними парами: зберігаємо автоматично,
+          // сторінка сама піде на головну без оверлею.
+          if (guard.hasSavableProgress?.call() ?? false) {
+            guard.finishOnQuit?.call();
+            return false;
+          }
+
+          guard.allowExit = true;
+
+          Future.microtask(() {
+            if (!context.mounted) {
+              return;
+            }
+
+            Router.neglect(context, () => context.go(AppRoutes.home));
+          });
+
+          return false;
+        }
 
         if (guard.hasSavableProgress?.call() ?? false) {
           guard.onExitDialogOpened?.call();
@@ -177,6 +209,9 @@ Future<bool> _confirmLearningExit(BuildContext context) async {
 class LearningExitGuard {
   bool allowExit = false;
 
+  /// Дитячий режим: реєструє LearningPage.
+  bool isKidsUi = false;
+
   /// Нижче поля реєструє LearningPage, поки вона відкрита.
   bool Function()? hasSavableProgress;
   String? Function()? exitSummary;
@@ -190,5 +225,6 @@ class LearningExitGuard {
     onExitDialogOpened = null;
     onExitDialogClosed = null;
     finishOnQuit = null;
+    isKidsUi = false;
   }
 }

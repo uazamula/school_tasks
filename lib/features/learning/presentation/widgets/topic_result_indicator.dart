@@ -90,18 +90,23 @@ class TopicResultIndicator extends ConsumerWidget {
   }
 
   Widget _buildStreak(int streak) {
+    // Колір в обох режимах, більший розмір лише в дитячому.
+    final iconSize = kidsMode ? 40.0 : 18.0;
+    final fontSize = kidsMode ? 28.0 : _gradeFontSize;
+
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.local_fire_department, size: 18),
+          Icon(
+            Icons.local_fire_department,
+            size: iconSize,
+            color: Colors.deepOrange,
+          ),
           Text(
             '$streak',
-            style: const TextStyle(
-              fontSize: _gradeFontSize,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
           ),
         ],
       ),

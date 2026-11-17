@@ -168,6 +168,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       setState(() {});
     });
     widget.exitGuard
+      ..isKidsUi = _isKidsUi
       ..hasSavableProgress = _hasSavableProgress
       ..exitSummary = _exitSummary
       ..onExitDialogOpened = _pauseForExitDialog
@@ -217,6 +218,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       paused: _isExitPaused,
     );
 
+    final kidsUi = ref.watch(kidsUiControllerProvider).value ?? false;
+
     return Stack(
       children: [
         AppScaffold(
@@ -232,7 +235,14 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                           rootNavigatorKey.currentState?.maybePop();
                         },
                         tooltip: 'Вийти',
-                        icon: const Icon(Icons.arrow_back),
+                        // Дитячий режим: більша, закруглена, кольорова, але не кричуща.
+                        iconSize: kidsUi ? 32 : null,
+                        color: kidsUi
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                        icon: Icon(
+                          kidsUi ? Icons.arrow_back_rounded : Icons.arrow_back,
+                        ),
                       ),
                     ),
                     Expanded(
@@ -566,6 +576,12 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     // Дитячий режим: замість діалогів показуємо оверлей з результатом.
     if (_isKidsUi) {
+      // Вихід по кнопці: результат уже збережено, оверлей не потрібен.
+      if (completionReason == TopicCompletionReason.quit) {
+        _leavePage();
+        return;
+      }
+
       _markFinishing();
 
       // Результат уже збережено, тож системне «назад» виходить без питань.
