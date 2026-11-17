@@ -16,7 +16,11 @@ class LearningNodeWidget extends StatelessWidget {
     this.getTopicResult,
     this.isNodeExpanded,
     this.onExpansionChanged,
+    this.kidsMode = false,
   });
+
+  /// Дитячий режим: більші плитки тем.
+  final bool kidsMode;
 
   final LearningNode node;
   final int level;
@@ -26,8 +30,9 @@ class LearningNodeWidget extends StatelessWidget {
   final bool Function(String nodeId)? isNodeExpanded;
   final ValueChanged<String>? onExpansionChanged;
 
-  static const double _topicResultWidth = 56;
-  static const double _topicCardHeight = 94;
+  double get _topicResultWidth => kidsMode ? 88 : 56;
+
+  double get _topicCardHeight => kidsMode ? 120 : 94;
   static const double _topicCardRadius = 8;
 
   @override
@@ -50,6 +55,7 @@ class LearningNodeWidget extends StatelessWidget {
                 getTopicResult: getTopicResult,
                 isNodeExpanded: isNodeExpanded,
                 onExpansionChanged: onExpansionChanged,
+                kidsMode: kidsMode,
               ),
             ),
         ],
@@ -102,6 +108,7 @@ class LearningNodeWidget extends StatelessWidget {
                   child: Center(
                     child: TopicResultIndicator(
                       result: getTopicResult?.call(node.id),
+                      kidsMode: kidsMode,
                     ),
                   ),
                 ),
@@ -126,7 +133,10 @@ class LearningNodeWidget extends StatelessWidget {
   Widget _buildTopicTitle() {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: Text(node.titleKey, style: AppTextStyles.body),
+      child: Text(
+        node.titleKey,
+        style: kidsMode ? AppTextStyles.title : AppTextStyles.body,
+      ),
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/core/preferences/preferences_provider.dart';
+import 'package:school_tasks/core/ui/kids_ui_controller.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/presentation/dialogs/topic_dialog.dart';
@@ -51,6 +52,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final topicResults = ref.watch(learningResultsControllerProvider);
 
     final treeState = ref.watch(learningTreeControllerProvider);
+    final kidsUi = ref.watch(kidsUiControllerProvider).value ?? false;
 
     return AppScaffold(
       child: treeState.when(
@@ -75,6 +77,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       .read(learningTreeControllerProvider.notifier)
                       .toggleNode(nodeId);
                 },
+                kidsMode: kidsUi,
               );
             }).toList(),
           );
@@ -84,6 +87,14 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _onTopicPressed(LearningNode topicNode) async {
+    // Дитячий режим: тема стартує одразу, без діалогу.
+    final kidsUi = ref.read(kidsUiControllerProvider).value ?? false;
+
+    if (kidsUi) {
+      await context.push(AppRoutes.learningFor(topicNode.id));
+      return;
+    }
+
     final topic = LearningContent.topics[topicNode.id]!;
 
     final topicResults = ref.read(learningResultsControllerProvider);

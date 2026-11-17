@@ -11,9 +11,18 @@ import 'package:school_tasks/features/learning/providers/grade_scale_controller.
 import 'package:school_tasks/features/learning/providers/topic_result_display_controller.dart';
 
 class TopicResultIndicator extends ConsumerWidget {
-  const TopicResultIndicator({super.key, required this.result});
+  const TopicResultIndicator({
+    super.key,
+    required this.result,
+    this.kidsMode = false,
+  });
 
   final TopicResult? result;
+
+  /// Дитячий режим: завжди візуальна шкала, без часу.
+  final bool kidsMode;
+
+  static const double _visualSizeKids = 72;
 
   static const double _gradeFontSize = 20;
   static const double _durationFontSize = 12;
@@ -23,6 +32,20 @@ class TopicResultIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (kidsMode) {
+      if (result == null) {
+        return const Icon(Icons.star_border_rounded, size: 40);
+      }
+
+      return result!.kind == TopicResultKind.streak
+          ? _buildStreak(result!.bestStreak)
+          : _buildGrade(
+              GradeScale.visual,
+              result!.currentScore,
+              visualSize: _visualSizeKids,
+            );
+    }
+
     if (result == null) {
       return const Text('-');
     }
