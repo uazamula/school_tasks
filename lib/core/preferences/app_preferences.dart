@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:school_tasks/core/config/app_config.dart';
 import 'package:school_tasks/core/model/usage_statistics.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
 import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
@@ -253,5 +254,14 @@ class AppPreferences {
 
   Future<bool> setThemeChoice(AppThemeChoice choice) {
     return _prefs.setString(PreferenceKeys.themeMode, choice.name);
+  }
+
+  bool getKidsUiEnabled() {
+    return _prefs.getBool(PreferenceKeys.kidsUiEnabled) ??
+        AppConfig.kidsUiDefault;
+  }
+
+  Future<bool> setKidsUiEnabled(bool enabled) {
+    return _prefs.setBool(PreferenceKeys.kidsUiEnabled, enabled);
   }
 }
