@@ -3,6 +3,7 @@ import '../theme/app_spacing.dart';
 
 class AppScaffold extends StatelessWidget {
   final Widget child;
+
   const AppScaffold({super.key, required this.child});
 
   @override
@@ -11,7 +12,10 @@ class AppScaffold extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1200),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.xs,
+          ),
           child: child,
         ),
       ),
