@@ -32,6 +32,9 @@ import 'package:school_tasks/features/learning/presentation/widgets/topic_layout
 import 'package:school_tasks/features/learning/providers/learning_results_controller.dart';
 import 'package:school_tasks/routing/app_router.dart';
 import 'package:school_tasks/routing/app_routes.dart';
+import 'package:school_tasks/core/ui/kids_ui_controller.dart';
+import 'package:school_tasks/features/learning/domain/topic_result.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/kids_result_overlay.dart';
 
 import '../../../../core/services/audio/audio_service_provider.dart';
 
@@ -74,6 +77,11 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   int _completedProgressSteps = 0;
   bool _isFinishing = false;
   bool _hasSavedResult = false;
+
+  // Результат для оверлею дитячого режиму; null — оверлей не показано.
+  TopicResult? _kidsResult;
+
+  bool get _isKidsUi => ref.read(kidsUiControllerProvider).value ?? false;
 
   int _targetProgress = 0;
 
@@ -209,61 +217,74 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       paused: _isExitPaused,
     );
 
-    return AppScaffold(
-      child: SafeArea(
-        child: Column(
-          children: [
-            Row(
+    return Stack(
+      children: [
+        AppScaffold(
+          child: SafeArea(
+            child: Column(
               children: [
-                Transform.translate(
-                  offset: const Offset(-8, 0),
-                  child: IconButton(
-                    onPressed: () {
-                      rootNavigatorKey.currentState?.maybePop();
-                    },
-                    tooltip: 'Вийти',
-                    icon: const Icon(Icons.arrow_back),
-                  ),
+                Row(
+                  children: [
+                    Transform.translate(
+                      offset: const Offset(-8, 0),
+                      child: IconButton(
+                        onPressed: () {
+                          rootNavigatorKey.currentState?.maybePop();
+                        },
+                        tooltip: 'Вийти',
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                    ),
+                    Expanded(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: _buildProgressIndicators(isManualAnswered),
+                      ),
+                    ),
+                    if (_topic.dashboard.showStreak) ...[
+                      const SizedBox(width: 12),
+                      StreakIndicator(progress: _streak),
+                    ],
+                    if (_topic.dashboard.showRemainingAttempts) ...[
+                      const SizedBox(width: 12),
+                      FailureLimitIndicator(
+                        failureLimit: _failureLimit,
+                        failureCount: _failureCount,
+                      ),
+                    ],
+                  ],
                 ),
+                const SizedBox(height: 16),
                 Expanded(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: _buildProgressIndicators(isManualAnswered),
+                  child: TopicLayoutWidget(
+                    layout: _topic.layout,
+                    prompt: taskWidget.buildPrompt(),
+                    interaction: taskWidget.buildInteraction(),
+                    dimmed: isManualAnswered,
+                    promptOverlay: isManualAnswered
+                        ? FilledButton(
+                            onPressed: _attempt.isFinished
+                                ? _finishAttempt
+                                : _onManualNext,
+                            child: Text(
+                              _attempt.isFinished ? 'Завершити' : 'Далі',
+                            ),
+                          )
+                        : null,
                   ),
                 ),
-                if (_topic.dashboard.showStreak) ...[
-                  const SizedBox(width: 12),
-                  StreakIndicator(progress: _streak),
-                ],
-                if (_topic.dashboard.showRemainingAttempts) ...[
-                  const SizedBox(width: 12),
-                  FailureLimitIndicator(
-                    failureLimit: _failureLimit,
-                    failureCount: _failureCount,
-                  ),
-                ],
               ],
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TopicLayoutWidget(
-                layout: _topic.layout,
-                prompt: taskWidget.buildPrompt(),
-                interaction: taskWidget.buildInteraction(),
-                dimmed: isManualAnswered,
-                promptOverlay: isManualAnswered
-                    ? FilledButton(
-                        onPressed: _attempt.isFinished
-                            ? _finishAttempt
-                            : _onManualNext,
-                        child: Text(_attempt.isFinished ? 'Завершити' : 'Далі'),
-                      )
-                    : null,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        if (_kidsResult != null)
+          Positioned.fill(
+            child: KidsResultOverlay(
+              result: _kidsResult!,
+              onContinue: _leavePage,
+            ),
+          ),
+      ],
     );
   }
 
@@ -418,7 +439,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       return;
     }
 
-    if (!_hasEndlessMemory) {
+    if (!_hasEndlessMemory && !_isKidsUi) {
       await _showTimeExpiredDialog();
     }
 
@@ -543,12 +564,30 @@ class _LearningPageState extends ConsumerState<LearningPage> {
         .read(learningResultsControllerProvider.notifier)
         .setResult(_topic.id, updatedResult);
 
+    // Дитячий режим: замість діалогів показуємо оверлей з результатом.
+    if (_isKidsUi) {
+      _markFinishing();
+
+      // Результат уже збережено, тож системне «назад» виходить без питань.
+      widget.exitGuard.allowExit = true;
+
+      setState(() => _kidsResult = updatedResult);
+      return;
+    }
+
     if (_hasEndlessMemory) {
       await _showEndlessResultDialog(
         previousBest: previousResult?.bestStreak ?? 0,
       );
       if (!mounted) return;
     }
+
+    _leavePage();
+  }
+
+  /// Вихід зі сторінки після завершення теми.
+  void _leavePage() {
+    if (!mounted) return;
 
     // Нормальне завершення теми — це дозволений вихід,
     // тому confirmation через onExit показувати не потрібно.

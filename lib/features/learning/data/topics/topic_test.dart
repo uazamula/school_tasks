@@ -170,7 +170,7 @@ abstract final class Tests {
     evaluation: EvaluationConfig(
       weights: {
         EvaluationCriterionType.accuracy: 1,
-        EvaluationCriterionType.time: 1,
+        EvaluationCriterionType.time: 0,
       },
       time: TimeEvaluationConfig(
         targetTime: Duration(seconds: 15),
@@ -178,7 +178,7 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(
-      // minimumAccuracy: 0.6,
+      minimumAccuracy: 0.6,
       // maximumTime: Duration(seconds: 15),
       // maximumFailures: 1,
     ),
@@ -193,7 +193,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 1000),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,
-      countdown: Duration(seconds: 60, milliseconds: 0),
+      countdown: Duration(seconds: 10, milliseconds: 0),
     ),
     dashboard: DashboardConfig(
       showProgress: true,
