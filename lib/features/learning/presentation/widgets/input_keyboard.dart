@@ -56,56 +56,32 @@ class InputKeyboard extends StatelessWidget {
   final VoidCallback onDecimalSeparatorPressed;
   final VoidCallback onBackspacePressed;
 
-  List<List<InputKeyboardKey>> _getLayout() {
-    switch (mode) {
-      case InputMode.integer:
-        return [
-          [
-            const InputKeyboardKey.input('1'),
-            const InputKeyboardKey.input('2'),
-            const InputKeyboardKey.input('3'),
-          ],
-          [
-            const InputKeyboardKey.input('4'),
-            const InputKeyboardKey.input('5'),
-            const InputKeyboardKey.input('6'),
-          ],
-          [
-            const InputKeyboardKey.input('7'),
-            const InputKeyboardKey.input('8'),
-            const InputKeyboardKey.input('9'),
-          ],
-          [
-            const InputKeyboardKey.backspace(),
-            const InputKeyboardKey.input('0'),
-            const InputKeyboardKey.empty(),
-          ],
-        ];
+  static const double _width = 240;
+  static const double _keyHeight = 48;
 
-      case InputMode.decimal:
-        return [
-          [
-            const InputKeyboardKey.input('1'),
-            const InputKeyboardKey.input('2'),
-            const InputKeyboardKey.input('3'),
-          ],
-          [
-            const InputKeyboardKey.input('4'),
-            const InputKeyboardKey.input('5'),
-            const InputKeyboardKey.input('6'),
-          ],
-          [
-            const InputKeyboardKey.input('7'),
-            const InputKeyboardKey.input('8'),
-            const InputKeyboardKey.input('9'),
-          ],
-          [
-            const InputKeyboardKey.backspace(),
-            const InputKeyboardKey.input('0'),
-            const InputKeyboardKey.decimalSeparator(),
-          ],
-        ];
-    }
+  // Цифри 1–9 однакові для всіх режимів.
+  static const _digitRows = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+  ];
+
+  List<List<InputKeyboardKey>> _getLayout() {
+    // Режими відрізняються лише останньою клавішею нижнього рядка.
+    final lastKey = switch (mode) {
+      InputMode.integer => const InputKeyboardKey.empty(),
+      InputMode.decimal => const InputKeyboardKey.decimalSeparator(),
+    };
+
+    return [
+      for (final row in _digitRows)
+        [for (final digit in row) InputKeyboardKey.input(digit)],
+      [
+        const InputKeyboardKey.backspace(),
+        const InputKeyboardKey.input('0'),
+        lastKey,
+      ],
+    ];
   }
 
   @override
@@ -113,19 +89,19 @@ class InputKeyboard extends StatelessWidget {
     final rows = _getLayout();
 
     return SizedBox(
-      width: 240,
+      width: _width,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (final row in rows) ...[
-            if (row != rows.first) const SizedBox(height: AppSpacing.sm),
+          for (var r = 0; r < rows.length; r++) ...[
+            if (r > 0) const SizedBox(height: AppSpacing.sm),
             SizedBox(
-              height: 48,
+              height: _keyHeight,
               child: Row(
                 children: [
-                  for (var index = 0; index < row.length; index++) ...[
-                    if (index > 0) const SizedBox(width: AppSpacing.sm),
-                    Expanded(child: _buildKey(row[index])),
+                  for (var c = 0; c < rows[r].length; c++) ...[
+                    if (c > 0) const SizedBox(width: AppSpacing.sm),
+                    Expanded(child: _buildKey(rows[r][c])),
                   ],
                 ],
               ),
@@ -137,97 +113,47 @@ class InputKeyboard extends StatelessWidget {
   }
 
   Widget _buildKey(InputKeyboardKey key) {
-    switch (key.type) {
-      case InputKeyboardKeyType.input:
-        return _InputButton(
-          value: key.value!,
-          enabled: enabled,
-          onPressed: onInputPressed,
-        );
-
-      case InputKeyboardKeyType.cycle:
-        return _CycleButton(
-          values: key.values!,
-          enabled: enabled,
-          onPressed: () => onCyclePressed(key.values!),
-        );
-
-      case InputKeyboardKeyType.decimalSeparator:
-        return _InputButton(
-          value: decimalSeparator,
-          enabled: enabled,
-          onPressed: (_) => onDecimalSeparatorPressed(),
-        );
-
-      case InputKeyboardKeyType.backspace:
-        return _ActionButton(
-          icon: Icons.backspace_outlined,
-          enabled: enabled,
-          onPressed: onBackspacePressed,
-        );
-
-      case InputKeyboardKeyType.empty:
-        return const SizedBox.expand();
-    }
+    return switch (key.type) {
+      InputKeyboardKeyType.input => _KeyButton(
+        enabled: enabled,
+        onPressed: () => onInputPressed(key.value!),
+        child: Text(key.value!, style: AppTextStyles.title),
+      ),
+      InputKeyboardKeyType.cycle => _KeyButton(
+        enabled: enabled,
+        onPressed: () => onCyclePressed(key.values!),
+        child: Text(key.values!.join(' / '), style: AppTextStyles.title),
+      ),
+      InputKeyboardKeyType.decimalSeparator => _KeyButton(
+        enabled: enabled,
+        onPressed: onDecimalSeparatorPressed,
+        child: Text(decimalSeparator, style: AppTextStyles.title),
+      ),
+      InputKeyboardKeyType.backspace => _KeyButton(
+        enabled: enabled,
+        onPressed: onBackspacePressed,
+        child: const Icon(Icons.backspace_outlined),
+      ),
+      InputKeyboardKeyType.empty => const SizedBox.expand(),
+    };
   }
 }
 
-class _InputButton extends StatelessWidget {
-  const _InputButton({
-    required this.value,
+/// Єдина кнопка клавіатури: вигляд задає [child], а вимкнений стан
+/// (enabled == false) прибирає обробник натискання.
+class _KeyButton extends StatelessWidget {
+  const _KeyButton({
     required this.enabled,
     required this.onPressed,
+    required this.child,
   });
 
-  final String value;
-  final bool enabled;
-  final ValueChanged<String> onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: enabled ? () => onPressed(value) : null,
-      child: Text(value, style: AppTextStyles.title),
-    );
-  }
-}
-
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.icon,
-    required this.enabled,
-    required this.onPressed,
-  });
-
-  final IconData icon;
   final bool enabled;
   final VoidCallback onPressed;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: enabled ? onPressed : null,
-      child: Icon(icon),
-    );
-  }
-}
-
-class _CycleButton extends StatelessWidget {
-  const _CycleButton({
-    required this.values,
-    required this.enabled,
-    required this.onPressed,
-  });
-
-  final List<String> values;
-  final bool enabled;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: enabled ? onPressed : null,
-      child: Text(values.join(' / '), style: AppTextStyles.title),
-    );
+    return FilledButton(onPressed: enabled ? onPressed : null, child: child);
   }
 }
