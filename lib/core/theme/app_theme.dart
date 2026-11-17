@@ -27,4 +27,20 @@ class AppTheme {
       scaffoldBackgroundColor: colorScheme.surface,
     );
   }
+
+  /// Лагідна тема для дошкільнят: теплий фон, великі заокруглення,
+  /// трохи крупніший текст. Завжди світла.
+  static ThemeData gentle() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.gentleSeed,
+      brightness: Brightness.light,
+    ).copyWith(surface: AppColors.gentleSurface);
+
+    final base = ThemeData(useMaterial3: true, colorScheme: colorScheme);
+
+    return base.copyWith(
+      scaffoldBackgroundColor: colorScheme.surface,
+      // ... cardTheme, filledButtonTheme, elevatedButtonTheme без змін
+    );
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:school_tasks/core/model/usage_statistics.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
+import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
@@ -241,5 +242,16 @@ class AppPreferences {
 
   Future<bool> setServiceSoundsEnabled(bool enabled) {
     return _prefs.setBool(PreferenceKeys.serviceSoundsEnabled, enabled);
+  }
+
+  AppThemeChoice getThemeChoice() {
+    final value = _prefs.getString(PreferenceKeys.themeMode);
+
+    // Невідоме або відсутнє значення — тема пристрою.
+    return AppThemeChoice.values.asNameMap()[value] ?? AppThemeChoice.system;
+  }
+
+  Future<bool> setThemeChoice(AppThemeChoice choice) {
+    return _prefs.setString(PreferenceKeys.themeMode, choice.name);
   }
 }

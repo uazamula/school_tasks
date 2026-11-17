@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/services/emoji_preloader.dart';
+import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
 import 'package:school_tasks/l10n/app_localizations.dart';
 
 import 'core/localization/locale_controller.dart';
@@ -21,9 +22,13 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
 
+    final themeChoice =
+        ref.watch(themeControllerProvider).value ?? AppThemeChoice.system;
+    final isGentle = themeChoice == AppThemeChoice.gentle;
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-
+      themeAnimationDuration: Duration.zero,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
 
@@ -31,13 +36,25 @@ class MyApp extends ConsumerWidget {
 
       routerConfig: appRouter,
 
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: themeMode.value ?? ThemeMode.system,
+      theme: isGentle ? AppTheme.gentle() : AppTheme.light(),
+      // Для «лагідної» темна тема теж лагідна, щоб тема пристрою не впливала.
+      darkTheme: isGentle ? AppTheme.gentle() : AppTheme.dark(),
+      themeMode: themeChoice.themeMode,
       builder: (context, child) {
-        return ColoredBox(
-          color: Theme.of(context).colorScheme.surface,
-          child: EmojiPreloader(child: child ?? const SizedBox.shrink()),
+        final mediaQuery = MediaQuery.of(context);
+
+        // Для «лагідної» теми текст трохи крупніший, з урахуванням
+        // системного масштабу шрифту.
+        final textScaler = isGentle
+            ? TextScaler.linear(mediaQuery.textScaler.scale(1) * 1.15)
+            : mediaQuery.textScaler;
+
+        return MediaQuery(
+          data: mediaQuery.copyWith(textScaler: textScaler),
+          child: ColoredBox(
+            color: Theme.of(context).colorScheme.surface,
+            child: EmojiPreloader(child: child ?? const SizedBox.shrink()),
+          ),
         );
       },
     );
