@@ -157,7 +157,7 @@ abstract final class MemoryEndlessDemo {
     progressionMode: TopicProgressionMode.automaticWithFeedback,
     automaticTermination: const AutomaticTerminationConfig(
       failureLimit: 3,
-      countdown: Duration(seconds: 20),
+      countdown: Duration(seconds: 35),
       pauseOnExitDialog: false,
     ),
     dashboard: const DashboardConfig(

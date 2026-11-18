@@ -6,6 +6,7 @@ import 'package:school_tasks/core/model/usage_statistics.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
 import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/topic_result_attempt.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/profile/model/user_profile.dart';
@@ -263,5 +264,16 @@ class AppPreferences {
 
   Future<bool> setKidsUiEnabled(bool enabled) {
     return _prefs.setBool(PreferenceKeys.kidsUiEnabled, enabled);
+  }
+
+  /// null означає, що користувач ще не обирав (діє значення за замовчуванням).
+  TopicResultAttempt? getTopicResultAttempt() {
+    final value = _prefs.getString(PreferenceKeys.topicResultAttempt);
+
+    return TopicResultAttempt.values.asNameMap()[value];
+  }
+
+  Future<bool> setTopicResultAttempt(TopicResultAttempt attempt) {
+    return _prefs.setString(PreferenceKeys.topicResultAttempt, attempt.name);
   }
 }

@@ -26,4 +26,7 @@ abstract final class PreferenceKeys {
 
   // Увімкнення дитячого інтерфейсу.
   static const kidsUiEnabled = 'kids_ui_enabled';
+
+  // Яку спробу показувати на плитці теми.
+  static const topicResultAttempt = 'topic_result_attempt';
 }

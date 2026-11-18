@@ -6,6 +6,7 @@ import 'package:school_tasks/features/settings/widgets/kids_ui_section.dart';
 import 'package:school_tasks/features/settings/widgets/language_section.dart';
 import 'package:school_tasks/features/settings/widgets/learning_data_section.dart';
 import 'package:school_tasks/features/settings/widgets/service_sounds_section.dart';
+import 'package:school_tasks/features/settings/widgets/topic_result_attempt_section.dart';
 import 'package:school_tasks/features/settings/widgets/topic_result_display_section.dart';
 
 import '../../../core/widgets/app_scaffold.dart';
@@ -45,6 +46,10 @@ class SettingsPage extends StatelessWidget {
           Divider(),
 
           TopicResultDisplaySection(),
+
+          Divider(),
+
+          TopicResultAttemptSection(),
 
           Divider(),
 

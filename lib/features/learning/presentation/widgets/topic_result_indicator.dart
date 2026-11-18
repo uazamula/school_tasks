@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:school_tasks/core/config/app_config.dart';
 import 'package:school_tasks/core/formatters/duration_formatter.dart';
+import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_snapshot.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/topic_result_attempt.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/visual_grade_scale_widget.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
+import 'package:school_tasks/features/learning/providers/topic_result_attempt_controller.dart';
 import 'package:school_tasks/features/learning/providers/topic_result_display_controller.dart';
 
 class TopicResultIndicator extends ConsumerWidget {
@@ -22,66 +26,82 @@ class TopicResultIndicator extends ConsumerWidget {
   /// Дитячий режим: завжди візуальна шкала, без часу.
   final bool kidsMode;
 
-  static const double _visualSizeKids = 72;
-
   static const double _gradeFontSize = 20;
   static const double _durationFontSize = 12;
 
   static const double _visualSizeGradeOnly = 56;
   static const double _visualSizeGradeAndDuration = 46;
+  static const double _visualSizeKids = 72;
+
+  /// Порожній стан: зірочка для дітей, прочерк для дорослих.
+  Widget _buildEmpty() {
+    return kidsMode
+        ? const Icon(Icons.star_border_rounded, size: 40)
+        : const Text('-');
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (kidsMode) {
-      if (result == null) {
-        return const Icon(Icons.star_border_rounded, size: 40);
-      }
+    final stored = result;
 
-      return result!.kind == TopicResultKind.streak
-          ? _buildStreak(result!.bestStreak)
-          : _buildGrade(
-              GradeScale.visual,
-              result!.currentScore,
-              visualSize: _visualSizeKids,
-            );
+    if (stored == null) {
+      return _buildEmpty();
     }
 
-    if (result == null) {
-      return const Text('-');
-    }
-
+    final attemptAsync = ref.watch(topicResultAttemptControllerProvider);
     final gradeScaleAsync = ref.watch(gradeScaleControllerProvider);
     final displayAsync = ref.watch(topicResultDisplayControllerProvider);
 
-    if (gradeScaleAsync.isLoading || displayAsync.isLoading) {
-      return const Text('-');
+    if (attemptAsync.isLoading ||
+        gradeScaleAsync.isLoading ||
+        displayAsync.isLoading ||
+        attemptAsync.hasError ||
+        gradeScaleAsync.hasError ||
+        displayAsync.hasError) {
+      return _buildEmpty();
     }
 
-    if (gradeScaleAsync.hasError || displayAsync.hasError) {
-      return const Text('-');
+    // Вибір користувача або значення за замовчуванням для режиму.
+    final attemptKind =
+        attemptAsync.value ??
+        (kidsMode
+            ? AppConfig.kidsResultAttemptDefault
+            : AppConfig.resultAttemptDefault);
+
+    final TopicAttemptSnapshot? snapshot =
+        attemptKind == TopicResultAttempt.best
+        ? stored.bestAttempt
+        : stored.currentAttempt;
+
+    // Найкращої зарахованої спроби ще немає.
+    if (snapshot == null) {
+      return _buildEmpty();
+    }
+
+    Widget main(GradeScale scale, double visualSize) =>
+        snapshot.kind == TopicResultKind.streak
+        ? _buildStreak(snapshot.streak ?? 0)
+        : _buildGrade(scale, snapshot.score, visualSize: visualSize);
+
+    if (kidsMode) {
+      return main(GradeScale.visual, _visualSizeKids);
     }
 
     final gradeScale = gradeScaleAsync.value!;
     final display = displayAsync.value!;
 
-    final duration = DurationFormatter.formatShort(
-      context,
-      result!.currentDuration,
-    );
-
-    Widget main(double visualSize) => result!.kind == TopicResultKind.streak
-        ? _buildStreak(result!.bestStreak)
-        : _buildGrade(gradeScale, result!.currentScore, visualSize: visualSize);
+    // Тривалість з тієї самої спроби, що й оцінка.
+    final duration = DurationFormatter.formatShort(context, snapshot.duration);
 
     return switch (display) {
-      TopicResultDisplay.grade => main(_visualSizeGradeOnly),
+      TopicResultDisplay.grade => main(gradeScale, _visualSizeGradeOnly),
       TopicResultDisplay.duration => _buildDuration(duration),
       TopicResultDisplay.gradeAndDuration => Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          main(_visualSizeGradeAndDuration),
+          main(gradeScale, _visualSizeGradeAndDuration),
           const SizedBox(height: 1),
           _buildDuration(duration),
         ],

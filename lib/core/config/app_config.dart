@@ -1,3 +1,5 @@
+import 'package:school_tasks/features/learning/domain/evaluation/topic_result_attempt.dart';
+
 /// Програмні перемикачі застосунку (змінюються в коді).
 abstract final class AppConfig {
   const AppConfig._();
@@ -7,4 +9,8 @@ abstract final class AppConfig {
 
   /// Чи показувати перемикач дитячого інтерфейсу в налаштуваннях.
   static const kidsUiSwitchVisible = true;
+
+  /// Яку спробу показувати на плитці, поки користувач не обрав сам.
+  static const resultAttemptDefault = TopicResultAttempt.current;
+  static const kidsResultAttemptDefault = TopicResultAttempt.best;
 }

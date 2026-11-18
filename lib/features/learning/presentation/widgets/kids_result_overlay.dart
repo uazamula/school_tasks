@@ -40,6 +40,16 @@ class _KidsResultOverlayState extends State<KidsResultOverlay>
     curve: const Interval(0.7, 1, curve: Curves.easeIn),
   );
 
+  // Новий рекорд: найкраща спроба збігається з поточною.
+  bool get _isNewRecord {
+    final result = widget.result;
+    final best = result.bestAttempt;
+
+    return best != null &&
+        best.completedAt == result.currentAttempt.completedAt &&
+        result.currentStreak > 0;
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -87,13 +97,19 @@ class _KidsResultOverlayState extends State<KidsResultOverlay>
             size: _resultSize * 0.7,
             color: Colors.deepOrange,
           ),
+          // Завжди результат щойно зіграної спроби, а не рекорд.
           Text(
-            '${result.bestStreak}',
+            '${result.currentStreak}',
             style: const TextStyle(
               fontSize: _resultSize * 0.5,
               fontWeight: FontWeight.bold,
             ),
           ),
+          if (_isNewRecord)
+            const Padding(
+              padding: EdgeInsets.only(left: 12),
+              child: Text('🏆', style: TextStyle(fontSize: _resultSize * 0.5)),
+            ),
         ],
       );
     }
