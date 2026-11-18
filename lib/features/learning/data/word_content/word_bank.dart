@@ -28,7 +28,7 @@ final ukWords = [
   wordUk('beetle', ':🪲', 'uk_zhuk', 'жук', 'жук'),
   wordUk('birch', 'birch', 'uk_bereza', 'береза', 'бе-ре-за'),
   wordUk('boat', ':🛶', 'uk_choven', 'човен', 'чо-вен'),
-  wordUk('bucket', 'bucket', 'uk_vidro', 'відро', 'ві-дро'),
+  wordUk('bucket', ':🪣', 'uk_vidro', 'відро', 'ві-дро'),
   wordUk('buddy', null, null, 'чоловіче', null),
   wordUk('bus', ':🚌', 'uk_avtobus', 'автобус', 'ав-то-бус'),
   wordUk('butter', ':🧈', 'uk_maslo', 'масло', 'ма-сло'),

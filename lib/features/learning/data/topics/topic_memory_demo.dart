@@ -93,7 +93,7 @@ final pairs2 = MemoryPairBuilder(
   audioPlace: MemoryAudioPlace.hidden,
   audioSource: MemoryAudioSource.word,
   syllableAudio: syllableAudioUk,
-  printDiagnostics: false
+  printDiagnostics: false,
 ).build();
 
 TaskPrompt _prompt(String text) => TaskPrompt(content: [TextContent(text)]);
@@ -157,7 +157,7 @@ abstract final class MemoryEndlessDemo {
     progressionMode: TopicProgressionMode.automaticWithFeedback,
     automaticTermination: const AutomaticTerminationConfig(
       failureLimit: 3,
-      countdown: Duration(minutes: 2),
+      countdown: Duration(seconds: 20),
       pauseOnExitDialog: false,
     ),
     dashboard: const DashboardConfig(

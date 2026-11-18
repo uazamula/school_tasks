@@ -11,6 +11,7 @@ import 'package:school_tasks/features/learning/data/topics/topic_percents.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_test.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 
 abstract final class LearningContent {
@@ -47,6 +48,11 @@ abstract final class LearningContent {
               id: 'shapes',
               titleKey: 'tests',
               type: LearningNodeType.topic,
+              titleContent: [
+                TextContent('А'),
+                ImageContent('assets/images/harp.png'),
+                EmojiContent('🍍'),
+              ],
             ),
           ],
         ),
