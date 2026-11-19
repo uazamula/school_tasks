@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/services/emoji_preloader.dart';
+import 'package:school_tasks/core/startup/startup_gate.dart';
 import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
 import 'package:school_tasks/l10n/app_localizations.dart';
 
@@ -19,7 +20,6 @@ class MyApp extends ConsumerWidget {
     ref.watch(usageStatisticsServiceProvider);
     ref.watch(serviceSoundsControllerProvider);
 
-    final themeMode = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
 
     final themeChoice =
@@ -53,7 +53,12 @@ class MyApp extends ConsumerWidget {
           data: mediaQuery.copyWith(textScaler: textScaler),
           child: ColoredBox(
             color: Theme.of(context).colorScheme.surface,
-            child: EmojiPreloader(child: child ?? const SizedBox.shrink()),
+            child: ColoredBox(
+              color: Theme.of(context).colorScheme.surface,
+              child: StartupGate(
+                child: EmojiPreloader(child: child ?? const SizedBox.shrink()),
+              ),
+            ),
           ),
         );
       },

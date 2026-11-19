@@ -4,9 +4,14 @@ import 'package:school_tasks/features/learning/domain/evaluation/topic_result_at
 /// Програмні перемикачі застосунку (змінюються в коді).
 abstract final class AppConfig {
   const AppConfig._();
+  /// Сплеш: текст, емодзі та мінімальний час показу (потім локалізуємо).
+  static const splashEmoji = '🎒';
+  static const splashTitle = 'Шкільні завдання';
+  static const splashHint = 'Завантажуємо...';
+  static const splashMinDuration = Duration(seconds: 1, milliseconds: 700);
 
   /// Дитячий інтерфейс за замовчуванням, поки користувач нічого не обрав.
-  static const kidsUiDefault = false;
+  static const kidsUiDefault = true;
 
   /// Чи показувати перемикач дитячого інтерфейсу в налаштуваннях.
   static const kidsUiSwitchVisible = true;
