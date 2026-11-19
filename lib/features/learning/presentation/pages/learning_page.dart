@@ -15,6 +15,7 @@ import 'package:school_tasks/features/learning/domain/attempts/topic_attempt_res
 import 'package:school_tasks/features/learning/domain/attempts/topic_completion_reason.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/accuracy_result.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_calculator.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/streak_progress.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/memory_task.dart';
@@ -29,6 +30,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/streak_indic
 import 'package:school_tasks/features/learning/presentation/widgets/task_callbacks.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
+import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
 import 'package:school_tasks/features/learning/providers/learning_results_controller.dart';
 import 'package:school_tasks/routing/app_router.dart';
 import 'package:school_tasks/routing/app_routes.dart';
@@ -219,6 +221,9 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     );
 
     final kidsUi = ref.watch(kidsUiControllerProvider).value ?? false;
+    final kidsScale =
+        (ref.watch(gradeScaleControllerProvider).value ?? GradeScale.hundred)
+            .forKids;
 
     return Stack(
       children: [
@@ -291,6 +296,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
           Positioned.fill(
             child: KidsResultOverlay(
               result: _kidsResult!,
+              scale: kidsScale,
               onContinue: _leavePage,
             ),
           ),
@@ -576,12 +582,6 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     // Дитячий режим: замість діалогів показуємо оверлей з результатом.
     if (_isKidsUi) {
-      // Вихід по кнопці: результат уже збережено, оверлей не потрібен.
-      if (completionReason == TopicCompletionReason.quit) {
-        _leavePage();
-        return;
-      }
-
       _markFinishing();
 
       // Результат уже збережено, тож системне «назад» виходить без питань.

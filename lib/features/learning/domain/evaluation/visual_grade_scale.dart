@@ -1,3 +1,5 @@
+import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+
 import 'grade_scale.dart';
 import 'visual_grade_level.dart';
 

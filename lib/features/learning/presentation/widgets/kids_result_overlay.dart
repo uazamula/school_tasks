@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
-import 'package:school_tasks/features/learning/presentation/widgets/visual_grade_scale_widget.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/grade_mark.dart';
 
 /// Повноекранний результат теми для дитячого режиму:
 /// оцінка з анімацією та одна велика кнопка «Далі».
@@ -9,10 +10,14 @@ class KidsResultOverlay extends StatefulWidget {
   const KidsResultOverlay({
     super.key,
     required this.result,
+    required this.scale,
     required this.onContinue,
   });
 
   final TopicResult result;
+
+  /// Шкала для дитячого режиму (візуальна або емодзі).
+  final GradeScale scale;
   final VoidCallback onContinue;
 
   @override
@@ -65,7 +70,17 @@ class _KidsResultOverlayState extends State<KidsResultOverlay>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ScaleTransition(scale: _scale, child: _buildResult()),
+              ScaleTransition(
+                scale: _scale,
+                // Ряд зменшується, якщо не вміщується (двозначна серія).
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: _buildResult(),
+                  ),
+                ),
+              ),
               const SizedBox(height: 48),
               FadeTransition(
                 opacity: _buttonOpacity,
@@ -114,9 +129,10 @@ class _KidsResultOverlayState extends State<KidsResultOverlay>
       );
     }
 
-    // Тут пізніше підставимо шкалу з емодзі (п. 8).
-    return VisualGradeScaleWidget(
+    return GradeMark(
       score: result.currentScore,
+      isPassed: result.currentIsPassed,
+      scale: widget.scale,
       size: _resultSize,
     );
   }

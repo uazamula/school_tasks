@@ -9,6 +9,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/topic_result_at
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/grade_mark.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/visual_grade_scale_widget.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
 import 'package:school_tasks/features/learning/providers/topic_result_attempt_controller.dart';
@@ -78,16 +79,17 @@ class TopicResultIndicator extends ConsumerWidget {
       return _buildEmpty();
     }
 
+    final gradeScale = gradeScaleAsync.value!;
+
     Widget main(GradeScale scale, double visualSize) =>
         snapshot.kind == TopicResultKind.streak
         ? _buildStreak(snapshot.streak ?? 0)
-        : _buildGrade(scale, snapshot.score, visualSize: visualSize);
+        : _buildGrade(scale, snapshot, visualSize: visualSize);
 
     if (kidsMode) {
-      return main(GradeScale.visual, _visualSizeKids);
+      return main(gradeScale.forKids, _visualSizeKids);
     }
 
-    final gradeScale = gradeScaleAsync.value!;
     final display = displayAsync.value!;
 
     // Тривалість з тієї самої спроби, що й оцінка.
@@ -135,24 +137,29 @@ class TopicResultIndicator extends ConsumerWidget {
 
   Widget _buildGrade(
     GradeScale scale,
-    double score, {
+    TopicAttemptSnapshot snapshot, {
     required double visualSize,
   }) {
-    if (scale == GradeScale.visual) {
+    if (scale == GradeScale.visual || scale == GradeScale.emoji) {
       return Center(
         child: SizedBox(
           width: visualSize,
           height: visualSize,
           child: FittedBox(
             fit: BoxFit.contain,
-            child: VisualGradeScaleWidget(score: score, size: visualSize),
+            child: GradeMark(
+              score: snapshot.score,
+              isPassed: snapshot.isPassed,
+              scale: scale,
+              size: visualSize,
+            ),
           ),
         ),
       );
     }
 
     return Text(
-      scale.formatScore(score),
+      scale.formatScore(snapshot.score),
       textAlign: TextAlign.center,
       style: const TextStyle(
         fontSize: _gradeFontSize,

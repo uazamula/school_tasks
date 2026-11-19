@@ -65,7 +65,8 @@ class AppPreferences {
 
       case PreferenceValues.gradeScaleVisual:
         return GradeScale.visual;
-
+      case PreferenceValues.gradeScaleEmoji:
+        return GradeScale.emoji;
       case PreferenceValues.gradeScaleHundred:
       default:
         return GradeScale.hundred;
@@ -77,6 +78,7 @@ class AppPreferences {
       GradeScale.hundred => PreferenceValues.gradeScaleHundred,
       GradeScale.twelve => PreferenceValues.gradeScaleTwelve,
       GradeScale.visual => PreferenceValues.gradeScaleVisual,
+      GradeScale.emoji => PreferenceValues.gradeScaleEmoji,
     });
   }
 

@@ -1,6 +1,10 @@
-enum GradeScale { hundred, twelve, visual }
+enum GradeScale { hundred, twelve, visual, emoji }
 
 extension GradeScaleExtension on GradeScale {
+  /// Шкала для дитячого режиму: візуальна лишається, решта стає емодзі.
+  GradeScale get forKids =>
+      this == GradeScale.visual ? GradeScale.visual : GradeScale.emoji;
+
   String formatScore(double score) {
     final normalizedScore = score.clamp(0.0, 1.0);
 
@@ -12,12 +16,13 @@ extension GradeScaleExtension on GradeScale {
         return '${toTwelveGrade(score)}';
 
       case GradeScale.visual:
-        // У текстовому представленні візуальної шкали
-        // використовуємо відсоток.
+      case GradeScale.emoji:
+        // У текстовому представленні графічних шкал — відсоток.
         return '${(normalizedScore * 100).round()}%';
     }
   }
 
+  // toTwelveGrade без змін
   int toTwelveGrade(double score) {
     final percentage = score.clamp(0.0, 1.0) * 100;
 

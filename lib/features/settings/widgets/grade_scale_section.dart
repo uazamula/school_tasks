@@ -45,6 +45,7 @@ class GradeScaleSection extends ConsumerWidget {
                 value: GradeScale.visual,
                 child: Text('Візуальна'),
               ),
+              DropdownMenuItem(value: GradeScale.emoji, child: Text('Емодзі')),
             ],
           ),
         );
