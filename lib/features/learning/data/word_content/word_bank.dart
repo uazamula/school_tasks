@@ -118,7 +118,7 @@ final ukWords = [
   wordUk('moon', ':🌙', 'uk_misjats', 'місяць', 'мі-сяць'),
   wordUk('mosquito', ':🦟', 'uk_komar', 'комар', 'ко-мар'),
   wordUk('moth', 'moth', 'uk_milj', 'міль', 'міль'),
-  wordUk('mountains', ':⛰', 'uk_hory', 'гори', 'гори'),
+  wordUk('mountains', ':⛰', 'uk_hory', 'гори', 'го-ри'),
   wordUk('mouse', ':🐭', 'uk_mysha', 'миша', 'ми-ша'),
   wordUk('mouth', 'mouth', 'uk_rot', 'рот', 'рот'),
   wordUk('mushroom', ':🍄', 'uk_hryb', 'гриб', 'гриб'),

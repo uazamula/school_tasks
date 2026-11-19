@@ -30,7 +30,7 @@ import 'package:school_tasks/features/learning/presentation/widgets/streak_indic
 import 'package:school_tasks/features/learning/presentation/widgets/task_callbacks.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
-import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
+import 'package:school_tasks/features/learning/providers/effective_grade_scale_provider.dart';
 import 'package:school_tasks/features/learning/providers/learning_results_controller.dart';
 import 'package:school_tasks/routing/app_router.dart';
 import 'package:school_tasks/routing/app_routes.dart';
@@ -222,8 +222,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
     final kidsUi = ref.watch(kidsUiControllerProvider).value ?? false;
     final kidsScale =
-        (ref.watch(gradeScaleControllerProvider).value ?? GradeScale.hundred)
-            .forKids;
+        ref.watch(effectiveGradeScaleProvider).value ?? GradeScale.emoji;
 
     return Stack(
       children: [

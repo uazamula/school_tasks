@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_attempt.dart';
 
 /// Програмні перемикачі застосунку (змінюються в коді).
@@ -13,4 +14,8 @@ abstract final class AppConfig {
   /// Яку спробу показувати на плитці, поки користувач не обрав сам.
   static const resultAttemptDefault = TopicResultAttempt.current;
   static const kidsResultAttemptDefault = TopicResultAttempt.best;
+
+  /// Шкала оцінювання, поки користувач не обрав сам.
+  static const gradeScaleDefault = GradeScale.hundred;
+  static const kidsGradeScaleDefault = GradeScale.emoji;
 }

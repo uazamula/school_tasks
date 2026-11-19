@@ -1,10 +1,6 @@
 enum GradeScale { hundred, twelve, visual, emoji }
 
 extension GradeScaleExtension on GradeScale {
-  /// Шкала для дитячого режиму: візуальна лишається, решта стає емодзі.
-  GradeScale get forKids =>
-      this == GradeScale.visual ? GradeScale.visual : GradeScale.emoji;
-
   String formatScore(double score) {
     final normalizedScore = score.clamp(0.0, 1.0);
 

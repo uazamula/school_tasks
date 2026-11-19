@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
+import 'package:school_tasks/features/learning/providers/effective_grade_scale_provider.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
 
 class GradeScaleSection extends ConsumerWidget {
@@ -9,9 +10,9 @@ class GradeScaleSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gradeScaleAsync = ref.watch(gradeScaleControllerProvider);
+    final scaleAsync = ref.watch(effectiveGradeScaleProvider);
 
-    return gradeScaleAsync.when(
+    return scaleAsync.when(
       loading: () => const ListTile(
         title: Text('Шкала оцінювання'),
         trailing: CircularProgressIndicator(),

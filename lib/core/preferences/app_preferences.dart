@@ -56,21 +56,17 @@ class AppPreferences {
     return _prefs.setString(PreferenceKeys.languageCode, locale.languageCode);
   }
 
-  GradeScale getGradeScale() {
+  /// null означає, що користувач ще не обирав (діє значення за замовчуванням).
+  GradeScale? getGradeScale() {
     final value = _prefs.getString(PreferenceKeys.gradeScale);
 
-    switch (value) {
-      case PreferenceValues.gradeScaleTwelve:
-        return GradeScale.twelve;
-
-      case PreferenceValues.gradeScaleVisual:
-        return GradeScale.visual;
-      case PreferenceValues.gradeScaleEmoji:
-        return GradeScale.emoji;
-      case PreferenceValues.gradeScaleHundred:
-      default:
-        return GradeScale.hundred;
-    }
+    return switch (value) {
+      PreferenceValues.gradeScaleHundred => GradeScale.hundred,
+      PreferenceValues.gradeScaleTwelve => GradeScale.twelve,
+      PreferenceValues.gradeScaleVisual => GradeScale.visual,
+      PreferenceValues.gradeScaleEmoji => GradeScale.emoji,
+      _ => null,
+    };
   }
 
   Future<bool> setGradeScale(GradeScale scale) {

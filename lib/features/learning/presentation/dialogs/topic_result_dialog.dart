@@ -11,7 +11,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dar
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
-import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
+import 'package:school_tasks/features/learning/providers/effective_grade_scale_provider.dart';
 
 import 'topic_evaluation_details.dart';
 
@@ -36,8 +36,7 @@ class _TopicResultDialogState extends ConsumerState<TopicResultDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final gradeScaleAsync = ref.watch(gradeScaleControllerProvider);
-
+    final gradeScaleAsync = ref.watch(effectiveGradeScaleProvider);
     return AlertDialog(
       title: const Text('Результат'),
       content: gradeScaleAsync.when(
