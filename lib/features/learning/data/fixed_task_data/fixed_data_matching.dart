@@ -57,8 +57,8 @@ final matchingTasks = [
       ),
       MatchingPair(
         left: AudioContent.localized({
-          'uk': 'assets/audio/devjat.mp3',
-          'tr': 'assets/audio/tr_dokuz.mp3',
+          'uk': 'assets/audio/pronunciation/uk_devjat.mp3',
+          'tr': 'assets/audio/pronunciation/tr_dokuz.mp3',
         }),
         right: TextContent('9'),
       ),
@@ -69,7 +69,7 @@ final matchingTasks = [
       MatchingPair(
         left: TextContent(
           '🍎🍎🍎🍎🍎🍎🍎🍎🍎',
-          audio: AudioContent.fixed('assets/audio/devjat.mp3'),
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_devjat.mp3'),
         ),
         right: TextContent('9'),
       ),

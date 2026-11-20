@@ -26,13 +26,13 @@ const List<TaskData> additionWithSound = [
   ),
   SelectionTaskData(
     prompt: TaskPrompt(content: [TextContent('Скільки буде 2 + 5?')]),
-    correctAnswers: [AudioContent.fixed('assets/audio/sim.mp3')],
+    correctAnswers: [AudioContent.fixed('assets/audio/uk_sim.mp3')],
     wrongAnswers: [
       AudioContent.localized({
-        'uk': 'assets/audio/devjat.mp3',
-        'tr': 'assets/audio/tr_dokuz.mp3',
+        'uk': 'assets/audio/pronunciation/uk_devjat.mp3',
+        'tr': 'assets/audio/pronunciation/tr_dokuz.mp3',
       }),
-      AudioContent.localized({'uk': 'assets/audio/dva.mp3'}),
+      AudioContent.localized({'uk': 'assets/audio/pronunciation/uk_dva.mp3'}),
     ],
     wrongAnswerCount: 2,
     requiresConfirmation: true,
@@ -67,7 +67,7 @@ const List<TaskData> audioPromptDemo = [
 
         ImageContent(
           'assets/images/tasks/apple.png',
-          audio: AudioContent.fixed('assets/audio/sim.mp3'),
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_sim.mp3'),
         ),
       ],
     ),
@@ -86,7 +86,7 @@ const List<TaskData> audioSelectionDemo = [
         TextContent('Скільки яблук?'),
         EmojiContent(
           '🍎🍎🍎',
-          audio: AudioContent.fixed('assets/audio/sim.mp3'),
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_sim.mp3'),
         ),
       ],
     ),
@@ -101,12 +101,18 @@ const List<TaskData> audioSelectionDemo = [
     prompt: TaskPrompt(
       content: [
         TextContent('Обери всі числа, які можна почути:'),
-        EmojiContent('🔊 2', audio: AudioContent.fixed('assets/audio/dva.mp3')),
+        EmojiContent(
+          '🔊 2',
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_dva.mp3'),
+        ),
         EmojiContent(
           '🔊 9',
-          audio: AudioContent.fixed('assets/audio/devjat.mp3'),
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_devjat.mp3'),
         ),
-        EmojiContent('🔊 2', audio: AudioContent.fixed('assets/audio/dva.mp3')),
+        EmojiContent(
+          '🔊 2',
+          audio: AudioContent.fixed('assets/audio/pronunciation/uk_dva.mp3'),
+        ),
       ],
     ),
     correctAnswers: ['🔊 2', '🔊 9'],
@@ -123,7 +129,7 @@ const List<TaskData> audioSelectionDemo = [
     correctAnswers: [
       ImageContent(
         'assets/images/tasks/apple.png',
-        audio: AudioContent.fixed('assets/audio/sim.mp3'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_sim.mp3'),
       ),
     ],
     wrongAnswers: [
@@ -143,11 +149,11 @@ const List<TaskData> audioSelectionDemo = [
     correctAnswers: [
       ImageContent(
         'assets/images/tasks/apple.png',
-        audio: AudioContent.fixed('assets/audio/sim.mp3'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_sim.mp3'),
       ),
       ImageContent(
         'assets/images/tasks/triangle.png',
-        audio: AudioContent.fixed('assets/audio/devjat.mp3'),
+        audio: AudioContent.fixed('assets/audio/pronunciation/uk_devjat.mp3'),
       ),
     ],
     wrongAnswers: [EmojiContent('🍌'), EmojiContent('🍐')],

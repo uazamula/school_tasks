@@ -9,6 +9,7 @@ import 'package:school_tasks/features/learning/data/topics/topic_mult_sel.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_multiplication_table.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_percents.dart';
 import 'package:school_tasks/features/learning/data/topics/topic_test.dart';
+import 'package:school_tasks/features/learning/data/topics/topic_test_audio.dart';
 import 'package:school_tasks/features/learning/domain/learning_node.dart';
 import 'package:school_tasks/features/learning/domain/learning_node_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
@@ -53,6 +54,11 @@ abstract final class LearningContent {
                 ImageContent('assets/images/harp.png'),
                 EmojiContent('🍍'),
               ],
+            ),
+            LearningNode(
+              id: 'test_audio_content',
+              titleKey: 'Test Audio Content',
+              type: LearningNodeType.topic,
             ),
           ],
         ),
@@ -166,6 +172,7 @@ abstract final class LearningContent {
     'memory_goal': MemoryGoalDemo.topic,
     'matching_syllables': MatchingSyllablesGeneratorDemo.topic,
     'languages_memory': MemoryLanguagesDemo.topic,
+    'test_audio_content': TopicAudioContentTest.topic,
   };
 
   static Topic getTopic(String topicId) {
