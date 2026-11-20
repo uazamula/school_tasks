@@ -98,8 +98,11 @@ class _SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(AppConfig.splashEmoji, style: TextStyle(fontSize: 96)),
-            const SizedBox(height: 16),
+            const Icon(
+              AppConfig.splashIcon,
+              size: 112,
+              color: AppColors.gentleSeed,
+            ),            const SizedBox(height: 16),
             const Text(
               AppConfig.splashTitle,
               textAlign: TextAlign.center,

@@ -189,20 +189,16 @@ class AppPreferences {
     }
   }
 
-  TopicResultDisplay getTopicResultDisplay() {
-    final value = _prefs.getString(PreferenceKeys.topicResultDisplay);
-
-    switch (value) {
-      case PreferenceValues.topicResultDisplayDuration:
-        return TopicResultDisplay.duration;
-
-      case PreferenceValues.topicResultDisplayGradeAndDuration:
-        return TopicResultDisplay.gradeAndDuration;
-
-      case PreferenceValues.topicResultDisplayGrade:
-      default:
-        return TopicResultDisplay.grade;
-    }
+  /// null — користувач ще не обирав (діє значення профілю).
+  TopicResultDisplay? getTopicResultDisplay() {
+    return switch (_prefs.getString(PreferenceKeys.topicResultDisplay)) {
+      PreferenceValues.topicResultDisplayGrade => TopicResultDisplay.grade,
+      PreferenceValues.topicResultDisplayDuration =>
+      TopicResultDisplay.duration,
+      PreferenceValues.topicResultDisplayGradeAndDuration =>
+      TopicResultDisplay.gradeAndDuration,
+      _ => null,
+    };
   }
 
   Future<bool> setTopicResultDisplay(TopicResultDisplay display) {
@@ -244,11 +240,11 @@ class AppPreferences {
     return _prefs.setBool(PreferenceKeys.serviceSoundsEnabled, enabled);
   }
 
-  AppThemeChoice getThemeChoice() {
-    final value = _prefs.getString(PreferenceKeys.themeMode);
-
-    // Невідоме або відсутнє значення — тема пристрою.
-    return AppThemeChoice.values.asNameMap()[value] ?? AppThemeChoice.system;
+  /// null — користувач ще не обирав (діє значення профілю).
+  AppThemeChoice? getThemeChoice() {
+    return AppThemeChoice.values.asNameMap()[_prefs.getString(
+      PreferenceKeys.themeMode,
+    )];
   }
 
   Future<bool> setThemeChoice(AppThemeChoice choice) {

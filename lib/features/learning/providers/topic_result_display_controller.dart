@@ -8,7 +8,7 @@ part 'topic_result_display_controller.g.dart';
 @Riverpod(keepAlive: true)
 class TopicResultDisplayController extends _$TopicResultDisplayController {
   @override
-  Future<TopicResultDisplay> build() async {
+  Future<TopicResultDisplay?> build() async {
     final preferences = await ref.watch(appPreferencesProvider.future);
 
     return preferences.getTopicResultDisplay();

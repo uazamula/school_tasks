@@ -7,14 +7,14 @@ part of 'topic_result_display_controller.dart';
 // **************************************************************************
 
 String _$topicResultDisplayControllerHash() =>
-    r'2d1e0e4b392e0e0801c9c29eec9b091799c6d59c';
+    r'327f1a732579adc0a21174bec5e7946f2ae2d131';
 
 /// See also [TopicResultDisplayController].
 @ProviderFor(TopicResultDisplayController)
 final topicResultDisplayControllerProvider =
     AsyncNotifierProvider<
       TopicResultDisplayController,
-      TopicResultDisplay
+      TopicResultDisplay?
     >.internal(
       TopicResultDisplayController.new,
       name: r'topicResultDisplayControllerProvider',
@@ -25,6 +25,6 @@ final topicResultDisplayControllerProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$TopicResultDisplayController = AsyncNotifier<TopicResultDisplay>;
+typedef _$TopicResultDisplayController = AsyncNotifier<TopicResultDisplay?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -9,7 +9,7 @@ part 'theme_controller.g.dart';
 @Riverpod(keepAlive: true)
 class ThemeController extends _$ThemeController {
   @override
-  Future<AppThemeChoice> build() async {
+  Future<AppThemeChoice?> build() async {
     final preferences = await ref.watch(appPreferencesProvider.future);
 
     return preferences.getThemeChoice();

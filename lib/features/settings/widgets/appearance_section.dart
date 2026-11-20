@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/extensions/context_extension.dart';
+import 'package:school_tasks/core/theme/effective_theme_provider.dart';
 import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
 import 'package:school_tasks/core/theme/theme_controller.dart';
 
@@ -11,8 +12,7 @@ class AppearanceSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode =
         ref.watch(themeControllerProvider).value ?? ThemeMode.system;
-    final themeChoice =
-        ref.watch(themeControllerProvider).value ?? AppThemeChoice.system;
+    final themeChoice = ref.watch(effectiveThemeChoiceProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

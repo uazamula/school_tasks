@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/services/emoji_preloader.dart';
 import 'package:school_tasks/core/startup/startup_gate.dart';
+import 'package:school_tasks/core/theme/effective_theme_provider.dart';
 import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
 import 'package:school_tasks/l10n/app_localizations.dart';
 
 import 'core/localization/locale_controller.dart';
 import 'core/statistics/usage_statistics_service_provider.dart';
 import 'core/theme/app_theme.dart';
-import 'core/theme/theme_controller.dart';
 import 'features/settings/providers/service_sounds_controller.dart';
 import 'routing/app_router.dart';
 
@@ -22,8 +22,7 @@ class MyApp extends ConsumerWidget {
 
     final locale = ref.watch(localeControllerProvider);
 
-    final themeChoice =
-        ref.watch(themeControllerProvider).value ?? AppThemeChoice.system;
+    final themeChoice = ref.watch(effectiveThemeChoiceProvider);
     final isGentle = themeChoice == AppThemeChoice.gentle;
 
     return MaterialApp.router(

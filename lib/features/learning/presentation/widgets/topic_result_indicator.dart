@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:school_tasks/core/config/app_config.dart';
 import 'package:school_tasks/core/formatters/duration_formatter.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_attempt.dart';
@@ -10,8 +9,7 @@ import 'package:school_tasks/features/learning/domain/topic_result.dart';
 import 'package:school_tasks/features/learning/domain/topic_result_kind.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/grade_mark.dart';
 import 'package:school_tasks/features/learning/providers/effective_grade_scale_provider.dart';
-import 'package:school_tasks/features/learning/providers/topic_result_attempt_controller.dart';
-import 'package:school_tasks/features/learning/providers/topic_result_display_controller.dart';
+import 'package:school_tasks/features/learning/providers/effective_result_settings.dart';
 
 class TopicResultIndicator extends ConsumerWidget {
   const TopicResultIndicator({
@@ -47,25 +45,13 @@ class TopicResultIndicator extends ConsumerWidget {
       return _buildEmpty();
     }
 
-    final attemptAsync = ref.watch(topicResultAttemptControllerProvider);
     final scaleAsync = ref.watch(effectiveGradeScaleProvider);
-    final displayAsync = ref.watch(topicResultDisplayControllerProvider);
+    final attemptKind = ref.watch(effectiveTopicResultAttemptProvider);
+    final display = ref.watch(effectiveTopicResultDisplayProvider);
 
-    if (attemptAsync.isLoading ||
-        scaleAsync.isLoading ||
-        displayAsync.isLoading ||
-        attemptAsync.hasError ||
-        scaleAsync.hasError ||
-        displayAsync.hasError) {
+    if (scaleAsync.isLoading || scaleAsync.hasError) {
       return _buildEmpty();
     }
-
-    // Вибір користувача або значення за замовчуванням для режиму.
-    final attemptKind =
-        attemptAsync.value ??
-        (kidsMode
-            ? AppConfig.kidsResultAttemptDefault
-            : AppConfig.resultAttemptDefault);
 
     final snapshot = attemptKind == TopicResultAttempt.best
         ? stored.bestAttempt
@@ -97,8 +83,6 @@ class TopicResultIndicator extends ConsumerWidget {
     if (kidsMode) {
       return main(_markSizeKids);
     }
-
-    final display = displayAsync.value!;
 
     // Тривалість з тієї ж спроби, що й оцінка; без неї береться остання.
     final durationSource = snapshot ?? stored.currentAttempt;

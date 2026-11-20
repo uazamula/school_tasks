@@ -1,5 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:school_tasks/core/config/ui_profile.dart';
+import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/grade_scale.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/topic_result_attempt.dart';
+import 'package:school_tasks/features/learning/domain/evaluation/topic_result_display.dart';
 
 /// Програмні перемикачі застосунку (змінюються в коді).
 abstract final class AppConfig {
@@ -14,13 +18,26 @@ abstract final class AppConfig {
   static const kidsUiDefault = true;
 
   /// Чи показувати перемикач дитячого інтерфейсу в налаштуваннях.
-  static const kidsUiSwitchVisible = true;
+  static const kidsUiSwitchVisible = false;
 
-  /// Яку спробу показувати на плитці, поки користувач не обрав сам.
-  static const resultAttemptDefault = TopicResultAttempt.current;
-  static const kidsResultAttemptDefault = TopicResultAttempt.best;
+  /// Значення за замовчуванням для дорослого інтерфейсу.
+  static const adultProfile = UiProfile(
+    themeChoice: AppThemeChoice.system,
+    gradeScale: GradeScale.hundred,
+    resultAttempt: TopicResultAttempt.current,
+    resultDisplay: TopicResultDisplay.grade,
+    serviceSounds: true,
+  );
 
-  /// Шкала оцінювання, поки користувач не обрав сам.
-  static const gradeScaleDefault = GradeScale.hundred;
-  static const kidsGradeScaleDefault = GradeScale.emoji;
+  /// Значення за замовчуванням для дитячого інтерфейсу.
+  static const kidsProfile = UiProfile(
+    themeChoice: AppThemeChoice.gentle,
+    gradeScale: GradeScale.emoji,
+    resultAttempt: TopicResultAttempt.best,
+    resultDisplay: TopicResultDisplay.gradeAndDuration,
+    serviceSounds: true,
+  );
+
+  /// Іконка сплеша (не залежить від шрифту емодзі).
+  static const splashIcon = Icons.backpack_rounded;
 }
