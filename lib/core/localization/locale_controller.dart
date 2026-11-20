@@ -9,7 +9,7 @@ part 'locale_controller.g.dart';
 @Riverpod(keepAlive: true)
 class LocaleController extends _$LocaleController {
   @override
-  Future<Locale> build() async {
+  Future<Locale?> build() async {
     final preferences = await ref.watch(appPreferencesProvider.future);
 
     return preferences.getLocale();

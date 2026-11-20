@@ -7,7 +7,7 @@ part of 'service_sounds_controller.dart';
 // **************************************************************************
 
 String _$serviceSoundsControllerHash() =>
-    r'b3d1fac32d334158b193faca159638d339e6da2c';
+    r'1aab7c1e5236d6196ec4c91ef7040a1e6f06e4de';
 
 /// See also [ServiceSoundsController].
 @ProviderFor(ServiceSoundsController)

@@ -42,14 +42,11 @@ class AppPreferences {
     });
   }
 
-  Locale getLocale() {
+  /// null — користувач ще не обирав мову.
+  Locale? getLocale() {
     final languageCode = _prefs.getString(PreferenceKeys.languageCode);
 
-    if (languageCode == null) {
-      return const Locale(PreferenceValues.uk);
-    }
-
-    return Locale(languageCode);
+    return languageCode == null ? null : Locale(languageCode);
   }
 
   Future<bool> setLocale(Locale locale) {
@@ -194,9 +191,9 @@ class AppPreferences {
     return switch (_prefs.getString(PreferenceKeys.topicResultDisplay)) {
       PreferenceValues.topicResultDisplayGrade => TopicResultDisplay.grade,
       PreferenceValues.topicResultDisplayDuration =>
-      TopicResultDisplay.duration,
+        TopicResultDisplay.duration,
       PreferenceValues.topicResultDisplayGradeAndDuration =>
-      TopicResultDisplay.gradeAndDuration,
+        TopicResultDisplay.gradeAndDuration,
       _ => null,
     };
   }
@@ -232,8 +229,9 @@ class AppPreferences {
     );
   }
 
-  bool getServiceSoundsEnabled() {
-    return _prefs.getBool(PreferenceKeys.serviceSoundsEnabled) ?? true;
+  /// null — користувач ще не обирав (діє значення профілю).
+  bool? getServiceSoundsEnabled() {
+    return _prefs.getBool(PreferenceKeys.serviceSoundsEnabled);
   }
 
   Future<bool> setServiceSoundsEnabled(bool enabled) {
@@ -269,5 +267,15 @@ class AppPreferences {
 
   Future<bool> setTopicResultAttempt(TopicResultAttempt attempt) {
     return _prefs.setString(PreferenceKeys.topicResultAttempt, attempt.name);
+  }
+
+  /// Скидає вибір користувача: далі діють значення профілю.
+  /// Мова і дитячий режим не чіпаються.
+  Future<void> resetUiSettings() async {
+    await _prefs.remove(PreferenceKeys.themeMode);
+    await _prefs.remove(PreferenceKeys.gradeScale);
+    await _prefs.remove(PreferenceKeys.topicResultAttempt);
+    await _prefs.remove(PreferenceKeys.topicResultDisplay);
+    await _prefs.remove(PreferenceKeys.serviceSoundsEnabled);
   }
 }

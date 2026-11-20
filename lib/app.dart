@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:school_tasks/core/config/app_config.dart';
 import 'package:school_tasks/core/services/emoji_preloader.dart';
+import 'package:school_tasks/core/startup/language_gate.dart';
 import 'package:school_tasks/core/startup/startup_gate.dart';
 import 'package:school_tasks/core/theme/effective_theme_provider.dart';
 import 'package:school_tasks/core/theme/theme_app_theme_choice.dart';
@@ -31,8 +33,7 @@ class MyApp extends ConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
 
-      locale: locale.value,
-
+      locale: locale.value ?? AppConfig.defaultLocale,
       routerConfig: appRouter,
 
       theme: isGentle ? AppTheme.gentle() : AppTheme.light(),
@@ -55,7 +56,11 @@ class MyApp extends ConsumerWidget {
             child: ColoredBox(
               color: Theme.of(context).colorScheme.surface,
               child: StartupGate(
-                child: EmojiPreloader(child: child ?? const SizedBox.shrink()),
+                child: LanguageGate(
+                  child: EmojiPreloader(
+                    child: child ?? const SizedBox.shrink(),
+                  ),
+                ),
               ),
             ),
           ),

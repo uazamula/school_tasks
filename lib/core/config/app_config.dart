@@ -8,6 +8,7 @@ import 'package:school_tasks/features/learning/domain/evaluation/topic_result_di
 /// Програмні перемикачі застосунку (змінюються в коді).
 abstract final class AppConfig {
   const AppConfig._();
+
   /// Сплеш: текст, емодзі та мінімальний час показу (потім локалізуємо).
   static const splashEmoji = '🎒';
   static const splashTitle = 'Шкільні завдання';
@@ -15,10 +16,10 @@ abstract final class AppConfig {
   static const splashMinDuration = Duration(seconds: 1, milliseconds: 700);
 
   /// Дитячий інтерфейс за замовчуванням, поки користувач нічого не обрав.
-  static const kidsUiDefault = true;
+  static const kidsUiDefault = false;
 
   /// Чи показувати перемикач дитячого інтерфейсу в налаштуваннях.
-  static const kidsUiSwitchVisible = false;
+  static const kidsUiSwitchVisible = true;
 
   /// Значення за замовчуванням для дорослого інтерфейсу.
   static const adultProfile = UiProfile(
@@ -26,7 +27,7 @@ abstract final class AppConfig {
     gradeScale: GradeScale.hundred,
     resultAttempt: TopicResultAttempt.current,
     resultDisplay: TopicResultDisplay.grade,
-    serviceSounds: true,
+    serviceSounds: false,
   );
 
   /// Значення за замовчуванням для дитячого інтерфейсу.
@@ -34,10 +35,20 @@ abstract final class AppConfig {
     themeChoice: AppThemeChoice.gentle,
     gradeScale: GradeScale.emoji,
     resultAttempt: TopicResultAttempt.best,
-    resultDisplay: TopicResultDisplay.gradeAndDuration,
+    resultDisplay: TopicResultDisplay.grade,
     serviceSounds: true,
   );
 
   /// Іконка сплеша (не залежить від шрифту емодзі).
   static const splashIcon = Icons.backpack_rounded;
+
+  /// Мова, поки користувач не обрав сам.
+  static const defaultLocale = Locale('uk');
+
+  /// Назви мов для екрана вибору (рідною мовою, без локалізації).
+  static const languageNames = {
+    'uk': 'Українська',
+    'en': 'English',
+    'tr': 'Türkçe',
+  };
 }
