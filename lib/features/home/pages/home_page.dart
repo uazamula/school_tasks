@@ -22,32 +22,6 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   @override
-  void initState() {
-    super.initState();
-    _loadTopicResults();
-  }
-
-  Future<void> _loadTopicResults() async {
-    final preferences = await ref.read(appPreferencesProvider.future);
-    final controller = ref.read(learningResultsControllerProvider.notifier);
-
-    for (final topic in LearningContent.topics.values) {
-      final result = preferences.getTopicResult(topic.id);
-
-      if (result == null) continue;
-
-      // Вид результату змінився (оцінка <-> серія): старий результат
-      // непорівнянний, тому скидаємо його.
-      if (result.kind != topic.resultKind) {
-        await preferences.clearTopicResult(topic.id);
-        continue;
-      }
-
-      controller.setResult(topic.id, result);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final topicResults = ref.watch(learningResultsControllerProvider);
 

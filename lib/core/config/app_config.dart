@@ -16,7 +16,7 @@ abstract final class AppConfig {
   static const splashMinDuration = Duration(seconds: 1, milliseconds: 700);
 
   /// Дитячий інтерфейс за замовчуванням, поки користувач нічого не обрав.
-  static const kidsUiDefault = false;
+  static const kidsUiDefault = true;
 
   /// Чи показувати перемикач дитячого інтерфейсу в налаштуваннях.
   static const kidsUiSwitchVisible = true;

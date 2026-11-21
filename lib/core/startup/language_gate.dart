@@ -44,24 +44,31 @@ class LanguageGate extends ConsumerWidget {
                             width: 280,
                             height: 72,
                             child: FilledButton(
+                              style: FilledButton.styleFrom(
+                                alignment: Alignment.centerLeft,
+                              ),
                               onPressed: () => ref
                                   .read(localeControllerProvider.notifier)
                                   .setLocale(Locale(language.languageCode)),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  LanguageFlag(
-                                    languageCode: language.languageCode,
-                                    height: 36,
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    AppConfig.languageNames[language
-                                            .languageCode] ??
-                                        language.languageCode,
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
-                                ],
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    LanguageFlag(
+                                      languageCode: language.languageCode,
+                                      height: 36,
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Text(
+                                      AppConfig.languageNames[language
+                                              .languageCode] ??
+                                          language.languageCode,
+                                      style: const TextStyle(fontSize: 22),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/localization/locale_controller.dart';
+import 'package:school_tasks/core/startup/load_topic_results.dart';
 import 'package:school_tasks/core/theme/theme_controller.dart';
 import 'package:school_tasks/core/ui/kids_ui_controller.dart';
 import 'package:school_tasks/features/learning/providers/grade_scale_controller.dart';
@@ -27,4 +28,6 @@ final appReadyProvider = FutureProvider<void>((ref) async {
     safe(ref.watch(topicResultDisplayControllerProvider.future)),
     safe(ref.watch(learningTreeControllerProvider.future)),
   ]);
+  // Результати тем: плитки не мають мигати порожнім станом.
+  await safe(loadTopicResults(ref));
 });
