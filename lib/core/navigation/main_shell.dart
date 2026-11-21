@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/core/config/app_config.dart';
 import 'package:school_tasks/core/responsive/responsive_extension.dart';
 import 'package:school_tasks/core/ui/kids_ui_controller.dart';
 import 'package:school_tasks/core/ui/parent_gate_dialog.dart';
@@ -30,29 +33,49 @@ class MainShell extends ConsumerWidget {
   Widget _buildKids(BuildContext context) {
     final isHome = navigationShell.currentIndex == _homeIndex;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            KidsShellBar(
-              isHome: isHome,
-              onPressed: () async {
-                // Назад на головну без перевірки.
-                if (!isHome) {
-                  navigationShell.goBranch(_homeIndex);
-                  return;
-                }
+    return PopScope(
+      // Кнопку «назад» обробляємо самі, лише на мобільних і за прапорцем.
+      canPop: kIsWeb || !AppConfig.kidsBackRequiresGate,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
 
-                // У налаштування лише після батьківського контролю.
-                final passed = await showParentGate(context);
+        // З налаштувань повертаємось на головну без перевірки.
+        if (!isHome) {
+          navigationShell.goBranch(_homeIndex);
+          return;
+        }
 
-                if (passed && context.mounted) {
-                  navigationShell.goBranch(_settingsIndex);
-                }
-              },
-            ),
-            Expanded(child: navigationShell),
-          ],
+        // Закрити застосунок можна лише після батьківського контролю.
+        final passed = await showParentGate(context);
+
+        if (passed) {
+          await SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              KidsShellBar(
+                isHome: isHome,
+                onPressed: () async {
+                  // Назад на головну без перевірки.
+                  if (!isHome) {
+                    navigationShell.goBranch(_homeIndex);
+                    return;
+                  }
+
+                  // У налаштування лише після батьківського контролю.
+                  final passed = await showParentGate(context);
+
+                  if (passed && context.mounted) {
+                    navigationShell.goBranch(_settingsIndex);
+                  }
+                },
+              ),
+              Expanded(child: navigationShell),
+            ],
+          ),
         ),
       ),
     );

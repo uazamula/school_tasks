@@ -58,4 +58,8 @@ abstract final class AppConfig {
     'en': 'assets/images/flags/gb.svg',
     'tr': 'assets/images/flags/tr.svg',
   };
+
+  /// Дитячий режим: системна кнопка «назад» на головній потребує
+  /// батьківського контролю, щоб дитина не закрила застосунок випадково.
+  static const kidsBackRequiresGate = true;
 }
