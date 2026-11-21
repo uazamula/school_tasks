@@ -95,59 +95,75 @@ class _ParentGateDialogState extends State<ParentGateDialog>
     final colorScheme = Theme.of(context).colorScheme;
 
     return Dialog(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _task.question,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            AnimatedBuilder(
-              animation: _shake,
-              builder: (context, child) {
-                final t = _shake.value;
-                final dx = sin(t * pi * 6) * 12 * (1 - t);
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _task.question,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                AnimatedBuilder(
+                  animation: _shake,
+                  builder: (context, child) {
+                    final t = _shake.value;
+                    final dx = sin(t * pi * 6) * 12 * (1 - t);
 
-                return Transform.translate(offset: Offset(dx, 0), child: child);
-              },
-              child: Container(
-                width: 240,
-                height: 56,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
+                    return Transform.translate(
+                      offset: Offset(dx, 0),
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    width: 240,
+                    height: 56,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _input,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
                 ),
-                child: Text(
-                  _input,
-                  style: Theme.of(context).textTheme.headlineMedium,
+                const SizedBox(height: 16),
+                InputKeyboard(
+                  mode: InputMode.integer,
+                  enabled: true,
+                  decimalSeparator: ',',
+                  onInputPressed: _onDigit,
+                  onCyclePressed: (_) {},
+                  onDecimalSeparatorPressed: () {},
+                  onBackspacePressed: _onBackspace,
                 ),
-              ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: 240,
+                  child: FilledButton(
+                    onPressed: _input.isEmpty ? null : _onSubmit,
+                    child: const Text('OK'),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            InputKeyboard(
-              mode: InputMode.integer,
-              enabled: true,
-              decimalSeparator: ',',
-              onInputPressed: _onDigit,
-              onCyclePressed: (_) {},
-              onDecimalSeparatorPressed: () {},
-              onBackspacePressed: _onBackspace,
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: IconButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              icon: const Icon(Icons.close_rounded),
+              tooltip: 'Закрити',
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: 240,
-              child: FilledButton(
-                onPressed: _input.isEmpty ? null : _onSubmit,
-                child: const Text('OK'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

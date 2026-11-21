@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Показує дитячий діалог виходу. Повертає true, якщо треба вийти.
-/// Тап поза діалогом означає «залишитись».
+/// Хрестик і тап поза діалогом означають «залишитись».
 Future<bool> showKidsExitDialog(BuildContext context) async {
   final shouldExit = await showDialog<bool>(
     context: context,
@@ -11,50 +11,49 @@ Future<bool> showKidsExitDialog(BuildContext context) async {
   return shouldExit == true;
 }
 
-/// Дві великі кнопки без тексту: «залишитись» і «вийти».
+/// Одна велика кнопка виходу та хрестик у куті.
 class KidsExitDialog extends StatelessWidget {
   const KidsExitDialog({super.key});
 
-  // Піктограми в константах, щоб легко замінити.
-  static const _stayIcon = '▶️';
-  static const _exitIcon = '🚪➡️';
+  static const _exitImage = 'assets/images/exit.png';
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Менша й нейтральна кнопка виходу, щоб не натиснути випадково.
-            FilledButton.tonal(
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(32, 48, 32, 32),
+            child: FilledButton.tonal(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(
-                minimumSize: const Size(80, 80),
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              child: const Text(_exitIcon, style: TextStyle(fontSize: 28)),
-            ),
-            const SizedBox(width: 24),
-            // Більша кольорова основна кнопка «залишитись».
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              style: FilledButton.styleFrom(
                 minimumSize: const Size(120, 120),
-                padding: EdgeInsets.zero,
+                padding: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32),
                 ),
               ),
-              child: const Text(_stayIcon, style: TextStyle(fontSize: 56)),
+              child: Image.asset(
+                _exitImage,
+                width: 88,
+                height: 88,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) =>
+                    const Icon(Icons.directions_run, size: 72),
+              ),
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: IconButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              icon: const Icon(Icons.close_rounded, size: 32),
+              tooltip: 'Залишитись',
+            ),
+          ),
+        ],
       ),
     );
   }
