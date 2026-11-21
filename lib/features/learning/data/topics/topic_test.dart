@@ -29,9 +29,7 @@ import 'package:school_tasks/features/learning/domain/word_content/word_filter.d
 abstract final class Tests {
   static final Topic topic = Topic(
     id: 'shapes',
-    taskTypeCounts: {
-      LearningTaskType.slotAssembly: 1,
-    },
+    taskTypeCounts: {LearningTaskType.slotAssembly: 1},
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([
       GeneratedTaskDataSource([
@@ -57,9 +55,7 @@ abstract final class Tests {
         ),
       ]),
 
-      FixedTaskDataSource([
-        ...matchingTasks,
-      ]),
+      FixedTaskDataSource([...matchingTasks]),
     ]),
     help: 'Тестування різних типів завдань',
 

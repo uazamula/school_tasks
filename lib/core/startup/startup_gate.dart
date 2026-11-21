@@ -102,7 +102,8 @@ class _SplashScreen extends StatelessWidget {
               AppConfig.splashIcon,
               size: 112,
               color: AppColors.gentleSeed,
-            ),            const SizedBox(height: 16),
+            ),
+            const SizedBox(height: 16),
             const Text(
               AppConfig.splashTitle,
               textAlign: TextAlign.center,

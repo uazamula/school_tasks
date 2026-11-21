@@ -64,10 +64,23 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.5.4
   riverpod_generator: ^2.6.5
+  flutter_native_splash: ^2.4.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+
+#flutter pub get
+#dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FFF8EE"
+  # Іконка по центру. Без неї на Android < 12 і в вебі буде лише колір.
+  image: assets/splash/splash_icon.png
+  android_12:
+    color: "#FFF8EE"
+    image: assets/splash/splash_icon.png
+  web: true
+
 flutter:
   generate: true
 

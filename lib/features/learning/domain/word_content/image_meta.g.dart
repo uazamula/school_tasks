@@ -33,6 +33,7 @@ const Map<String, ImageMeta> generatedImageMeta = {
   'assets/images/ear.png': ImageMeta(300, 471),
   'assets/images/egg.png': ImageMeta(236, 306),
   'assets/images/emu.png': ImageMeta(286, 298),
+  'assets/images/exit.png': ImageMeta(640, 640),
   'assets/images/eye.png': ImageMeta(420, 260),
   'assets/images/eyes.png': ImageMeta(314, 146),
   'assets/images/fairy.png': ImageMeta(258, 325),

@@ -37,7 +37,7 @@ abstract final class MatchingSyllablesGeneratorDemo {
           filter: WordFilter(
             syllablePattern: 'с*',
             position: SyllableSearchPosition.any,
-         //   imageAspect: ImageAspect.square
+            //   imageAspect: ImageAspect.square
           ),
           language: Language.uk,
 
