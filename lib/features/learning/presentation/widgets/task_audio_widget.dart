@@ -7,19 +7,23 @@ import 'package:school_tasks/features/learning/domain/tasks/content/audio_conten
 class AudioPlaybackController {
   Future<void> Function()? _togglePlayback;
   Future<void> Function()? _playAndWait;
+  Future<void> Function()? _stop;
 
   void attach(
     Future<void> Function() callback, {
     Future<void> Function()? playAndWait,
+    Future<void> Function()? stop,
   }) {
     _togglePlayback = callback;
     _playAndWait = playAndWait;
+    _stop = stop;
   }
 
   void detach(Future<void> Function() callback) {
     if (identical(_togglePlayback, callback)) {
       _togglePlayback = null;
       _playAndWait = null;
+      _stop = null;
     }
   }
 
@@ -42,6 +46,15 @@ class AudioPlaybackController {
   void dispose() {
     _togglePlayback = null;
     _playAndWait = null;
+    _stop = null;
+  }
+
+  void stop() {
+    final callback = _stop;
+
+    if (callback != null) {
+      unawaited(callback());
+    }
   }
 }
 
@@ -57,7 +70,11 @@ class TaskAudioWidget extends StatefulWidget {
     this.onCompleted,
     this.controller,
     this.stopOnDeactivate = true,
+    this.onPlayingChanged,
   });
+
+  /// Викликається, коли відтворення починається (true) або закінчується (false).
+  final ValueChanged<bool>? onPlayingChanged;
 
   final AudioContent content;
   final VoidCallback? onCompleted;
@@ -105,9 +122,11 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
     widget.controller?.attach(
       _controllerCallback,
       playAndWait: _playAndWaitCallback,
+      stop: _stop,
     );
 
     _player.onPlayerStateChanged.listen((state) {
+      widget.onPlayingChanged?.call(state == PlayerState.playing);
       if (mounted) {
         setState(() {
           _playerState = state;
@@ -148,6 +167,7 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
       widget.controller?.attach(
         _controllerCallback,
         playAndWait: _playAndWaitCallback,
+        stop: _stop,
       );
     }
 

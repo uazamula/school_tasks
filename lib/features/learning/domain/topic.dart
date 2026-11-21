@@ -2,6 +2,7 @@ import 'package:school_tasks/features/learning/domain/automatic_termination_conf
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/evaluation_config.dart';
 import 'package:school_tasks/features/learning/domain/evaluation/passing_criteria.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/audio_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
@@ -24,6 +25,9 @@ class Topic {
     this.taskOrderMode = TaskOrderMode.random,
     this.dashboard = const DashboardConfig(),
     this.resultKind = TopicResultKind.grade,
+    this.helpAudio,
+    this.helpAudioAutoplay = false,
+    this.pauseTimerOnHelpAudio = true,
   }) : assert(
          resultKind != TopicResultKind.streak ||
              automaticTermination?.failureLimit != null ||
@@ -45,4 +49,13 @@ class Topic {
   final AutomaticTerminationConfig? automaticTermination;
   final TaskOrderMode taskOrderMode;
   final DashboardConfig dashboard;
+
+  /// Озвучена довідка. Якщо задана, на Dashboard з'являється кнопка.
+  final AudioContent? helpAudio;
+
+  /// Запускати довідку автоматично на старті теми.
+  final bool helpAudioAutoplay;
+
+  /// Зупиняти секундомір, поки грає довідка.
+  final bool pauseTimerOnHelpAudio;
 }

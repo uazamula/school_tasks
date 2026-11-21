@@ -42,7 +42,6 @@ abstract final class TopicAudioContentTest {
         ),
       ]),
     ]),
-    help: 'Тестування audio',
     evaluation: EvaluationConfig(
       weights: {
         EvaluationCriterionType.accuracy: 1,
@@ -54,5 +53,11 @@ abstract final class TopicAudioContentTest {
     feedbackDuration: Duration(milliseconds: 500),
     automaticTermination: AutomaticTerminationConfig(pauseOnExitDialog: true),
     dashboard: DashboardConfig(showRemainingAttempts: true),
+    help: 'Тестування audio',
+    helpAudio: AudioContent.localized({
+      'uk': 'assets/audio/help/uk_test_audio.mp3',
+    }),
+    helpAudioAutoplay: true,
+    pauseTimerOnHelpAudio: false,
   );
 }

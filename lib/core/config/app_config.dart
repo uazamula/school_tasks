@@ -51,4 +51,11 @@ abstract final class AppConfig {
     'en': 'English',
     'tr': 'Türkçe',
   };
+
+  /// Прапори для мов (SVG, не емодзі: вони не залежать від шрифту).
+  static const languageFlags = {
+    'uk': 'assets/images/flags/ua.svg',
+    'en': 'assets/images/flags/gb.svg',
+    'tr': 'assets/images/flags/tr.svg',
+  };
 }

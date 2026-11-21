@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/config/app_config.dart';
 import 'package:school_tasks/core/localization/locale_controller.dart';
 import 'package:school_tasks/core/theme/app_colors.dart';
+import 'package:school_tasks/core/widgets/language_flag.dart';
 import 'package:school_tasks/l10n/app_localizations.dart';
 
 /// Показує вибір мови, поки користувач її не обрав.
@@ -46,11 +47,21 @@ class LanguageGate extends ConsumerWidget {
                               onPressed: () => ref
                                   .read(localeControllerProvider.notifier)
                                   .setLocale(Locale(language.languageCode)),
-                              child: Text(
-                                AppConfig.languageNames[language
-                                        .languageCode] ??
-                                    language.languageCode,
-                                style: const TextStyle(fontSize: 24),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  LanguageFlag(
+                                    languageCode: language.languageCode,
+                                    height: 36,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    AppConfig.languageNames[language
+                                            .languageCode] ??
+                                        language.languageCode,
+                                    style: const TextStyle(fontSize: 24),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

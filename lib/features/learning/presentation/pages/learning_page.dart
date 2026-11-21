@@ -27,6 +27,7 @@ import 'package:school_tasks/features/learning/domain/topic_result_updater.dart'
 import 'package:school_tasks/features/learning/presentation/widgets/failure_limit_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/learning_progress_indicator.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/streak_indicator.dart';
+import 'package:school_tasks/features/learning/presentation/widgets/task_audio_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_callbacks.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/task_widget.dart';
 import 'package:school_tasks/features/learning/presentation/widgets/topic_layout_widget.dart';
@@ -66,6 +67,10 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   final TopicResultUpdater _topicResultUpdater = const TopicResultUpdater();
 
   late final Stopwatch _stopwatch;
+
+  final AudioPlaybackController _helpAudio = AudioPlaybackController();
+  bool _helpAudioActive = false;
+  bool _resumeStopwatchAfterHelp = false;
 
   int _failureCount = 0;
 
@@ -176,6 +181,12 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       ..onExitDialogOpened = _pauseForExitDialog
       ..onExitDialogClosed = _resumeAfterExitDialog
       ..finishOnQuit = _finishOnQuit;
+
+    if (_topic.helpAudio != null && _topic.helpAudioAutoplay) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _helpAudio.toggle();
+      });
+    }
   }
 
   @override
@@ -184,6 +195,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     _autoAdvanceTimer?.cancel();
     _stopwatch.stop();
     widget.exitGuard.detach();
+    _helpAudio.dispose();
     super.dispose();
   }
 
@@ -264,6 +276,15 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                       FailureLimitIndicator(
                         failureLimit: _failureLimit,
                         failureCount: _failureCount,
+                      ),
+                    ],
+                    if (_topic.helpAudio != null) ...[
+                      const SizedBox(width: 12),
+                      TaskAudioWidget(
+                        content: _topic.helpAudio!,
+                        controller: _helpAudio,
+                        iconColor: Theme.of(context).colorScheme.onPrimary,
+                        onPlayingChanged: _onHelpAudioPlaying,
                       ),
                     ],
                   ],
@@ -352,6 +373,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     if (currentTask.isAnswered) {
       return;
     }
+    _stopHelpAudio();
 
     _attempt.recordResult(result);
 
@@ -470,6 +492,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
 
   /// Позначає завершення: зупиняє таймери та секундомір.
   void _markFinishing() {
+    _stopHelpAudio();
     _isFinishing = true;
 
     _timer?.cancel();
@@ -755,6 +778,7 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   }
 
   void _pauseForExitDialog() {
+    _stopHelpAudio();
     if (!_hasEndlessMemory) return;
     if (!mounted || !_pauseOnExitDialog || _isExitPaused) return;
 
@@ -779,5 +803,40 @@ class _LearningPageState extends ConsumerState<LearningPage> {
     _markFinishing();
 
     unawaited(_finishAttempt(completionReason: TopicCompletionReason.quit));
+  }
+
+  /// Секундомір стоїть, поки грає довідка (якщо тема цього вимагає).
+  void _onHelpAudioPlaying(bool playing) {
+    if (!mounted || !_topic.pauseTimerOnHelpAudio) return;
+
+    if (playing) {
+      if (_helpAudioActive || _isFinishing) return;
+
+      _helpAudioActive = true;
+      _resumeStopwatchAfterHelp = _stopwatch.isRunning;
+      _stopwatch.stop();
+      return;
+    }
+
+    _releaseHelpPause();
+  }
+
+  /// Знімає паузу секундоміра, яку поставила довідка.
+  void _releaseHelpPause() {
+    if (!_helpAudioActive) return;
+
+    _helpAudioActive = false;
+
+    if (_resumeStopwatchAfterHelp && !_isFinishing && !_isExitPaused) {
+      _stopwatch.start();
+    }
+
+    _resumeStopwatchAfterHelp = false;
+  }
+
+  /// Зупиняє довідку (відповідь, вихід, завершення).
+  void _stopHelpAudio() {
+    _releaseHelpPause();
+    _helpAudio.stop();
   }
 }

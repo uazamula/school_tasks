@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/extensions/context_extension.dart';
 import 'package:school_tasks/core/localization/locale_controller.dart';
 import 'package:school_tasks/core/preferences/preference_values.dart';
+import 'package:school_tasks/core/widgets/language_flag.dart';
 
 class LanguageSection extends ConsumerWidget {
   const LanguageSection({super.key});
@@ -31,16 +32,25 @@ class LanguageSection extends ConsumerWidget {
               RadioListTile<Locale>(
                 value: Locale(PreferenceValues.uk),
                 title: Text(context.l10n.ukrainian),
+                secondary: const LanguageFlag(
+                  languageCode: PreferenceValues.uk,
+                ),
                 contentPadding: EdgeInsets.zero,
               ),
               RadioListTile<Locale>(
                 value: Locale(PreferenceValues.en),
                 title: Text(context.l10n.english),
+                secondary: const LanguageFlag(
+                  languageCode: PreferenceValues.en,
+                ),
                 contentPadding: EdgeInsets.zero,
               ),
               RadioListTile<Locale>(
                 value: Locale(PreferenceValues.tr),
                 title: Text(context.l10n.turkish),
+                secondary: const LanguageFlag(
+                  languageCode: PreferenceValues.tr,
+                ),
                 contentPadding: EdgeInsets.zero,
               ),
             ],
