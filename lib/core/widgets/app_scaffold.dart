@@ -12,10 +12,7 @@ class AppScaffold extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1200),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.xs,
-          ),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: child,
         ),
       ),

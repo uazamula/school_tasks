@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_tasks/core/extensions/context_extension.dart';
+import 'package:school_tasks/core/navigation/kids_shell_bar.dart';
+import 'package:school_tasks/core/ui/kids_ui_controller.dart';
 import 'package:school_tasks/features/settings/widgets/appearance_section.dart';
 import 'package:school_tasks/features/settings/widgets/grade_scale_section.dart';
 import 'package:school_tasks/features/settings/widgets/kids_ui_section.dart';
@@ -12,15 +15,19 @@ import 'package:school_tasks/features/settings/widgets/topic_result_display_sect
 
 import '../../../core/widgets/app_scaffold.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final kidsUi = ref.watch(kidsUiControllerProvider).value ?? false;
+
     return AppScaffold(
       child: ListView(
         children: [
+          if (kidsUi) const SizedBox(height: KidsShellBar.height),
           Text(
+            // ... решта без змін
             context.l10n.settings,
             style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),

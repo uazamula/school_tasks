@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_tasks/core/navigation/kids_shell_bar.dart';
 import 'package:school_tasks/core/preferences/preferences_provider.dart';
 import 'package:school_tasks/core/ui/kids_ui_controller.dart';
 import 'package:school_tasks/features/learning/data/learning_content.dart';
@@ -36,24 +37,28 @@ class _HomePageState extends ConsumerState<HomePage> {
         },
         data: (_) {
           return ListView(
-            children: LearningContent.items.map((node) {
-              return LearningNodeWidget(
-                node: node,
-                getTopicResult: (topicId) => topicResults[topicId],
-                onTopicPressed: _onTopicPressed,
-                isNodeExpanded: (nodeId) {
-                  return ref
-                      .read(learningTreeControllerProvider.notifier)
-                      .isExpanded(nodeId);
-                },
-                onExpansionChanged: (nodeId) {
-                  ref
-                      .read(learningTreeControllerProvider.notifier)
-                      .toggleNode(nodeId);
-                },
-                kidsMode: kidsUi,
-              );
-            }).toList(),
+            children: [
+              // Місце під кнопку, що лежить поверх (скролиться разом зі списком).
+              if (kidsUi) const SizedBox(height: KidsShellBar.height),
+              ...LearningContent.items.map((node) {
+                return LearningNodeWidget(
+                  node: node,
+                  getTopicResult: (topicId) => topicResults[topicId],
+                  onTopicPressed: _onTopicPressed,
+                  isNodeExpanded: (nodeId) {
+                    return ref
+                        .read(learningTreeControllerProvider.notifier)
+                        .isExpanded(nodeId);
+                  },
+                  onExpansionChanged: (nodeId) {
+                    ref
+                        .read(learningTreeControllerProvider.notifier)
+                        .toggleNode(nodeId);
+                  },
+                  kidsMode: kidsUi,
+                );
+              }),
+            ],
           );
         },
       ),

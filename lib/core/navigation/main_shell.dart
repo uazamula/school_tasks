@@ -30,83 +30,86 @@ class MainShell extends ConsumerWidget {
 
   /// Оболонка дитячого режиму: без нижньої панелі та rail,
   /// лише кнопка зліва зверху.
-  Widget _buildKids(BuildContext context) {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final kidsUi = ref.watch(kidsUiControllerProvider).value ?? false;
     final isHome = navigationShell.currentIndex == _homeIndex;
+    final showRail = !kidsUi && !context.useBottomNavigation;
+    final showBottomBar = !kidsUi && context.useBottomNavigation;
+
+    final navigation = kidsUi
+        ? null
+        : AppNavigation(
+            controller: AppNavigationController(
+              selectedIndex: navigationShell.currentIndex,
+              onDestinationSelected: _onDestinationSelected,
+            ),
+          );
 
     return PopScope(
-      // Кнопку «назад» обробляємо самі, лише на мобільних і за прапорцем.
-      canPop: kIsWeb || !AppConfig.kidsBackRequiresGate,
+      // «Назад» обробляємо самі лише в дитячому режимі на мобільних.
+      canPop: !kidsUi || kIsWeb || !AppConfig.kidsBackRequiresGate,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
 
-        // З налаштувань повертаємось на головну без перевірки.
         if (!isHome) {
           navigationShell.goBranch(_homeIndex);
           return;
         }
 
-        // Закрити застосунок можна лише після батьківського контролю.
-        final passed = await showParentGate(context);
-
-        if (passed) {
+        if (await showParentGate(context)) {
           await SystemNavigator.pop();
         }
       },
       child: Scaffold(
+        bottomNavigationBar: showBottomBar ? navigation : null,
+        // Структура дерева однакова в обох режимах, щоб navigationShell
+        // не переїжджав між батьками (інакше помилка GlobalKey).
         body: SafeArea(
-          child: Column(
+          top: kidsUi,
+          bottom: kidsUi,
+          left: kidsUi,
+          right: kidsUi,
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              KidsShellBar(
-                isHome: isHome,
-                onPressed: () async {
-                  // Назад на головну без перевірки.
-                  if (!isHome) {
-                    navigationShell.goBranch(_homeIndex);
-                    return;
-                  }
-
-                  // У налаштування лише після батьківського контролю.
-                  final passed = await showParentGate(context);
-
-                  if (passed && context.mounted) {
-                    navigationShell.goBranch(_settingsIndex);
-                  }
-                },
+              // Вільна смужка зверху лише в дитячому режимі. Дерево віджетів
+              // однакове в обох режимах, змінюється тільки значення відступу.
+              Row(
+                children: [
+                  showRail ? navigation! : const SizedBox.shrink(),
+                  showRail
+                      ? const VerticalDivider(width: 1)
+                      : const SizedBox.shrink(),
+                  Expanded(child: navigationShell),
+                ],
               ),
-              Expanded(child: navigationShell),
+              if (kidsUi)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: KidsShellBar(
+                    isHome: isHome,
+                    onPressed: () async {
+                      // Назад на головну без перевірки.
+                      if (!isHome) {
+                        navigationShell.goBranch(_homeIndex);
+                        return;
+                      }
+
+                      // У налаштування лише після батьківського контролю.
+                      final passed = await showParentGate(context);
+
+                      if (passed && context.mounted) {
+                        navigationShell.goBranch(_settingsIndex);
+                      }
+                    },
+                  ),
+                ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final kidsUi = ref.watch(kidsUiControllerProvider).value ?? false;
-
-    if (kidsUi) {
-      return _buildKids(context);
-    }
-
-    final controller = AppNavigationController(
-      selectedIndex: navigationShell.currentIndex,
-      onDestinationSelected: _onDestinationSelected,
-    );
-
-    final navigation = AppNavigation(controller: controller);
-
-    return Scaffold(
-      body: context.useBottomNavigation
-          ? navigationShell
-          : Row(
-              children: [
-                navigation,
-                const VerticalDivider(width: 1),
-                Expanded(child: navigationShell),
-              ],
-            ),
-      bottomNavigationBar: context.useBottomNavigation ? navigation : null,
     );
   }
 }
