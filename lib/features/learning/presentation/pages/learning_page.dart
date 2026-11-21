@@ -285,6 +285,8 @@ class _LearningPageState extends ConsumerState<LearningPage> {
                         controller: _helpAudio,
                         iconColor: Theme.of(context).colorScheme.onPrimary,
                         onPlayingChanged: _onHelpAudioPlaying,
+                        playIcon: Icons.volume_up_rounded,
+                        stopIcon: Icons.stop_rounded,
                       ),
                     ],
                   ],
@@ -609,6 +611,10 @@ class _LearningPageState extends ConsumerState<LearningPage> {
       // Результат уже збережено, тож системне «назад» виходить без питань.
       widget.exitGuard.allowExit = true;
 
+      if (_isSuccessfulResult(updatedResult)) {
+        _audioService.playTada();
+      }
+
       setState(() => _kidsResult = updatedResult);
       return;
     }
@@ -838,5 +844,19 @@ class _LearningPageState extends ConsumerState<LearningPage> {
   void _stopHelpAudio() {
     _releaseHelpPause();
     _helpAudio.stop();
+  }
+
+  /// Ta-da: зарахована оцінка або новий рекорд серії.
+  /// Незарахована спроба (🤷) звучить тихо.
+  bool _isSuccessfulResult(TopicResult result) {
+    if (result.kind == TopicResultKind.streak) {
+      final best = result.bestAttempt;
+
+      return best != null &&
+          best.completedAt == result.currentAttempt.completedAt &&
+          result.currentStreak > 0;
+    }
+
+    return result.currentIsPassed;
   }
 }

@@ -34,4 +34,12 @@ class AudioService {
   Future<void> dispose() async {
     await _player.dispose();
   }
+
+  Future<void> playTada() async {
+    if (!_enabled) {
+      return;
+    }
+
+    await _player.play(AssetSource('audio/tada.mp3'));
+  }
 }

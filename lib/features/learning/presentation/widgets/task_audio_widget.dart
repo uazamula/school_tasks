@@ -71,7 +71,12 @@ class TaskAudioWidget extends StatefulWidget {
     this.controller,
     this.stopOnDeactivate = true,
     this.onPlayingChanged,
+    this.playIcon = Icons.play_arrow,
+    this.stopIcon = Icons.stop,
   });
+
+  final IconData playIcon;
+  final IconData stopIcon;
 
   /// Викликається, коли відтворення починається (true) або закінчується (false).
   final ValueChanged<bool>? onPlayingChanged;
@@ -331,7 +336,7 @@ class _TaskAudioWidgetState extends State<TaskAudioWidget> {
         widget.iconColor ?? Theme.of(context).colorScheme.onSurface;
 
     final icon = Icon(
-      isPlaying ? Icons.stop : Icons.play_arrow,
+      isPlaying ? widget.stopIcon : widget.playIcon,
       color: iconColor,
       size: 32,
     );
