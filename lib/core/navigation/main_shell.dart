@@ -7,6 +7,7 @@ import 'package:school_tasks/core/config/app_config.dart';
 import 'package:school_tasks/core/responsive/responsive_extension.dart';
 import 'package:school_tasks/core/ui/kids_ui_controller.dart';
 import 'package:school_tasks/core/ui/parent_gate_dialog.dart';
+import 'package:school_tasks/routing/settings_access_guard.dart';
 
 import 'app_navigation.dart';
 import 'app_navigation_controller.dart';
@@ -101,6 +102,7 @@ class MainShell extends ConsumerWidget {
                       final passed = await showParentGate(context);
 
                       if (passed && context.mounted) {
+                        settingsAccessGuard.unlocked = true;
                         navigationShell.goBranch(_settingsIndex);
                       }
                     },

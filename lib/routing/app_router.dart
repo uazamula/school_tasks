@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_tasks/features/learning/presentation/dialogs/kids_exit_dialog.dart';
 import 'package:school_tasks/features/profile/pages/profile_page.dart';
+import 'package:school_tasks/routing/settings_access_guard.dart';
 
 import '../core/navigation/main_shell.dart';
 import '../features/home/pages/home_page.dart';
@@ -20,6 +21,23 @@ final LearningExitGuard _learningExitGuard = LearningExitGuard();
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: AppRoutes.home,
+  refreshListenable: settingsAccessGuard,
+  redirect: (context, state) {
+    final guard = settingsAccessGuard;
+
+    // Будь-який інший маршрут скидає дозвіл: наступний вхід знову з перевіркою.
+    if (state.matchedLocation != AppRoutes.settings) {
+      guard.unlocked = false;
+      return null;
+    }
+
+    // У дитячому режимі налаштування лише після батьківського контролю.
+    if (guard.kidsUi && !guard.unlocked) {
+      return AppRoutes.home;
+    }
+
+    return null;
+  },
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
