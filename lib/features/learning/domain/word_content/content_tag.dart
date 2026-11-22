@@ -2,6 +2,7 @@ enum ContentTag {
   animal,
   domesticAnimal,
   wildAnimal,
+  bird,
   person,
   food,
   object,
@@ -13,6 +14,7 @@ enum ContentTag {
 const Map<ContentTag, ContentTag> _contentTagParents = {
   ContentTag.domesticAnimal: ContentTag.animal,
   ContentTag.wildAnimal: ContentTag.animal,
+  ContentTag.bird: ContentTag.animal,
 };
 
 extension ContentTagHierarchy on ContentTag {
