@@ -257,6 +257,9 @@ class TopicAttemptGenerator {
         denominator: data.denominator,
         parts: data.parts,
         selectionMode: data.selectionMode,
+        decoration: data.decoration,
+        baseColor: data.baseColor,
+        selectedColor: data.selectedColor,
       ),
     );
   }

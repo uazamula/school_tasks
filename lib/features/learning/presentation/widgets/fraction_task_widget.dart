@@ -37,10 +37,28 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
   Offset? _lastDragPoint;
   bool _dragActive = false;
 
+  // Колір невиділеної частини за замовчуванням.
+  static const Color _defaultBaseColor = Color(0xFFFFE0B2);
+
+  // Колір таці за замовчуванням (коричневий).
+  static const Color _defaultTrayColor = Color(0xFF8D6E63);
+
+  // Тривалість зникання посипки та зміни кольору.
+  static const Duration _fadeDuration = Duration(milliseconds: 250);
+
+  // Зерно випадковості: стабільне для завдання, нове для кожного завдання.
+  late int _decorSeed;
+
   // Мінімальний рух (логічні пікселі), після якого жест — перетягування, а не тап.
   static const double _dragThreshold = 10;
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
+
+  @override
+  void initState() {
+    super.initState();
+    _decorSeed = Random().nextInt(1 << 30);
+  }
 
   @override
   void didUpdateWidget(covariant FractionTaskWidget oldWidget) {
@@ -165,20 +183,43 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
 
     final colors = Theme.of(context).colorScheme;
 
+    final showSprinkles =
+        widget.task.decoration == FractionDecoration.sprinkles &&
+        !isSelected &&
+        state == TaskAnswerState.neutral;
+
     return ClipRRect(
       borderRadius: borderRadius,
       child: Material(
+        animationDuration: _fadeDuration,
         color: switch (state) {
           TaskAnswerState.correct => Colors.green,
           TaskAnswerState.incorrect => Colors.red,
           TaskAnswerState.neutral =>
-            isSelected ? colors.primary : const Color(0xFFFFE0B2),
+            isSelected
+                ? (widget.task.selectedColor ?? _defaultTrayColor)
+                : (widget.task.baseColor ?? _defaultBaseColor),
         },
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: colors.outline, width: 1),
-            borderRadius: borderRadius,
-          ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (widget.task.decoration == FractionDecoration.sprinkles)
+              AnimatedOpacity(
+                opacity: showSprinkles ? 1 : 0,
+                duration: _fadeDuration,
+                child: CustomPaint(
+                  painter: _SprinklesPainter(
+                    seed: Object.hash(_decorSeed, index),
+                  ),
+                ),
+              ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: colors.outline, width: 1),
+                borderRadius: borderRadius,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -414,4 +455,66 @@ class _ImmediatePanRecognizer extends PanGestureRecognizer {
     PointerDeviceKind pointerDeviceKind,
     double? deviceTouchSlop,
   ) => true;
+}
+
+/// Малює посипку: по одному штриху в кожній підкомірці з випадковим
+/// зсувом, кутом і кольором. Результат стабільний для того самого seed.
+class _SprinklesPainter extends CustomPainter {
+  const _SprinklesPainter({required this.seed});
+
+  final int seed;
+
+  // Фіксована "харчова" палітра.
+  static const List<Color> _palette = [
+    Color(0xFFE53935),
+    Color(0xFF1E88E5),
+    Color(0xFFFDD835),
+    Color(0xFF43A047),
+    Color(0xFF8E24AA),
+    Color(0xFFFB8C00),
+  ];
+
+  // Бажаний розмір підкомірки (логічні пікселі) та межі кількості.
+  static const double _targetSubcell = 12;
+  static const int _minGrid = 2;
+  static const int _maxGrid = 6;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final random = Random(seed);
+
+    final grid = (size.shortestSide / _targetSubcell).round().clamp(
+      _minGrid,
+      _maxGrid,
+    );
+
+    final cellWidth = size.width / grid;
+    final cellHeight = size.height / grid;
+    final length = min(cellWidth, cellHeight) * 0.7;
+
+    final paint = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = length * 0.3;
+
+    for (var row = 0; row < grid; row++) {
+      for (var column = 0; column < grid; column++) {
+        // Центр штриха зсунутий усередині підкомірки, щоб не торкатися країв.
+        final center = Offset(
+          (column + 0.25 + random.nextDouble() * 0.5) * cellWidth,
+          (row + 0.25 + random.nextDouble() * 0.5) * cellHeight,
+        );
+
+        final angle = random.nextDouble() * pi;
+        final half = Offset(cos(angle), sin(angle)) * (length / 2);
+
+        paint.color = _palette[random.nextInt(_palette.length)];
+
+        canvas.drawLine(center - half, center + half, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SprinklesPainter oldDelegate) =>
+      oldDelegate.seed != seed;
 }

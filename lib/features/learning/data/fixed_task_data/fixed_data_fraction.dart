@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_data/task_data.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
@@ -9,8 +11,11 @@ abstract final class FractionData {
       prompt: TaskPrompt(content: [TextContent("З'їж половину торта.")]),
       numerator: 1,
       denominator: 2,
-      parts: 4,
+      parts: 40,
       selectionMode: FractionSelectionMode.both,
+      decoration: FractionDecoration.sprinkles,
+      baseColor: Color(0xFFF8BBD0),   // рожева глазур
+      selectedColor: Color(0xFF8D6E63), // таця
     ),
     FractionTaskData(
       prompt: TaskPrompt(content: [TextContent("З'їж половину піци.")]),

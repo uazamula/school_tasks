@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/fraction_interaction.dart';
@@ -13,6 +15,9 @@ class FractionTask extends LearningTask<Set<int>, int> {
     required this.denominator,
     required this.parts,
     this.selectionMode = FractionSelectionMode.both,
+    this.decoration = FractionDecoration.plain,
+    this.baseColor,
+    this.selectedColor,
   }) : super(
          interaction: const FractionInteraction(),
          solution: Solution<Set<int>, int>(
@@ -25,6 +30,11 @@ class FractionTask extends LearningTask<Set<int>, int> {
   final int denominator;
   final int parts;
   final FractionSelectionMode selectionMode;
+  final FractionDecoration decoration;
+  final Color? baseColor;
+
+  /// Колір таці, що видно на місці забраного шматка. null — колір теми.
+  final Color? selectedColor;
 
   int get requiredSelectedParts => parts * numerator ~/ denominator;
 
