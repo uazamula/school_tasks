@@ -32,9 +32,13 @@ class FractionTaskWidget extends StatefulWidget {
 class _FractionTaskWidgetState extends State<FractionTaskWidget> {
   final Set<int> _selectedParts = {};
 
-  // Режим поточного перетягування: true — виділяємо, false — знімаємо.
   bool? _dragSelects;
+  Offset? _dragOrigin;
   Offset? _lastDragPoint;
+  bool _dragActive = false;
+
+  // Мінімальний рух (логічні пікселі), після якого жест — перетягування, а не тап.
+  static const double _dragThreshold = 10;
 
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
@@ -44,7 +48,7 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
 
     if (oldWidget.task != widget.task) {
       _selectedParts.clear();
-      _onDragEnd();
+      _resetDrag();
     }
   }
 
@@ -96,19 +100,39 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
         final canTap = mode != FractionSelectionMode.drag && !_isAnswered;
         final canDrag = mode != FractionSelectionMode.tap && !_isAnswered;
 
-        return GestureDetector(
+        return RawGestureDetector(
           behavior: HitTestBehavior.opaque,
-          // Перетягування починається з точки дотику, а не після порогу руху.
-          dragStartBehavior: DragStartBehavior.down,
-          onTapUp: canTap ? (d) => _onTapUp(d.localPosition, geometry) : null,
-          onPanStart: canDrag
-              ? (d) => _onDragStart(d.localPosition, geometry)
-              : null,
-          onPanUpdate: canDrag
-              ? (d) => _onDragUpdate(d.localPosition, geometry)
-              : null,
-          onPanEnd: canDrag ? (_) => _onDragEnd() : null,
-          onPanCancel: canDrag ? _onDragEnd : null,
+          gestures: {
+            if (canTap)
+              TapGestureRecognizer:
+                  GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
+                    () => TapGestureRecognizer(),
+                    (recognizer) {
+                      recognizer.onTapUp = (d) =>
+                          _onTapUp(d.localPosition, geometry);
+                    },
+                  ),
+            if (canDrag)
+              _ImmediatePanRecognizer:
+                  GestureRecognizerFactoryWithHandlers<_ImmediatePanRecognizer>(
+                    () => _ImmediatePanRecognizer(),
+                    (recognizer) {
+                      recognizer.dragStartBehavior = DragStartBehavior.down;
+                      recognizer.onStart = (details) {
+                        _onDragStart(details.localPosition);
+                      };
+                      recognizer.onUpdate = (details) {
+                        _onDragUpdate(details.localPosition, geometry);
+                      };
+                      recognizer.onEnd = (details) {
+                        _onDragEnd(geometry);
+                      };
+                      recognizer.onCancel = () {
+                        _resetDrag();
+                      };
+                    },
+                  ),
+          },
           child: SizedBox(
             width: width,
             height: height,
@@ -280,29 +304,41 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
     });
   }
 
-  void _onDragStart(Offset point, _CakeGeometry geometry) {
-    final index = geometry.cellAt(point);
-
-    // Перша торкнута частина визначає режим усього жесту.
-    _dragSelects = !_selectedParts.contains(index);
+  void _onDragStart(Offset point) {
+    _dragOrigin = point;
     _lastDragPoint = point;
-
-    setState(() => _applyDrag(index));
+    _dragActive = false;
+    _dragSelects = null;
   }
 
   void _onDragUpdate(Offset point, _CakeGeometry geometry) {
+    final origin = _dragOrigin;
     final last = _lastDragPoint;
 
-    if (_dragSelects == null || last == null) return;
+    if (origin == null || last == null) return;
 
-    // Інтерполяція: крок не більший за пів клітинки, щоб швидкий рух
-    // не пропускав частини між двома подіями.
-    final distance = (point - last).distance;
-    final steps = max(1, (distance / (geometry.cellSize / 2)).ceil());
+    // Рух замалий — ще не перетягування.
+    if (!_dragActive && (point - origin).distance < _dragThreshold) return;
 
     setState(() {
+      var from = last;
+
+      if (!_dragActive) {
+        _dragActive = true;
+        from = origin;
+
+        // Перша торкнута частина визначає режим усього жесту.
+        final index = geometry.cellAt(origin);
+        _dragSelects = !_selectedParts.contains(index);
+        _applyDrag(index);
+      }
+
+      // Інтерполяція: крок не більший за пів клітинки.
+      final distance = (point - from).distance;
+      final steps = max(1, (distance / (geometry.cellSize / 2)).ceil());
+
       for (var i = 1; i <= steps; i++) {
-        final p = Offset.lerp(last, point, i / steps)!;
+        final p = Offset.lerp(from, point, i / steps)!;
         _applyDrag(geometry.cellAt(p));
       }
     });
@@ -310,9 +346,24 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
     _lastDragPoint = point;
   }
 
-  void _onDragEnd() {
+  void _onDragEnd(_CakeGeometry geometry) {
+    final origin = _dragOrigin;
+
+    // Рух не дійшов до порогу — це тап (лише коли тап дозволений).
+    if (!_dragActive &&
+        origin != null &&
+        widget.task.selectionMode == FractionSelectionMode.both) {
+      _onTapUp(origin, geometry);
+    }
+
+    _resetDrag();
+  }
+
+  void _resetDrag() {
     _dragSelects = null;
+    _dragOrigin = null;
     _lastDragPoint = null;
+    _dragActive = false;
   }
 
   void _applyDrag(int index) {
@@ -353,4 +404,14 @@ class _CakeGeometry {
 
     return row * columns + column;
   }
+}
+
+/// Pan, що виграє арену жестів після першого ж руху, тому батьківський
+/// скрол не перехоплює вертикальне перетягування по торту.
+class _ImmediatePanRecognizer extends PanGestureRecognizer {
+  @override
+  bool hasSufficientGlobalDistanceToAccept(
+    PointerDeviceKind pointerDeviceKind,
+    double? deviceTouchSlop,
+  ) => true;
 }
