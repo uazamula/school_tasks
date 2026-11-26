@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
 
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/fraction_task.dart';
@@ -30,6 +32,10 @@ class FractionTaskWidget extends StatefulWidget {
 class _FractionTaskWidgetState extends State<FractionTaskWidget> {
   final Set<int> _selectedParts = {};
 
+  // Режим поточного перетягування: true — виділяємо, false — знімаємо.
+  bool? _dragSelects;
+  Offset? _lastDragPoint;
+
   bool get _isAnswered => widget.result?.isAnswered ?? false;
 
   @override
@@ -38,6 +44,7 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
 
     if (oldWidget.task != widget.task) {
       _selectedParts.clear();
+      _onDragEnd();
     }
   }
 
@@ -78,22 +85,47 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
         final height =
             cellSize * dimensions.rows + spacing * (dimensions.rows - 1);
 
-        return SizedBox(
-          width: width,
-          height: height,
-          child: GridView.builder(
-            padding: EdgeInsets.zero,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: dimensions.columns,
-              crossAxisSpacing: spacing,
-              mainAxisSpacing: spacing,
-              childAspectRatio: 1,
+        final geometry = _CakeGeometry(
+          rows: dimensions.rows,
+          columns: dimensions.columns,
+          cellSize: cellSize,
+          spacing: spacing,
+        );
+
+        final mode = widget.task.selectionMode;
+        final canTap = mode != FractionSelectionMode.drag && !_isAnswered;
+        final canDrag = mode != FractionSelectionMode.tap && !_isAnswered;
+
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          // Перетягування починається з точки дотику, а не після порогу руху.
+          dragStartBehavior: DragStartBehavior.down,
+          onTapUp: canTap ? (d) => _onTapUp(d.localPosition, geometry) : null,
+          onPanStart: canDrag
+              ? (d) => _onDragStart(d.localPosition, geometry)
+              : null,
+          onPanUpdate: canDrag
+              ? (d) => _onDragUpdate(d.localPosition, geometry)
+              : null,
+          onPanEnd: canDrag ? (_) => _onDragEnd() : null,
+          onPanCancel: canDrag ? _onDragEnd : null,
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: GridView.builder(
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: dimensions.columns,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                childAspectRatio: 1,
+              ),
+              itemCount: widget.task.parts,
+              itemBuilder: (context, index) {
+                return _buildPart(index, dimensions.rows, dimensions.columns);
+              },
             ),
-            itemCount: widget.task.parts,
-            itemBuilder: (context, index) {
-              return _buildPart(index, dimensions.rows, dimensions.columns);
-            },
           ),
         );
       },
@@ -118,23 +150,10 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
           TaskAnswerState.neutral =>
             isSelected ? colors.primary : const Color(0xFFFFE0B2),
         },
-        child: InkWell(
-          onTap: _isAnswered
-              ? null
-              : () {
-                  setState(() {
-                    if (isSelected) {
-                      _selectedParts.remove(index);
-                    } else {
-                      _selectedParts.add(index);
-                    }
-                  });
-                },
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: colors.outline, width: 1),
-              borderRadius: borderRadius,
-            ),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: colors.outline, width: 1),
+            borderRadius: borderRadius,
           ),
         ),
       ),
@@ -250,6 +269,59 @@ class _FractionTaskWidgetState extends State<FractionTaskWidget> {
 
     return TaskAnswerState.neutral;
   }
+
+  void _onTapUp(Offset point, _CakeGeometry geometry) {
+    final index = geometry.cellAt(point);
+
+    setState(() {
+      if (!_selectedParts.remove(index)) {
+        _selectedParts.add(index);
+      }
+    });
+  }
+
+  void _onDragStart(Offset point, _CakeGeometry geometry) {
+    final index = geometry.cellAt(point);
+
+    // Перша торкнута частина визначає режим усього жесту.
+    _dragSelects = !_selectedParts.contains(index);
+    _lastDragPoint = point;
+
+    setState(() => _applyDrag(index));
+  }
+
+  void _onDragUpdate(Offset point, _CakeGeometry geometry) {
+    final last = _lastDragPoint;
+
+    if (_dragSelects == null || last == null) return;
+
+    // Інтерполяція: крок не більший за пів клітинки, щоб швидкий рух
+    // не пропускав частини між двома подіями.
+    final distance = (point - last).distance;
+    final steps = max(1, (distance / (geometry.cellSize / 2)).ceil());
+
+    setState(() {
+      for (var i = 1; i <= steps; i++) {
+        final p = Offset.lerp(last, point, i / steps)!;
+        _applyDrag(geometry.cellAt(p));
+      }
+    });
+
+    _lastDragPoint = point;
+  }
+
+  void _onDragEnd() {
+    _dragSelects = null;
+    _lastDragPoint = null;
+  }
+
+  void _applyDrag(int index) {
+    if (_dragSelects ?? true) {
+      _selectedParts.add(index);
+    } else {
+      _selectedParts.remove(index);
+    }
+  }
 }
 
 class _GridDimensions {
@@ -257,4 +329,28 @@ class _GridDimensions {
 
   final int rows;
   final int columns;
+}
+
+/// Геометрія торта для перетворення позиції пальця на індекс частини.
+class _CakeGeometry {
+  const _CakeGeometry({
+    required this.rows,
+    required this.columns,
+    required this.cellSize,
+    required this.spacing,
+  });
+
+  final int rows;
+  final int columns;
+  final double cellSize;
+  final double spacing;
+
+  int cellAt(Offset point) {
+    final pitch = cellSize + spacing;
+
+    final column = min(max((point.dx / pitch).floor(), 0), columns - 1);
+    final row = min(max((point.dy / pitch).floor(), 0), rows - 1);
+
+    return row * columns + column;
+  }
 }

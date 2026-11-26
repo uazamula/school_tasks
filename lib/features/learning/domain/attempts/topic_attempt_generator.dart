@@ -256,6 +256,7 @@ class TopicAttemptGenerator {
         numerator: data.numerator,
         denominator: data.denominator,
         parts: data.parts,
+        selectionMode: data.selectionMode,
       ),
     );
   }

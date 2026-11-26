@@ -10,6 +10,7 @@ abstract final class FractionData {
       numerator: 1,
       denominator: 2,
       parts: 4,
+      selectionMode: FractionSelectionMode.drag,
     ),
     FractionTaskData(
       prompt: TaskPrompt(content: [TextContent("З'їж половину піци.")]),

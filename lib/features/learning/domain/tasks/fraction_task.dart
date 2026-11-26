@@ -1,3 +1,4 @@
+import 'package:school_tasks/features/learning/domain/task_data/fraction_task_data.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/fraction_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
@@ -11,6 +12,7 @@ class FractionTask extends LearningTask<Set<int>, int> {
     required this.numerator,
     required this.denominator,
     required this.parts,
+    this.selectionMode = FractionSelectionMode.both,
   }) : super(
          interaction: const FractionInteraction(),
          solution: Solution<Set<int>, int>(
@@ -22,6 +24,7 @@ class FractionTask extends LearningTask<Set<int>, int> {
   final int numerator;
   final int denominator;
   final int parts;
+  final FractionSelectionMode selectionMode;
 
   int get requiredSelectedParts => parts * numerator ~/ denominator;
 
