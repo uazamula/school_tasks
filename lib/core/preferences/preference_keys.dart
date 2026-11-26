@@ -19,7 +19,7 @@ abstract final class PreferenceKeys {
   static const topicResultDisplay = 'topic_result_display';
 
   // Стан розгортання рівнів і розділів дерева навчального матеріалу.
-  static const expandedLearningNodeIds = 'expanded_learning_node_ids';
+  static const collapsedLearningNodeIds = 'collapsed_learning_node_ids';
 
   // Увімкнення службових звуків.
   static const serviceSoundsEnabled = 'service_sounds_enabled';

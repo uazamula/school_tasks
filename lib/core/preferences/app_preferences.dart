@@ -211,20 +211,17 @@ class AppPreferences {
     );
   }
 
-  Set<String> getExpandedLearningNodeIds() {
+  /// Ідентифікатори вузлів, які користувач згорнув.
+  Set<String> getCollapsedLearningNodeIds() {
     return _prefs
-            .getStringList(PreferenceKeys.expandedLearningNodeIds)
+            .getStringList(PreferenceKeys.collapsedLearningNodeIds)
             ?.toSet() ??
         {};
   }
 
-  bool hasExpandedLearningNodeIds() {
-    return _prefs.containsKey(PreferenceKeys.expandedLearningNodeIds);
-  }
-
-  Future<bool> setExpandedLearningNodeIds(Set<String> ids) {
+  Future<bool> setCollapsedLearningNodeIds(Set<String> ids) {
     return _prefs.setStringList(
-      PreferenceKeys.expandedLearningNodeIds,
+      PreferenceKeys.collapsedLearningNodeIds,
       ids.toList(),
     );
   }
