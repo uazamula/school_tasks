@@ -1,5 +1,6 @@
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/task_data/position_selection_task_data.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/content_grid.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/emoji_grid.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
 import 'package:school_tasks/features/learning/domain/tasks/content/task_prompt.dart';
@@ -7,17 +8,30 @@ import 'package:school_tasks/features/learning/domain/tasks/interactions/selecti
 
 final positionSelectionTasks = <PositionSelectionTaskData>[
   PositionSelectionTaskData(
+    prompt: TaskPrompt(content: [TextContent('Склади слово.')]),
+    grid: ContentGrid.letters(['КОТАМ', 'РАКЕТ', 'СОНЦЕ']),
+    correctPositions: [
+      GridPosition(row: 3, column: 1),
+      GridPosition(row: 3, column: 2),
+      GridPosition(row: 3, column: 3),
+      GridPosition(row: 3, column: 4),
+      GridPosition(row: 3, column: 5),
+    ],
+    requiresConfirmation: true,
+    selectionMode: SelectionMode.multiple,
+  ),
+  PositionSelectionTaskData(
     prompt: TaskPrompt(
       content: [
         TextContent('Вибери будь-яке яблуко у другому справа стовпчику.'),
       ],
     ),
-    grid: EmojiGrid([
+    grid: ContentGrid.emoji([
       '🍌🍎🍎🍌🍎',
       '🍎🍎🍎🍎🍎',
       '🍎🍎🍎🍎🍎',
       '🍌🍌🍌🍌🍌',
-    ]).content,
+    ]),
     correctPositions: [
       GridPosition(row: 2, column: 4),
       GridPosition(row: 3, column: 4),
@@ -30,12 +44,12 @@ final positionSelectionTasks = <PositionSelectionTaskData>[
     prompt: TaskPrompt(
       content: [TextContent('Вибери всі яблука у четвертому стовпчику.')],
     ),
-    grid: EmojiGrid([
+    grid: ContentGrid.emoji([
       '🍌🍎🍎🍌🍎',
       '🍎🍎🍎🍎🍎',
       '🍎🍎🍎🍎🍎',
       '🍌🍌🍌🍌🍌',
-    ]).content,
+    ]),
     correctPositions: [
       GridPosition(row: 2, column: 4),
       GridPosition(row: 3, column: 4),
@@ -47,12 +61,12 @@ final positionSelectionTasks = <PositionSelectionTaskData>[
     prompt: TaskPrompt(
       content: [TextContent('Вибери будь-який банан першому рядку.')],
     ),
-    grid: EmojiGrid([
+    grid: ContentGrid.emoji([
       '🍌🍎🍎🍌🍎',
       '🍎🍎🍎🍎🍎',
       '🍎🍎🍎🍎🍎',
       '🍌🍌🍌🍌🍌',
-    ]).content,
+    ]),
     correctPositions: [
       GridPosition(row: 1, column: 1),
       GridPosition(row: 1, column: 4),

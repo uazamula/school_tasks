@@ -1,6 +1,6 @@
 import 'package:school_tasks/features/learning/domain/grid_position.dart';
 import 'package:school_tasks/features/learning/domain/task_result.dart';
-import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/content_grid.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_interaction.dart';
 import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task.dart';
@@ -32,7 +32,7 @@ class PositionSelectionTask
          ),
        );
 
-  final List<List<TaskContent>> grid;
+  final ContentGrid grid;
   final List<GridPosition> _correctPositions;
 
   final SelectionMode mode;

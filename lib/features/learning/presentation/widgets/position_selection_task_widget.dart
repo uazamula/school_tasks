@@ -69,8 +69,8 @@ class _PositionSelectionTaskWidgetState
   }
 
   Widget _buildGrid() {
-    final rows = widget.task.grid.length;
-    final columns = widget.task.grid.first.length;
+    final rows = widget.task.grid.rows;
+    final columns = widget.task.grid.columns;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -118,7 +118,8 @@ class _PositionSelectionTaskWidgetState
 
               return _buildCell(
                 GridPosition(row: row + 1, column: column + 1),
-                widget.task.grid[row][column],
+                widget.task.grid.cells[row][column],
+                size,
               );
             },
           ),
@@ -127,7 +128,11 @@ class _PositionSelectionTaskWidgetState
     );
   }
 
-  Widget _buildCell(GridPosition position, TaskContent content) {
+  Widget _buildCell(
+    GridPosition position,
+    TaskContent content,
+    double cellSize,
+  ) {
     final isSelected = _selectedPositions.contains(position);
 
     final state = _getPositionState(position);
@@ -139,7 +144,12 @@ class _PositionSelectionTaskWidgetState
       TaskAnswerState.incorrect => colors.error,
       TaskAnswerState.neutral => isSelected ? colors.primary : colors.surface,
     };
-
+    final foregroundColor = switch (state) {
+      TaskAnswerState.correct => Colors.white,
+      TaskAnswerState.incorrect => colors.onError,
+      TaskAnswerState.neutral =>
+        isSelected ? colors.onPrimary : colors.onSurface,
+    };
     return Material(
       color: backgroundColor,
       child: InkWell(
@@ -150,19 +160,36 @@ class _PositionSelectionTaskWidgetState
           decoration: BoxDecoration(
             border: Border.all(color: colors.outline, width: 1),
           ),
-          child: Center(child: _buildContent(content)),
+          child: Center(
+            child: _buildContent(content, cellSize, foregroundColor),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildContent(TaskContent content) {
+  Widget _buildContent(TaskContent content, double cellSize, Color color) {
     if (content is EmojiContent) {
-      return Text(content.emoji, style: const TextStyle(fontSize: 40));
+      // Розмір залежить від клітинки, а не фіксовані 40.
+      return Text(content.emoji, style: TextStyle(fontSize: cellSize * 0.55));
     }
 
     if (content is TextContent) {
-      return Text(content.text, textAlign: TextAlign.center);
+      return Padding(
+        padding: EdgeInsets.all(cellSize * 0.08),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            content.text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: cellSize * 0.55,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ),
+      );
     }
 
     if (content is ImageContent) {
