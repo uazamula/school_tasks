@@ -1,4 +1,8 @@
 import 'package:school_tasks/features/learning/data/fixed_task_data/fixed_data_position_selection.dart';
+import 'package:school_tasks/features/learning/data/generation/generated_task_data_source.dart';
+import 'package:school_tasks/features/learning/data/generation/grid_find_task_data_generator.dart';
+import 'package:school_tasks/features/learning/data/generation/hidden_word_task_data_generator.dart';
+import 'package:school_tasks/features/learning/data/word_content/word_bank.dart';
 import 'package:school_tasks/features/learning/domain/automatic_termination_config.dart';
 import 'package:school_tasks/features/learning/domain/composite_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/dashboard_config.dart';
@@ -9,12 +13,17 @@ import 'package:school_tasks/features/learning/domain/evaluation/time_evaluation
 import 'package:school_tasks/features/learning/domain/fixed_task_data_source.dart';
 import 'package:school_tasks/features/learning/domain/interaction_layout.dart';
 import 'package:school_tasks/features/learning/domain/prompt_layout.dart';
+import 'package:school_tasks/features/learning/domain/tasks/content/task_content.dart';
+import 'package:school_tasks/features/learning/domain/tasks/interactions/selection_mode.dart';
 import 'package:school_tasks/features/learning/domain/tasks/learning_task_type.dart';
 import 'package:school_tasks/features/learning/domain/tasks/task_order_mode.dart';
 import 'package:school_tasks/features/learning/domain/topic.dart';
 import 'package:school_tasks/features/learning/domain/topic_area_order.dart';
 import 'package:school_tasks/features/learning/domain/topic_layout.dart';
 import 'package:school_tasks/features/learning/domain/topic_progression_mode.dart';
+import 'package:school_tasks/features/learning/domain/word_content/int_range.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_direction.dart';
+import 'package:school_tasks/features/learning/domain/word_content/word_filter.dart';
 
 abstract final class Tests {
   static final Topic topic = Topic(
@@ -22,6 +31,37 @@ abstract final class Tests {
     taskTypeCounts: {LearningTaskType.slotAssembly: 1},
     taskOrderMode: TaskOrderMode.deterministic,
     dataSource: CompositeTaskDataSource([
+      GeneratedTaskDataSource([
+        HiddenWordTaskDataGenerator(
+          bank: ukWordBank,
+          taskCount: 2,
+          rows: 5,
+          columns: 5,
+          directions: {WordDirection.right},
+          filter: WordFilter(wordLength: IntRange(min: 2, max: 4)),
+          hintElement: HiddenWordHintElement.image,
+          hintAudio: HiddenWordHintAudio.word,
+          printDiagnostics: false,
+        ),
+        GridFindTaskDataGenerator(
+          taskCount: 1,
+          rows: 4,
+          columns: 5,
+          target: const EmojiContent('🍎'),
+          distractors: GridFindTaskDataGenerator.emojis(['🍌', '🍊', '🍐']),
+          minTargets: 3,
+          maxTargets: 6,
+        ),
+        GridFindTaskDataGenerator(
+          taskCount: 1,
+          rows: 3,
+          columns: 4,
+          target: const TextContent('М'),
+          distractors: GridFindTaskDataGenerator.letters(['Н', 'П', 'Л']),
+          selectionMode: SelectionMode.single,
+        ),
+      ]),
+
       FixedTaskDataSource([...positionSelectionTasks]),
     ]),
     help: 'Тестування різних типів завдань',
@@ -37,8 +77,8 @@ abstract final class Tests {
       ),
     ),
     passingCriteria: PassingCriteria(
-      minimumAccuracy: 0.6,
-      maximumTime: Duration(seconds: 15),
+      minimumAccuracy: 0.4,
+      // maximumTime: Duration(seconds: 15),
       maximumFailures: 1,
     ),
     layout: TopicLayout(
@@ -52,7 +92,7 @@ abstract final class Tests {
     feedbackDuration: Duration(milliseconds: 1000),
     automaticTermination: AutomaticTerminationConfig(
       failureLimit: 4,
-      countdown: Duration(seconds: 10, milliseconds: 0),
+      countdown: Duration(seconds: 20, milliseconds: 0),
       pauseOnExitDialog: true,
     ),
     dashboard: DashboardConfig(

@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:school_tasks/features/learning/domain/word_content/alphabets.dart';
+
 import 'content_tag.dart';
 import 'double_range.dart';
 import 'image_meta.dart';
@@ -175,7 +177,12 @@ class WordFilter {
     this.tagsNoneOf = const {},
     this.includeIds = const {},
     this.excludeIds = const {},
+    this.onlyAlphabetLetters = false,
   });
+
+  /// Слово складається лише з літер абетки своєї мови
+  /// (апострофи, дефіси й пробіли ігноруються).
+  final bool onlyAlphabetLetters;
 
   /// Маска всього слова (`к*`, `??р*`).
   final String? wordPattern;
@@ -254,6 +261,7 @@ class WordFilter {
     Set<ContentTag>? tagsNoneOf,
     Set<String>? includeIds,
     Set<String>? excludeIds,
+    bool? onlyAlphabetLetters,
   }) {
     return WordFilter(
       wordPattern: wordPattern ?? this.wordPattern,
@@ -274,6 +282,7 @@ class WordFilter {
       tagsNoneOf: tagsNoneOf ?? this.tagsNoneOf,
       includeIds: includeIds ?? this.includeIds,
       excludeIds: excludeIds ?? this.excludeIds,
+      onlyAlphabetLetters: onlyAlphabetLetters ?? this.onlyAlphabetLetters,
     );
   }
 
@@ -501,6 +510,17 @@ class WordFilter {
         WordFilterRule(
           'довжина слова',
           (m) => lengthRange.contains(countLetters(m.entry.word)) ? m : null,
+        ),
+      );
+    }
+
+    if (onlyAlphabetLetters) {
+      rules.add(
+        WordFilterRule(
+          'літери абетки',
+          (m) => Alphabets.lettersOf(m.entry.word, m.entry.language) != null
+              ? m
+              : null,
         ),
       );
     }
